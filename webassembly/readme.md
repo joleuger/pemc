@@ -8,12 +8,15 @@ xcode-select --install
 brew install ninja
 brew install emscripten
 pip3 install meson
+brew install cmake # needed by emcc
 
 # run llvm once
 update LLVM_ROOT in ~/.emscripten to /usr/local/Cellar//emscripten/1.38.6/libexec/llvm/bin
 
 
 meson .. . --cross-file emscripten-osx.txt
+ninja
+emcc libpemc.a -o pemc.js
 
 ```
 
