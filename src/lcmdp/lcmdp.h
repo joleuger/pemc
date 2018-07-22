@@ -24,5 +24,28 @@
 #ifndef PEMC_LCMDP_LCMDP_H_
 #define PEMC_LCMDP_LCMDP_H_
 
+#include <vector>
+
+#include "basic/tsIndex.h"
+#include "basic/probability.h"
+#include "basic/label.h"
+
+namespace pemc {
+
+  struct LcmdpStateEntry { TransitionIndex from; int elements; };
+
+  struct LcmdpTransitionEntry { Probability probability; Label label; StateIndex state; };
+
+  class Lcmdp {
+  public:
+      int initialTransitionFrom = 0;
+      int initialTransitionCount = 0;
+      std::vector<LcmdpStateEntry> states;
+      std::vector<LcmdpTransitionEntry> transitions;
+
+      Lcmdp();
+  };
+
+}
 
 #endif  // PEMC_LCMDP_LCMDP_H_
