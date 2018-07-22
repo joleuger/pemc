@@ -24,10 +24,21 @@
 #ifndef PEMC_BASIC_CONFIGURATION_H_
 #define PEMC_BASIC_CONFIGURATION_H_
 
+#include <functional>
+#include <iostream>
+
 namespace pemc {
 
   struct Configuration {
+    std::function<std::ostream*()> coutFunc = []() { return &std::cout; };
+
     bool PrintGraphViz = false;
+
+    void print(const std::string& output) {
+      auto cout = coutFunc();
+      if (cout!=nullptr)
+        (*cout) << output;
+    }
   };
 
 }
