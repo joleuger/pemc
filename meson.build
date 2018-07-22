@@ -1,5 +1,5 @@
-project('pemc', 'cpp')
-
+project('pemc', 'cpp',
+  default_options : ['cpp_std=c++14'])
 
 libpemc_include = include_directories('src')
 libpemc =  static_library('pemc',
