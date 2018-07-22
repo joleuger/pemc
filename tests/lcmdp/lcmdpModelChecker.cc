@@ -1,6 +1,6 @@
 #include<gtest/gtest.h>
 
-#include "lcmdp/lcmdpModelChecker.h"
+#include "pemc/lcmdp/lcmdpModelChecker.h"
 
 using namespace pemc;
 

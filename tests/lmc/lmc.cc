@@ -1,6 +1,6 @@
 #include<gtest/gtest.h>
 
-#include "lmc/lmc.h"
+#include "pemc/lmc/lmc.h"
 
 using namespace pemc;
 

@@ -1,6 +1,6 @@
 #include<gtest/gtest.h>
 
-#include "lcmdp/lcmdp.h"
+#include "pemc/lcmdp/lcmdp.h"
 
 using namespace pemc;
 

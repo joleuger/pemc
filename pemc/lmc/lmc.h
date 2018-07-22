@@ -21,20 +21,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMC_LMCMODELCHECKER_H_
-#define PEMC_LMC_LMCMODELCHECKER_H_
+#ifndef PEMC_LMC_LMC_H_
+#define PEMC_LMC_LMC_H_
 
-#include "lmc/lmc.h"
+#include <vector>
+
+#include "pemc/basic/tsIndex.h"
+#include "pemc/basic/probability.h"
+#include "pemc/basic/label.h"
 
 namespace pemc {
 
-  class LmcModelChecker {
+  struct LmcStateEntry { TransitionIndex from; int elements; };
+
+  struct LmcTransitionEntry { Probability probability; Label label; StateIndex state; };
+
+  class Lmc {
   public:
       int initialTransitionFrom = 0;
+      int initialTransitionCount = 0;
+      std::vector<LmcStateEntry> states;
+      std::vector<LmcTransitionEntry> transitions;
 
-      LmcModelChecker();
+      Lmc();
   };
 
 }
 
-#endif  // PEMC_LMC_LMCMODELCHECKER_H_
+#endif  // PEMC_LMC_LMC_H_

@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "lcmdp/lcmdp.h"
+#include "pemc/lcmdp/lcmdpToGv.h"
 
 namespace pemc {
 
-  Lcmdp::Lcmdp(){
+  LcmdpToGv::LcmdpToGv(){
   };
 
 }

@@ -21,11 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "lcmdp/lcmdpModelChecker.h"
+#include "pemc/lmc/lmcModelChecker.h"
 
 namespace pemc {
 
-  LcmdpModelChecker::LcmdpModelChecker(){
+  LmcModelChecker::LmcModelChecker(){
   };
 
 }

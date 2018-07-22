@@ -21,11 +21,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "lmc/lmc.h"
+#ifndef PEMC_LMC_LMCTOGV_H_
+#define PEMC_LMC_LMCTOGV_H_
 
 namespace pemc {
 
-  Lmc::Lmc(){
+  class LmcToGv {
+  public:
+      LmcToGv();
   };
 
 }
+
+#endif  // PEMC_LMC_LMCTOGV_H_

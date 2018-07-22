@@ -21,20 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LCMDP_LMCMODELCHECKER_H_
-#define PEMC_LCMDP_LMCMODELCHECKER_H_
-
-#include "lcmdp/lcmdp.h"
+#include "pemc/lmc/lmc.h"
 
 namespace pemc {
 
-  class LcmdpModelChecker {
-  public:
-      int initialTransitionFrom = 0;
-
-      LcmdpModelChecker();
+  Lmc::Lmc(){
   };
 
 }
-
-#endif  // PEMC_LCMDP_LMCMODELCHECKER_H_

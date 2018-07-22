@@ -1,13 +1,17 @@
 project('pemc', 'cpp',
   default_options : ['cpp_std=c++14'])
 
-libpemc_include = include_directories('src')
+# libpemc_include = include_directories('src')
+libpemc_include = include_directories('.')
+
 libpemc =  static_library('pemc',
-  'src/lcmdp/lcmdp.cc',
-  'src/lmc/lmc.cc',
-  'src/lmc/lmcModelChecker.cc',
-  'src/lcmdp/lcmdp.cc',
-  'src/lcmdp/lcmdpModelChecker.cc',
+  'pemc/lcmdp/lcmdp.cc',
+  'pemc/lmc/lmc.cc',
+  'pemc/lmc/lmcModelChecker.cc',
+  'pemc/lmc/lmcToGv.cc',
+  'pemc/lcmdp/lcmdp.cc',
+  'pemc/lcmdp/lcmdpModelChecker.cc',
+  'pemc/lcmdp/lcmdpToGv.cc',
   include_directories : libpemc_include)
 libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpemc_include)
 

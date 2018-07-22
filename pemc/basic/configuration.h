@@ -21,11 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "lmc/lmcModelChecker.h"
+#ifndef PEMC_BASIC_CONFIGURATION_H_
+#define PEMC_BASIC_CONFIGURATION_H_
 
 namespace pemc {
 
-  LmcModelChecker::LmcModelChecker(){
+  struct Configuration {
+    bool PrintGraphViz = false;
   };
 
 }
+#endif  // PEMC_BASIC_CONFIGURATION_H_
