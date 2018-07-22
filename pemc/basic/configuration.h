@@ -30,12 +30,17 @@
 namespace pemc {
 
   struct Configuration {
-    std::function<std::ostream*()> coutFunc = []() { return &std::cout; };
+
+    // Output stream to write output to.
+    // Note: Memory of cout is not managed. If memory management is required,
+    // then let coutManaged handle the memory management of the class and
+    // forward cout to coutManaged.get().
+    std::ostream* cout = &std::cout;
+    std::shared_ptr<std::ostream> coutManaged = nullptr;
 
     bool PrintGraphViz = false;
 
     void print(const std::string& output) {
-      auto cout = coutFunc();
       if (cout!=nullptr)
         (*cout) << output;
     }
