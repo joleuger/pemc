@@ -24,13 +24,12 @@
 #ifndef PEMC_LMC_LMCTOGV_H_
 #define PEMC_LMC_LMCTOGV_H_
 
+#include <iostream>
+
+#include "pemc/lmc/lmc.h"
+
 namespace pemc {
-
-  class LmcToGv {
-  public:
-      LmcToGv();
-  };
-
+  void ExportLmcToGv(const Lmc& lmc, const std::ostream& out);
 }
 
 #endif  // PEMC_LMC_LMCTOGV_H_

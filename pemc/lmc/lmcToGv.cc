@@ -23,9 +23,59 @@
 
 #include "pemc/lmc/lmcToGv.h"
 
+
+namespace {
+
+  using namespace pemc;
+
+  void ExportDistribution(const Lmc& lmc, const std::ostream& out,
+    const std::string& sourceStateName,
+    LabeledTransitionMarkovChain.LabeledTransitionEnumerator distribution)
+  {
+  	while (distribution.MoveNext())
+  	{
+  		out << $"{sourceStateName} -> {distribution.CurrentTargetState} [label=\"{Probability.PrettyPrint(distribution.CurrentProbability)}" << std::endl;
+
+  		for (int i = 0; i < markovChain.StateFormulaLabels.Length; i++)
+  		{
+  			if (i==0)
+  				out << "\\n";
+  			else
+  				out << ",";
+  			if (distribution.CurrentFormulas[i])
+  				out << "t";
+  			else
+  				out << "f";
+  		}
+  		out << "\"];" << std::endl;
+  	}
+  }
+}
+
 namespace pemc {
 
-  LmcToGv::LmcToGv(){
-  };
+  public void ExportToGv(const Lmc& lmc, const std::ostream& out)
+  {
+  	out << "digraph S {" << std::endl;
+  	//out << "size = \"8,5\"");
+  	out << "node [shape=box];" << std::endl;
+
+  	var initialStateName = "initialState";
+  	out << " {initialStateName} [shape=point,width=0.0,height=0.0,label=\"\"];" << std::endl;
+  	var initialDistribution = markovChain.GetInitialDistributionEnumerator();
+  	ExportDistribution(markovChain, sb, initialStateName, initialDistribution);
+
+  	foreach (var state in markovChain.SourceStates)
+  	{
+
+  		out << " {state} [label=\"{state}";
+  		out << "\"];" << std::endl;
+
+  		var distribution = markovChain.GetTransitionEnumerator(state);
+  		ExportDistribution(markovChain, sb, state.ToString(), distribution);
+
+  	}
+  	out << "}");
+  }
 
 }

@@ -12,5 +12,5 @@ using namespace pemc;
 
 TEST(configuration_test, output_works) {
     Configuration config;
-    config.print("configuration prints");
+    *config.cout << ("configuration prints");
 }

@@ -28,4 +28,15 @@ namespace pemc {
   Lmc::Lmc(){
   };
 
+  TransitionIterator Lmc::beginOfState(StateIndex state) {
+    return TransitionIterator(this, states[state].from);
+  }
+
+  TransitionIterator Lmc::endOfState(StateIndex state) {
+    return TransitionIterator(this, states[state].from + states[state].elements - 1);
+  }
+
+    iterator TransitionIterator beginOfState(StateIndex state);
+    TransitionIterator endOfState(StateIndex state);() {return iterator(FROM);}
+    iterator end() {return iterator(TO >= FROM? TO+1 : TO-1);}
 }

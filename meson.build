@@ -2,7 +2,7 @@ project('pemc', 'cpp',
   default_options : ['cpp_std=c++14'])
 
 # libpemc_include = include_directories('src')
-libpemc_include = include_directories('.')
+libpemc_include = include_directories('.', 'external/GSL/include')
 
 libpemc =  static_library('pemc',
   'pemc/lcmdp/lcmdp.cc',
@@ -18,10 +18,10 @@ libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpem
 
 
 # TEST
-gtest_include = include_directories('googletest/googletest/include')
+gtest_include = include_directories('external/googletest/googletest/include')
 
-gtest_build_include= include_directories('googletest/googletest','googletest/googletest/include')
-gtest_dep = declare_dependency(sources : ['googletest/googletest/src/gtest-all.cc','googletest/googletest/src/gtest_main.cc'], include_directories : gtest_build_include)
+gtest_build_include= include_directories('external/googletest/googletest','external/googletest/googletest/include')
+gtest_dep = declare_dependency(sources : ['external/googletest/googletest/src/gtest-all.cc','external/googletest/googletest/src/gtest_main.cc'], include_directories : gtest_build_include)
 
 tests = [
   'tests/test.cc',

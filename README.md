@@ -6,6 +6,7 @@ C++ implementation of algorithms introduced in
 
 ```
 git clone https://github.com/google/googletest.git
+git clone https://github.com/Microsoft/GSL.git
 
 mkdir build 
 cd build

@@ -25,6 +25,7 @@
 #define PEMC_LMC_LMC_H_
 
 #include <vector>
+#include <gsl/span>
 
 #include "pemc/basic/tsIndex.h"
 #include "pemc/basic/probability.h"
@@ -44,6 +45,27 @@ namespace pemc {
       std::vector<LmcTransitionEntry> transitions;
 
       Lmc();
+
+      class TransitionIterator : public std::iterator<
+          std::forward_iterator_tag,   // iterator_category
+          LmcTransitionEntry,          // value_type
+          const LmcTransitionEntry*,   // pointer
+          LmcTransitionEntry> {        // reference
+      private:
+        TransitionIndex currentIndex;
+        const Lmc& lmc;
+      public:
+        explicit TransitionIterator(const Lmc& _lmc, TransitionIndex _currentIndex)
+          : lmc(_lmc),currentIndex(_currentIndex)  {}
+        TransitionIterator& operator++() {currentIndex++; return *this;}
+        TransitionIterator operator++(int) {TransitionIterator retval = *this; ++(*this); return retval;}
+        bool operator==(TransitionIterator other) const {return currentIndex == other.currentIndex;}
+        bool operator!=(TransitionIterator other) const {return !(*this == currentIndex);}
+        reference operator*() const {return lmc.transitions[currentIndex];}
+      };
+
+      TransitionIterator beginOfState(StateIndex state);
+      TransitionIterator endOfState(StateIndex state);
   };
 
 }

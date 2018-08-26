@@ -39,11 +39,6 @@ namespace pemc {
     std::shared_ptr<std::ostream> coutManaged = nullptr;
 
     bool PrintGraphViz = false;
-
-    void print(const std::string& output) {
-      if (cout!=nullptr)
-        (*cout) << output;
-    }
   };
 
 }
