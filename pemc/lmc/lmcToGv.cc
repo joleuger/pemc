@@ -21,6 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <gsl/gsl_util>
+#include <string>
+
+#include "pemc/basic/probability.h"
 #include "pemc/lmc/lmcToGv.h"
 
 
@@ -28,21 +32,27 @@ namespace {
 
   using namespace pemc;
 
-  void ExportDistribution(const Lmc& lmc, const std::ostream& out,
-    const std::string& sourceStateName,
-    LabeledTransitionMarkovChain.LabeledTransitionEnumerator distribution)
+  void exportDistribution(Lmc& lmc, std::ostream& out,
+    const std::string& sourceStateName, gsl::span<LmcTransitionEntry> transitions)
   {
-  	while (distribution.MoveNext())
-  	{
-  		out << $"{sourceStateName} -> {distribution.CurrentTargetState} [label=\"{Probability.PrettyPrint(distribution.CurrentProbability)}" << std::endl;
+    auto labels = lmc.getLabels();
 
-  		for (int i = 0; i < markovChain.StateFormulaLabels.Length; i++)
+  	for (auto& transition : transitions)
+  	{
+  		out << sourceStateName
+          << " -> "
+          << transition.state
+          << "[label=\""
+          << prettyPrint(transition.probability)
+          << std::endl;
+
+  		for (gsl::index i = 0; i < labels.size(); ++i)
   		{
   			if (i==0)
   				out << "\\n";
   			else
   				out << ",";
-  			if (distribution.CurrentFormulas[i])
+  			if (transition.label[i])
   				out << "t";
   			else
   				out << "f";
@@ -54,28 +64,37 @@ namespace {
 
 namespace pemc {
 
-  public void ExportToGv(const Lmc& lmc, const std::ostream& out)
+  void exportLmcToGv(Lmc& lmc, std::ostream& out)
   {
   	out << "digraph S {" << std::endl;
   	//out << "size = \"8,5\"");
   	out << "node [shape=box];" << std::endl;
 
-  	var initialStateName = "initialState";
-  	out << " {initialStateName} [shape=point,width=0.0,height=0.0,label=\"\"];" << std::endl;
-  	var initialDistribution = markovChain.GetInitialDistributionEnumerator();
-  	ExportDistribution(markovChain, sb, initialStateName, initialDistribution);
+  	auto initialStateName = "initialState";
+  	out << " "
+        << initialStateName
+        << " [shape=point,width=0.0,height=0.0,label=\"\"];"
+        << std::endl;
+  	auto initialDistribution = lmc.getInitialTransitions();
+  	exportDistribution(lmc, out, initialStateName, initialDistribution);
 
-  	foreach (var state in markovChain.SourceStates)
-  	{
+    auto states = lmc.getStates();
 
-  		out << " {state} [label=\"{state}";
-  		out << "\"];" << std::endl;
+    for (gsl::index state = 0; state < states.size(); ++state)
+    {
+      auto stateString = std::to_string(state);
+  		out << " "
+          << stateString
+          << "[label=\""
+          << stateString
+          << "\"];"
+          << std::endl;
 
-  		var distribution = markovChain.GetTransitionEnumerator(state);
-  		ExportDistribution(markovChain, sb, state.ToString(), distribution);
+  		auto distribution = lmc.getTransitionsOfState(state);
+  		exportDistribution(lmc, out, stateString, distribution);
 
   	}
-  	out << "}");
+  	out << "}" << std::endl;
   }
 
 }

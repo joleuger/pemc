@@ -24,6 +24,7 @@
 #ifndef PEMC_LMC_LMC_H_
 #define PEMC_LMC_LMC_H_
 
+#include <string>
 #include <vector>
 #include <gsl/span>
 
@@ -38,34 +39,29 @@ namespace pemc {
   struct LmcTransitionEntry { Probability probability; Label label; StateIndex state; };
 
   class Lmc {
-  public:
-      int initialTransitionFrom = 0;
-      int initialTransitionCount = 0;
-      std::vector<LmcStateEntry> states;
+  private:
+      TransitionIndex transitionCount = 0;
       std::vector<LmcTransitionEntry> transitions;
 
+      int initialTransitionFrom = 0;
+      int initialTransitionElements = 0;
+      StateIndex stateCount = 0;
+      std::vector<LmcStateEntry> states;
+
+      std::vector<std::string> labels;
+
+      void reserveSpace();
+      void shrinkToFit();
+  public:
       Lmc();
 
-      class TransitionIterator : public std::iterator<
-          std::forward_iterator_tag,   // iterator_category
-          LmcTransitionEntry,          // value_type
-          const LmcTransitionEntry*,   // pointer
-          LmcTransitionEntry> {        // reference
-      private:
-        TransitionIndex currentIndex;
-        const Lmc& lmc;
-      public:
-        explicit TransitionIterator(const Lmc& _lmc, TransitionIndex _currentIndex)
-          : lmc(_lmc),currentIndex(_currentIndex)  {}
-        TransitionIterator& operator++() {currentIndex++; return *this;}
-        TransitionIterator operator++(int) {TransitionIterator retval = *this; ++(*this); return retval;}
-        bool operator==(TransitionIterator other) const {return currentIndex == other.currentIndex;}
-        bool operator!=(TransitionIterator other) const {return !(*this == currentIndex);}
-        reference operator*() const {return lmc.transitions[currentIndex];}
-      };
+      gsl::span<LmcStateEntry> getStates();
 
-      TransitionIterator beginOfState(StateIndex state);
-      TransitionIterator endOfState(StateIndex state);
+      gsl::span<std::string> getLabels();
+
+      gsl::span<LmcTransitionEntry> getTransitions();
+      gsl::span<LmcTransitionEntry> getInitialTransitions();
+      gsl::span<LmcTransitionEntry> getTransitionsOfState(StateIndex state);
   };
 
 }

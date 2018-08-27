@@ -28,15 +28,40 @@ namespace pemc {
   Lmc::Lmc(){
   };
 
-  TransitionIterator Lmc::beginOfState(StateIndex state) {
-    return TransitionIterator(this, states[state].from);
+  gsl::span<LmcStateEntry> Lmc::getStates() {
+     return gsl::span<LmcStateEntry>(states.data(),stateCount);
   }
 
-  TransitionIterator Lmc::endOfState(StateIndex state) {
-    return TransitionIterator(this, states[state].from + states[state].elements - 1);
+  gsl::span<LmcTransitionEntry> Lmc::getTransitions() {
+     return gsl::span<LmcTransitionEntry>(transitions.data(),transitionCount);
   }
 
-    iterator TransitionIterator beginOfState(StateIndex state);
-    TransitionIterator endOfState(StateIndex state);() {return iterator(FROM);}
-    iterator end() {return iterator(TO >= FROM? TO+1 : TO-1);}
+  gsl::span<LmcTransitionEntry> Lmc::getInitialTransitions() {
+    auto tspan = getTransitions();
+    return tspan.subspan(initialTransitionFrom,initialTransitionElements);
+  }
+
+  gsl::span<LmcTransitionEntry> Lmc::getTransitionsOfState(StateIndex state){
+    auto tspan = getTransitions();
+    auto from = states[state].from;
+    auto elements = states[state].elements;
+    return tspan.subspan(from,elements);
+  }
+
+  gsl::span<std::string> Lmc::getLabels() {
+    return gsl::span<std::string>(labels);
+  }
+
+  void Lmc::reserveSpace() {
+    return;
+    // https://stackoverflow.com/questions/35551254/filling-a-vector-with-multiple-threads
+    // https://stackoverflow.com/questions/21028299/is-this-behavior-of-vectorresizesize-type-n-under-c11-and-boost-container/21028912#21028912
+    //states.resize();
+    //transitions.resize();
+    // TODO: to omit initialization, either use malloc and free, or use custom allocator (see stackoverflow)
+  }
+
+  void Lmc::shrinkToFit() {
+    return;
+  }
 }

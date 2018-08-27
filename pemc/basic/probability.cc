@@ -21,15 +21,45 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMC_LMCTOGV_H_
-#define PEMC_LMC_LMCTOGV_H_
+#include <string>
+#include <stdio.h>
 
-#include <iostream>
-
-#include "pemc/lmc/lmc.h"
+#include "pemc/basic/probability.h"
 
 namespace pemc {
-  void exportLmcToGv(Lmc& lmc, std::ostream& out);
-}
 
-#endif  // PEMC_LMC_LMCTOGV_H_
+  std::string prettyPrint(Probability& probability) {
+    // http://www.cplusplus.com/reference/cstdio/printf/
+
+    char buffer [50];
+
+    if (probability.value * 10.0 >= 1.0)
+		{
+      auto success = snprintf (buffer, sizeof(buffer), "%0.2f", probability.value);
+      if (success>0)
+        return std::string(buffer);
+      else
+        return std::string("probability.cc: failed");
+		}
+		auto newValue = probability.value;
+		for (auto i = 0; i < 10; i++)
+		{
+			if (newValue >= 1.0)
+			{
+        auto success = snprintf (buffer, sizeof(buffer), "%0.2f", newValue);
+        if (success>0)
+          return std::string(buffer)+"×"+" 10E"+std::to_string(i);
+  				// \uc397 == ×
+        else
+          return std::string("probability.cc: failed");
+			}
+			newValue = newValue * 10.0;
+		}
+
+    auto success = snprintf (buffer, sizeof(buffer), "%E", probability.value);
+    if (success>0)
+      return std::string(buffer);
+    else
+      return std::string("probability.cc: failed");
+  }
+}

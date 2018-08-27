@@ -24,12 +24,15 @@
 #ifndef PEMC_BASIC_PROBABILITY_H_
 #define PEMC_BASIC_PROBABILITY_H_
 
+#include <string>
+
 namespace pemc {
 
   struct Probability {
     double value;
   };
 
+  std::string prettyPrint(Probability& probability);
 }
 
 #endif  // PEMC_BASIC_PROBABILITY_H_

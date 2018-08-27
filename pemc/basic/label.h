@@ -25,9 +25,14 @@
 #define PEMC_BASIC_LABEL_H_
 
 namespace pemc {
-  
+
   struct Label {
     int value;
+
+    bool operator[](int index)
+		{
+			return (value & (1 << index)) != 0;
+		}
   };
 
 }

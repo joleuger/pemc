@@ -5,6 +5,7 @@ project('pemc', 'cpp',
 libpemc_include = include_directories('.', 'external/GSL/include')
 
 libpemc =  static_library('pemc',
+  'pemc/basic/probability.cc',
   'pemc/lcmdp/lcmdp.cc',
   'pemc/lmc/lmc.cc',
   'pemc/lmc/lmcModelChecker.cc',
