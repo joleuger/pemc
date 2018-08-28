@@ -52,7 +52,8 @@ namespace pemc {
     return gsl::span<std::string>(labels);
   }
 
-  void Lmc::reserveSpace() {
+
+  void Lmc::reserveSpace(ModelCapacity& modelCapacity) {
     return;
     // https://stackoverflow.com/questions/35551254/filling-a-vector-with-multiple-threads
     // https://stackoverflow.com/questions/21028299/is-this-behavior-of-vectorresizesize-type-n-under-c11-and-boost-container/21028912#21028912

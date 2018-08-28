@@ -28,14 +28,16 @@
 #include <vector>
 #include <gsl/span>
 
-#include "pemc/basic/tsIndex.h"
+#include "pemc/basic/tscIndex.h"
 #include "pemc/basic/probability.h"
 #include "pemc/basic/label.h"
+#include "pemc/basic/modelCapacity.h"
 
 namespace pemc {
 
   struct LmcStateEntry { TransitionIndex from; int elements; };
 
+  // Transition = Target + Probability
   struct LmcTransitionEntry { Probability probability; Label label; StateIndex state; };
 
   class Lmc {
@@ -49,9 +51,6 @@ namespace pemc {
       std::vector<LmcStateEntry> states;
 
       std::vector<std::string> labels;
-
-      void reserveSpace();
-      void shrinkToFit();
   public:
       Lmc();
 
@@ -62,6 +61,9 @@ namespace pemc {
       gsl::span<LmcTransitionEntry> getTransitions();
       gsl::span<LmcTransitionEntry> getInitialTransitions();
       gsl::span<LmcTransitionEntry> getTransitionsOfState(StateIndex state);
+
+      void reserveSpace(ModelCapacity& modelCapacity);
+      void shrinkToFit();
   };
 
 }

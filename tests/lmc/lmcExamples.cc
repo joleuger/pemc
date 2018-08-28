@@ -24,6 +24,7 @@
 #include<gtest/gtest.h>
 
 #include "pemc/lmc/lmc.h"
+#include "tests/lmc/lmcExamples.h"
 
 using namespace pemc;
 

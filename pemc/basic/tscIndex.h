@@ -27,6 +27,8 @@ namespace pemc {
 
   #define StateIndex int
   #define TransitionIndex int
+  #define TargetIndex int
+  #define ChoiceIndex int
 
 }
 

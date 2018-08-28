@@ -21,16 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include<gtest/gtest.h>
+#include "pemc/lmc/lmcBuilder.h"
 
-#include "pemc/lmc/lmc.h"
+namespace pemc {
 
-using namespace pemc;
-
-
-TEST(lmc_test, lmc_is_constructed) {
-    Lmc lmc;
-
-    ASSERT_EQ(lmc.getStates().size(), 0) << "FAIL";
-    ASSERT_EQ(lmc.getTransitions().size(), 0) << "FAIL";
+  LmcBuilder::LmcBuilder(){
+  };
 }

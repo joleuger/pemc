@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "pemc/basic/tsIndex.h"
+#include "pemc/basic/tscIndex.h"
 #include "pemc/basic/probability.h"
 #include "pemc/basic/label.h"
 

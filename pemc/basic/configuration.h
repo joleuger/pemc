@@ -27,6 +27,8 @@
 #include <functional>
 #include <iostream>
 
+#include "pemc/basic/modelCapacity.h"
+
 namespace pemc {
 
   struct Configuration {
@@ -39,6 +41,8 @@ namespace pemc {
     std::shared_ptr<std::ostream> coutManaged = nullptr;
 
     bool PrintGraphViz = false;
+
+    std::shared_ptr<ModelCapacity> modelCapacity = std::make_shared<ModelCapacityByModelSize>(ModelCapacityByModelSize::Small());
   };
 
 }
