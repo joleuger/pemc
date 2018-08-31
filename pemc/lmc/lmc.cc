@@ -21,6 +21,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <limits>
+#include <algorithm>
+#include <ThrowAssert.hpp>
+
+#include "pemc/basic/exceptions.h"
 #include "pemc/lmc/lmc.h"
 
 namespace pemc {
@@ -33,7 +38,7 @@ namespace pemc {
   }
 
   gsl::span<LmcTransitionEntry> Lmc::getTransitions() {
-     return gsl::span<LmcTransitionEntry>(transitions.data(),transitionCount);
+     return gsl::span<LmcTransitionEntry>(transitions.data(),transitionCount.load());
   }
 
   gsl::span<LmcTransitionEntry> Lmc::getInitialTransitions() {
@@ -54,15 +59,61 @@ namespace pemc {
 
 
   void Lmc::reserveSpace(ModelCapacity& modelCapacity) {
-    return;
+    // For Debugging: ClearWithMinus1
+
+    maxNumberOfStates = modelCapacity.getMaximalStates();
+    maxNumberOfStates = std::min(std::numeric_limits<StateIndex>::max(),maxNumberOfStates);
+    states.resize(maxNumberOfStates);
+
+    #ifdef DEBUG
+    initialTransitionFrom = -1;
+    for (auto& stateEntry : states) {
+      stateEntry.from = -1;
+      stateEntry.elements = 0;
+    }
+    #endif
+
+    // number of transitions is equal to number of targets
+    maxNumberOfTransitions = modelCapacity.getMaximalTargets();
+    maxNumberOfTransitions = std::min(std::numeric_limits<TransitionIndex>::max(),maxNumberOfTransitions);
+    transitions.resize(maxNumberOfTransitions);
+
+    // TODO: to omit initialization, either use malloc and free, or use custom allocator (see stackoverflow)
     // https://stackoverflow.com/questions/35551254/filling-a-vector-with-multiple-threads
     // https://stackoverflow.com/questions/21028299/is-this-behavior-of-vectorresizesize-type-n-under-c11-and-boost-container/21028912#21028912
-    //states.resize();
-    //transitions.resize();
-    // TODO: to omit initialization, either use malloc and free, or use custom allocator (see stackoverflow)
   }
 
-  void Lmc::shrinkToFit() {
-    return;
+  TransitionIndex Lmc::getPlaceForNewTransitionChainElements(NoOfElements number) {
+		auto locationOfFirstNewEntry = std::atomic_fetch_add( &transitionCount, number);
+		if (locationOfFirstNewEntry + number >= maxNumberOfTransitions || locationOfFirstNewEntry < 0)
+			throw OutOfMemoryException("Unable to store transitions. Try increasing the transition capacity.");
+		return locationOfFirstNewEntry ;
+	}
+
+	void Lmc::createStutteringState(StateIndex stutteringStateIndex) {
+		// The stuttering state might not be reached at all.
+		// Make sure, that all used algorithms to not require a connected state graph.
+    auto &stateEntry = states[stutteringStateIndex];
+
+    // Only for debugging: Check if -1
+    #ifdef DEBUG
+		throw_assert(stateEntry.from == -1 && stateEntry.elements == 0, "Stuttering state has already been created");
+    #endif
+
+		auto locationOfNewEntry = getPlaceForNewTransitionChainElements(1);
+    auto &transitionEntry = transitions[locationOfNewEntry];
+		transitionEntry.label = Label();
+		transitionEntry.probability = Probability(1.0);
+		transitionEntry.state = stutteringStateIndex;
+
+    stateEntry.from=locationOfNewEntry;
+    stateEntry.elements=1;
+	}
+
+  void Lmc::finishCreation(StateIndex _stateCount) {
+    // Note: Do not miss to count the optional stuttering state!
+    stateCount = _stateCount;
+    states.resize(stateCount);
+    transitions.resize(transitionCount);
   }
 }

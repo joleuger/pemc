@@ -21,24 +21,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_BASIC_PROBABILITY_H_
-#define PEMC_BASIC_PROBABILITY_H_
+#ifndef PEMC_BASIC_EXCEPTIONS_H_
+#define PEMC_BASIC_EXCEPTIONS_H_
 
-#include <string>
+#include <exception>
 
 namespace pemc {
 
-  struct Probability {
-    Probability() = default;
-    
-    Probability(double _value) {
-      value=_value;
+  class OutOfMemoryException: public std::exception {
+  private:
+      std::string completeMessage;
+  public:
+    OutOfMemoryException(const std::string& message) {
+        completeMessage = "OutOfMemoryException: " +message;
     }
 
-    double value;
+    virtual const char* what() const throw() {
+      return completeMessage.c_str();
+    }
   };
 
-  std::string prettyPrint(Probability& probability);
 }
-
-#endif  // PEMC_BASIC_PROBABILITY_H_
+#endif  // PEMC_BASIC_EXCEPTIONS_H_

@@ -24,12 +24,14 @@
 #ifndef PEMC_BASIC_LABEL_H_
 #define PEMC_BASIC_LABEL_H_
 
+#include <inttypes.h>
+
 namespace pemc {
 
   struct Label {
-    int value;
+    int32_t value = 0;
 
-    bool operator[](int index)
+    bool operator[](int32_t index)
 		{
 			return (value & (1 << index)) != 0;
 		}

@@ -23,13 +23,16 @@
 
 #ifndef PEMC_BASIC_TSINDEX_H_
 #define PEMC_BASIC_TSINDEX_H_
+
+#include <cstdint>
+
 namespace pemc {
 
   #define StateIndex int
   #define TransitionIndex int
   #define TargetIndex int
   #define ChoiceIndex int
-
+  #define NoOfElements int32_t
 }
 
 #endif  // PEMC_BASIC_TSINDEX_H_

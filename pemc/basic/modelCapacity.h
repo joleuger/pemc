@@ -86,6 +86,7 @@ namespace pemc {
     };
 
     virtual TargetIndex getMaximalTargets() {
+      // Remind: Transition = Target + Probability
       return maximalTargets;
     };
 

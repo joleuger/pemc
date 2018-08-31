@@ -1,8 +1,18 @@
 project('pemc', 'cpp',
   default_options : ['cpp_std=c++14'])
 
+# if get_option('buildtype')=='release'
+if not get_option('buildtype').startswith('debug')
+  print('Deactivating Ensures and Expects of GSL')
+  add_global_arguments('-DGSL_UNENFORCED_ON_CONTRACT_VIOLATION', language : 'cpp')
+endif
+
+if get_option('buildtype').startswith('debug')
+  add_project_arguments('-DDEBUG', language : 'cpp')
+endif
+
 # libpemc_include = include_directories('src')
-libpemc_include = include_directories('.', 'external/GSL/include')
+libpemc_include = include_directories('.', 'external/GSL/include', 'external/ThrowAssert')
 
 libpemc =  static_library('pemc',
   'pemc/basic/probability.cc',

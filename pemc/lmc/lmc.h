@@ -42,11 +42,13 @@ namespace pemc {
 
   class Lmc {
   private:
-      TransitionIndex transitionCount = 0;
+      int maxNumberOfTransitions = 0;
+      std::atomic<TransitionIndex> transitionCount = 0;
       std::vector<LmcTransitionEntry> transitions;
-
-      int initialTransitionFrom = 0;
+      TransitionIndex initialTransitionFrom = -1; //is uninitialized at first, but may be something else than 0
       int initialTransitionElements = 0;
+
+      int maxNumberOfStates = 0;
       StateIndex stateCount = 0;
       std::vector<LmcStateEntry> states;
 
@@ -62,8 +64,11 @@ namespace pemc {
       gsl::span<LmcTransitionEntry> getInitialTransitions();
       gsl::span<LmcTransitionEntry> getTransitionsOfState(StateIndex state);
 
+      TransitionIndex getPlaceForNewTransitionChainElements(NoOfElements number);
+      void createStutteringState(StateIndex stutteringStateIndex);
+
       void reserveSpace(ModelCapacity& modelCapacity);
-      void shrinkToFit();
+      void finishCreation(StateIndex _stateCount);
   };
 
 }
