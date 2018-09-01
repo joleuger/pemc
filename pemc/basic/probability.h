@@ -30,7 +30,7 @@ namespace pemc {
 
   struct Probability {
     Probability() = default;
-    
+
     Probability(double _value) {
       value=_value;
     }
@@ -39,6 +39,10 @@ namespace pemc {
   };
 
   std::string prettyPrint(Probability& probability);
+
+  bool probabilityIsValid(Probability& probability);
+
+  bool probabilityIsOne(double value, double tolerance);
 }
 
 #endif  // PEMC_BASIC_PROBABILITY_H_

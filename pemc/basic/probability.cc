@@ -62,4 +62,12 @@ namespace pemc {
     else
       return std::string("probability.cc: failed");
   }
+  
+  bool probabilityIsValid(Probability& probability) {
+    return probability.value > 0.0 && probability.value <= 1.0;
+  }
+
+  bool probabilityIsOne(double value, double tolerance) {
+    return value >= value - tolerance && value <= 1.0 + tolerance;
+  }
 }

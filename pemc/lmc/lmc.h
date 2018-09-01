@@ -67,8 +67,9 @@ namespace pemc {
       TransitionIndex getPlaceForNewTransitionChainElements(NoOfElements number);
       void createStutteringState(StateIndex stutteringStateIndex);
 
-      void reserveSpace(ModelCapacity& modelCapacity);
+      void initialize(ModelCapacity& modelCapacity);
       void finishCreation(StateIndex _stateCount);
+      void validate();
   };
 
 }

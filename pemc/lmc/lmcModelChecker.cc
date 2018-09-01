@@ -23,6 +23,10 @@
 
 #include "pemc/lmc/lmcModelChecker.h"
 
+
+namespace {
+}
+
 namespace pemc {
 
   LmcModelChecker::LmcModelChecker(){

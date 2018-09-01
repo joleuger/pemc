@@ -58,14 +58,13 @@ namespace pemc {
   }
 
 
-  void Lmc::reserveSpace(ModelCapacity& modelCapacity) {
-    // For Debugging: ClearWithMinus1
-
+  void Lmc::initialize(ModelCapacity& modelCapacity) {
     maxNumberOfStates = modelCapacity.getMaximalStates();
     maxNumberOfStates = std::min(std::numeric_limits<StateIndex>::max(),maxNumberOfStates);
     states.resize(maxNumberOfStates);
 
     #ifdef DEBUG
+    // For debugging: be able to check if entries have already been written to (indicated by -1)
     initialTransitionFrom = -1;
     for (auto& stateEntry : states) {
       stateEntry.from = -1;
@@ -77,6 +76,9 @@ namespace pemc {
     maxNumberOfTransitions = modelCapacity.getMaximalTargets();
     maxNumberOfTransitions = std::min(std::numeric_limits<TransitionIndex>::max(),maxNumberOfTransitions);
     transitions.resize(maxNumberOfTransitions);
+
+    transitionCount = 0;
+    stateCount = 0;
 
     // TODO: to omit initialization, either use malloc and free, or use custom allocator (see stackoverflow)
     // https://stackoverflow.com/questions/35551254/filling-a-vector-with-multiple-threads
@@ -95,8 +97,8 @@ namespace pemc {
 		// Make sure, that all used algorithms to not require a connected state graph.
     auto &stateEntry = states[stutteringStateIndex];
 
-    // Only for debugging: Check if -1
     #ifdef DEBUG
+    // For debugging: check if entries have already been written to (indicated by -1)
 		throw_assert(stateEntry.from == -1 && stateEntry.elements == 0, "Stuttering state has already been created");
     #endif
 
@@ -115,5 +117,35 @@ namespace pemc {
     stateCount = _stateCount;
     states.resize(stateCount);
     transitions.resize(transitionCount);
+  }
+
+  void Lmc::validate() {
+      #ifdef DEBUG
+      throw_assert(initialTransitionFrom != -1, "Initial transitions not set");
+      throw_assert(stateCount > 0, "At least one state needed");
+      for (auto& stateEntry : getStates()) {
+        throw_assert(stateEntry.from != -1, "Transitions not set");
+        throw_assert(stateEntry.elements > 0, "At least one transition needed");
+      }
+      auto transitionSum = 0.0;
+      for (auto& transitionEntry : getTransitions()) {
+        throw_assert(transitionEntry.state >= 0 && transitionEntry.state < stateCount, "State invalid");
+        throw_assert(probabilityIsValid(transitionEntry.probability), "Probability invalid");
+      }
+      for (StateIndex i = 0; i < stateCount; i++) {
+        transitionSum = 0.0;
+        for (auto& transitionEntry : getTransitionsOfState(i)) {
+          transitionSum += transitionEntry.probability.value;
+        }
+        throw_assert(probabilityIsOne(transitionSum,0.00000001) , "Probability invalid");
+
+      }
+      transitionSum = 0.0;
+      for (auto& transitionEntry : getInitialTransitions()) {
+        throw_assert(transitionEntry.state >= 0 && transitionEntry.state < stateCount, "State invalid");
+        throw_assert(probabilityIsValid(transitionEntry.probability), "Probability invalid");
+      }
+      throw_assert(probabilityIsOne(transitionSum,0.00000001) , "Probability invalid");
+      #endif
   }
 }
