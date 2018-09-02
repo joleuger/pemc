@@ -62,7 +62,9 @@ namespace pemc {
 
       gsl::span<LmcTransitionEntry> getTransitions();
       gsl::span<LmcTransitionEntry> getInitialTransitions();
+      std::tuple<TransitionIndex,TransitionIndex> getInitialTransitionIndexes();
       gsl::span<LmcTransitionEntry> getTransitionsOfState(StateIndex state);
+      std::tuple<TransitionIndex,TransitionIndex> getTransitionIndexesOfState(StateIndex state);
 
       TransitionIndex getPlaceForNewTransitionChainElements(NoOfElements number);
       void createStutteringState(StateIndex stutteringStateIndex);

@@ -12,7 +12,11 @@ if get_option('buildtype').startswith('debug')
 endif
 
 # libpemc_include = include_directories('src')
-libpemc_include = include_directories('.', 'external/GSL/include', 'external/ThrowAssert')
+libpemc_include = include_directories('.',
+  'external/GSL/include',
+  'external/ThrowAssert',
+#  'external/range/include'
+)
 
 libpemc =  static_library('pemc',
   'pemc/basic/probability.cc',

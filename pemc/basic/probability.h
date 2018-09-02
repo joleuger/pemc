@@ -36,6 +36,43 @@ namespace pemc {
     }
 
     double value;
+
+    friend bool operator<(const Probability& l, const Probability& r) {
+        return l.value < r.value;
+    }
+
+    friend bool operator>(const Probability& l, const Probability& r) {
+        return l.value > r.value;
+    }
+
+    friend bool operator<=(const Probability& l, const Probability& r) {
+        return l.value <= r.value;
+    }
+
+    friend bool operator>=(const Probability& l, const Probability& r) {
+        return l.value >= r.value;
+    }
+
+    friend Probability operator+(const Probability& l, const Probability& r) {
+        return Probability(l.value + r.value);
+    }
+
+    friend Probability& operator+=(Probability& l, const Probability& r) {
+        l.value += r.value;
+        return l;
+    }
+
+    friend Probability operator*(const Probability& l, const Probability& r) {
+        return Probability(l.value * r.value);
+    }
+
+    static Probability One() {
+      return Probability(1.0);
+    }
+
+    static Probability Zero() {
+      return Probability(0.0);
+    }
   };
 
   std::string prettyPrint(Probability& probability);

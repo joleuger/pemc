@@ -46,11 +46,31 @@ namespace pemc {
     return tspan.subspan(initialTransitionFrom,initialTransitionElements);
   }
 
+  std::tuple<TransitionIndex,TransitionIndex> Lmc::getInitialTransitionIndexes(){
+    // returns begin(inclusive) and end(exclusive)
+    // use std::tie(begin, end) = lmc.getInitialTransitionIndexes();
+    // or auto& [a,b,c] = C++17 (https://en.cppreference.com/w/cpp/language/structured_binding)
+    // (Easier) alternatives:
+    //    * https://en.wikipedia.org/wiki/Generator_(computer_programming)#C++
+    //    * Boost range with irange(1, 10)
+    auto from = initialTransitionFrom;
+    auto to = initialTransitionFrom + initialTransitionElements;
+    return std::make_tuple(from,to);
+  }
+
   gsl::span<LmcTransitionEntry> Lmc::getTransitionsOfState(StateIndex state){
     auto tspan = getTransitions();
     auto from = states[state].from;
     auto elements = states[state].elements;
     return tspan.subspan(from,elements);
+  }
+
+  std::tuple<TransitionIndex,TransitionIndex> Lmc::getTransitionIndexesOfState(StateIndex state){
+    // returns begin(inclusive) and end(exclusive)
+    // use std::tie(begin, end) = lmc.getTransitionIndexesOfState(index);
+    auto from = states[state].from;
+    auto to = states[state].from + states[state].elements;
+    return std::make_tuple(from,to);
   }
 
   gsl::span<std::string> Lmc::getLabels() {

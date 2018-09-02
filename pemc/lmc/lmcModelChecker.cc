@@ -21,10 +21,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <functional>
+
 #include "pemc/lmc/lmcModelChecker.h"
 
-
 namespace {
+    using namespace pemc;
+
+    enum PrecalculatedTransitions : int8_t
+    {
+      Nothing = 0,
+      SatisfiedDirect = 1,
+      ExcludedDirect = 2,
+      Satisfied = 4, // Satisfied for the current run
+      Excluded = 8, // Excluded for the current run
+      Mark = 16,
+    };
+
+    void LmcIteration(Lmc& lmc,
+                      gsl::span<PrecalculatedTransitions> &precalculations,
+                      gsl::span<Probability> &xold,
+                      gsl::span<Probability> &xnew,
+                      Probability startValue,
+                      std::function<bool(Probability,Probability)> order) {
+        auto stateCount = lmc.getStates().size();
+        for (StateIndex s = 0; s < stateCount; ++s) {
+        	auto transitions = lmc.getTransitions();
+        	auto sum = Probability::Zero();
+          TransitionIndex begin, end = 0;
+          std::tie(begin, end) = lmc.getTransitionIndexesOfState(s);
+
+          for (TransitionIndex t=begin; t<end; t++) {
+        		auto& transition = transitions[t];
+            auto& precalulated = precalculations[t];
+        		if (precalulated & PrecalculatedTransitions::Satisfied)
+        		{
+        			sum += transition.probability;
+        		}
+        		else if (precalulated & PrecalculatedTransitions::Excluded)
+        		{
+        		}
+        		else
+        		{
+        			sum += transition.probability * xold[transition.state];
+        		}
+        	}
+        	xnew[s] = sum;
+        }
+    }
 }
 
 namespace pemc {

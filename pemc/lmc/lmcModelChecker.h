@@ -29,6 +29,8 @@
 namespace pemc {
 
   class LmcModelChecker {
+  private:
+
   public:
       int initialTransitionFrom = 0;
 
