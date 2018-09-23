@@ -23,6 +23,7 @@
 
 #include <functional>
 
+#include "pemc/formula/formulaUtils.h"
 #include "pemc/lmc/lmcModelChecker.h"
 
 namespace {
@@ -77,6 +78,17 @@ namespace pemc {
   {
   };
 
+  Probability LmcModelChecker::CalculateProbability(Formula formulaToCheck) {
+    auto matchFormula = tryExtractPhiUntilPsiWithBound(formulaToCheck);
 
+    if (matchFormula== boost::none)
+      return Probability::Error();
+    Formula* phi;
+    Formula* psi;
+    boost::optional<int> bound;
+    std::tie(phi, psi, bound) = *matchFormula;
+
+    return Probability::Error();
+  }
 
 }

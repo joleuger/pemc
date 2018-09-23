@@ -21,9 +21,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include "pemc/formula/unaryFormula.h"
+#include "pemc/formula/binaryFormula.h"
+#include "pemc/formula/boundedUnaryFormula.h"
+#include "pemc/formula/boundedBinaryFormula.h"
+
 #include "pemc/formula/formulaUtils.h"
 
 namespace pemc {
 
+  boost::optional<std::tuple<Formula*,Formula*,boost::optional<int>>> tryExtractPhiUntilPsiWithBound(Formula& formula) {
+    auto asUnaryFormula = dynamic_cast<UnaryFormula*>(&formula);
+    if (asUnaryFormula!=nullptr && asUnaryFormula->getOperator()==UnaryOperator::Finally) {
+      auto result = std::make_tuple( (Formula*) nullptr,asUnaryFormula->getOperand(), (boost::optional<int>) boost::none);
+      return result;
+    }
+
+    auto asBinaryFormula = dynamic_cast<BinaryFormula*>(&formula);
+    if (asBinaryFormula!=nullptr && asBinaryFormula->getOperator()==BinaryOperator::Until) {
+      auto result =  std::make_tuple(asBinaryFormula->getLeftOperand(),asBinaryFormula->getRightOperand(), (boost::optional<int>) boost::none);
+      return result;
+    }
+
+    auto asBoundedUnaryFormula = dynamic_cast<BoundedUnaryFormula*>(&formula);
+    if (asBoundedUnaryFormula!=nullptr && asBoundedUnaryFormula->getOperator()==UnaryOperator::Finally) {
+      auto result = std::make_tuple( (Formula*) nullptr,asBoundedUnaryFormula->getOperand(), (boost::optional<int>) asBoundedUnaryFormula->getBound());
+      return result;
+    }
+
+    auto asBoundedBinaryFormula = dynamic_cast<BoundedBinaryFormula*>(&formula);
+    if (asBoundedBinaryFormula!=nullptr && asBoundedBinaryFormula->getOperator()==BinaryOperator::Until) {
+      auto result =  std::make_tuple(asBoundedBinaryFormula->getLeftOperand(),asBoundedBinaryFormula->getRightOperand(), (boost::optional<int>) asBoundedBinaryFormula->getBound());
+      return result;
+    }
+
+    return boost::none;
+  }
 
 }

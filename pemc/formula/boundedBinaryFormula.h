@@ -31,13 +31,18 @@ namespace pemc {
 
   class BoundedBinaryFormula : Formula {
   private:
-    std::unique_ptr<Formula> leftOperand;
+    std::shared_ptr<Formula> leftOperand;
     BinaryOperator binaryOperator;
-    std::unique_ptr<Formula> rightOperand;
+    std::shared_ptr<Formula> rightOperand;
     int bound;
   public:
-    BoundedBinaryFormula(std::unique_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::unique_ptr<Formula> _rightOperand, int _bound, const std::string& _identifier = nullptr);
+    BoundedBinaryFormula(std::shared_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::shared_ptr<Formula> _rightOperand, int _bound, const std::string& _identifier = nullptr);
     virtual ~BoundedBinaryFormula() = default;
+
+    Formula* getLeftOperand();
+    BinaryOperator getOperator();
+    Formula* getRightOperand();
+    int getBound();
 
     virtual void Visit(FormulaVisitor& visitor);
   };

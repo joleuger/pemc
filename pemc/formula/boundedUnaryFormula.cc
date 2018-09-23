@@ -26,12 +26,24 @@
 
 namespace pemc {
 
-    BoundedUnaryFormula::BoundedUnaryFormula(std::unique_ptr<Formula> _operand, UnaryOperator _unaryOperator, int _bound, const std::string& _identifier)
+    BoundedUnaryFormula::BoundedUnaryFormula(std::shared_ptr<Formula> _operand, UnaryOperator _unaryOperator, int _bound, const std::string& _identifier)
         : Formula(_identifier),
-        operand(std::move(_operand)),
+        operand(_operand),
         unaryOperator(_unaryOperator),
         bound(_bound){
 
+    }
+
+    UnaryOperator BoundedUnaryFormula::getOperator() {
+      return unaryOperator;
+    }
+
+    Formula* BoundedUnaryFormula::getOperand() {
+      return operand.get();
+    }
+
+    int BoundedUnaryFormula::getBound() {
+        return this->bound;
     }
 
     void BoundedUnaryFormula::Visit(FormulaVisitor& visitor) {

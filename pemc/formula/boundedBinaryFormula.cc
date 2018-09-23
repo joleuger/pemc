@@ -26,14 +26,29 @@
 
 namespace pemc {
 
-  BoundedBinaryFormula::BoundedBinaryFormula(std::unique_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::unique_ptr<Formula> _rightOperand, int _bound, const std::string& _identifier)
+  BoundedBinaryFormula::BoundedBinaryFormula(std::shared_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::shared_ptr<Formula> _rightOperand, int _bound, const std::string& _identifier)
     : Formula(_identifier),
-      leftOperand(std::move(_leftOperand)),
+      leftOperand(_leftOperand),
       binaryOperator(_binaryOperator),
-      rightOperand(std::move(_rightOperand)),
+      rightOperand(_rightOperand),
       bound(_bound){
     }
 
+  Formula* BoundedBinaryFormula::getLeftOperand() {
+    return leftOperand.get();
+  }
+
+  BinaryOperator BoundedBinaryFormula::getOperator() {
+    return binaryOperator;
+  }
+
+  Formula* BoundedBinaryFormula::getRightOperand() {
+    return rightOperand.get();
+  }
+
+  int BoundedBinaryFormula::getBound() {
+      return this->bound;
+  }
 
   void BoundedBinaryFormula::Visit(FormulaVisitor& visitor) {
     visitor.VisitBoundedBinaryFormula(this);

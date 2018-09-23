@@ -41,12 +41,16 @@ namespace pemc {
 
   class BinaryFormula : Formula {
   private:
-    std::unique_ptr<Formula> leftOperand;
+    std::shared_ptr<Formula> leftOperand;
     BinaryOperator binaryOperator;
-    std::unique_ptr<Formula> rightOperand;
+    std::shared_ptr<Formula> rightOperand;
   public:
-    BinaryFormula(std::unique_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::unique_ptr<Formula> _rightOperand, const std::string& _identifier = nullptr);
+    BinaryFormula(std::shared_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::shared_ptr<Formula> _rightOperand, const std::string& _identifier = nullptr);
     virtual ~BinaryFormula() = default;
+
+    Formula* getLeftOperand();
+    BinaryOperator getOperator();
+    Formula* getRightOperand();
 
     virtual void Visit(FormulaVisitor& visitor);
   };

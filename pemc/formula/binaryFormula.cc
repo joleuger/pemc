@@ -26,13 +26,24 @@
 
 namespace pemc {
 
-  BinaryFormula::BinaryFormula(std::unique_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::unique_ptr<Formula> _rightOperand, const std::string& _identifier)
+  BinaryFormula::BinaryFormula(std::shared_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::shared_ptr<Formula> _rightOperand, const std::string& _identifier)
     : Formula(_identifier),
-      leftOperand(std::move(_leftOperand)),
+      leftOperand(_leftOperand),
       binaryOperator(_binaryOperator),
       rightOperand(std::move(_rightOperand)){
     }
 
+  Formula* BinaryFormula::getLeftOperand() {
+    return leftOperand.get();
+  }
+
+  BinaryOperator BinaryFormula::getOperator() {
+    return binaryOperator;
+  }
+
+  Formula* BinaryFormula::getRightOperand() {
+    return rightOperand.get();
+  }
 
   void BinaryFormula::Visit(FormulaVisitor& visitor) {
     visitor.VisitBinaryFormula(this);

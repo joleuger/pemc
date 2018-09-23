@@ -26,11 +26,19 @@
 
 namespace pemc {
 
-    UnaryFormula::UnaryFormula(std::unique_ptr<Formula> _operand, UnaryOperator _unaryOperator, const std::string& _identifier)
+    UnaryFormula::UnaryFormula(std::shared_ptr<Formula> _operand, UnaryOperator _unaryOperator, const std::string& _identifier)
         : Formula(_identifier),
-        operand(std::move(_operand)),
+        operand(_operand),
         unaryOperator(_unaryOperator){
 
+    }
+
+    UnaryOperator UnaryFormula::getOperator() {
+      return unaryOperator;
+    }
+
+    Formula* UnaryFormula::getOperand() {
+      return operand.get();
     }
 
     void UnaryFormula::Visit(FormulaVisitor& visitor) {

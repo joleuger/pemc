@@ -71,6 +71,10 @@ namespace pemc {
     static Probability Zero() {
       return Probability(0.0);
     }
+
+    static Probability Error() {
+      return Probability(std::numeric_limits<float>::quiet_NaN());
+    }
   };
 
   std::string prettyPrint(Probability& probability);

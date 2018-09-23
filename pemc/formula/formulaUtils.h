@@ -24,10 +24,13 @@
 #ifndef PEMC_FORMULA_FORMULAUTILS_H_
 #define PEMC_FORMULA_FORMULAUTILS_H_
 
+#include <boost/optional.hpp>
+
 #include "pemc/formula/formula.h"
 
 namespace pemc {
 
+    boost::optional<std::tuple<Formula*,Formula*,boost::optional<int>>> tryExtractPhiUntilPsiWithBound(Formula& formula);
 
 }
 #endif  // PEMC_FORMULA_FORMULAUTILS_H_
