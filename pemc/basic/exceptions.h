@@ -24,20 +24,32 @@
 #ifndef PEMC_BASIC_EXCEPTIONS_H_
 #define PEMC_BASIC_EXCEPTIONS_H_
 
+#include <string>
 #include <exception>
 
 namespace pemc {
 
-  class OutOfMemoryException: public std::exception {
+  class OutOfMemoryException : public std::exception {
   private:
       std::string completeMessage;
   public:
     OutOfMemoryException(const std::string& message) {
-        completeMessage = "OutOfMemoryException: " +message;
+        completeMessage = "OutOfMemoryException: " + message;
     }
+    ~OutOfMemoryException() = default;
 
     virtual const char* what() const throw() {
       return completeMessage.c_str();
+    }
+  };
+
+  class NotImplementedYetException : public std::exception {
+  public:
+    NotImplementedYetException() = default;
+    ~NotImplementedYetException() = default;
+
+    virtual const char* what() const throw() {
+      return "NotImplementedYetException";
     }
   };
 

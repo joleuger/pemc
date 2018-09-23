@@ -23,6 +23,7 @@
 
 #include <functional>
 
+#include "pemc/basic/exceptions.h"
 #include "pemc/formula/formulaUtils.h"
 #include "pemc/lmc/lmcModelChecker.h"
 
@@ -88,6 +89,7 @@ namespace pemc {
     boost::optional<int> bound;
     std::tie(phi, psi, bound) = *matchFormula;
 
+    throw NotImplementedYetException();
     return Probability::Error();
   }
 
