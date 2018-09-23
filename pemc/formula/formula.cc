@@ -21,18 +21,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LCMDP_LMCMODELCHECKER_H_
-#define PEMC_LCMDP_LMCMODELCHECKER_H_
-
-#include "pemc/lcmdp/lcmdp.h"
+#include "pemc/formula/formula.h"
 
 namespace pemc {
 
-  class LcmdpModelChecker {
-  public:
-      LcmdpModelChecker();
-  };
+  Formula::Formula(const std::string& _identifier)
+    : identifier(_identifier){
+
+  }
+
+  const std::string& Formula::getIdentifier() {
+    return this->identifier;
+  }
 
 }
-
-#endif  // PEMC_LCMDP_LMCMODELCHECKER_H_

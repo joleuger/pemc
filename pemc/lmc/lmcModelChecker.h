@@ -25,16 +25,17 @@
 #define PEMC_LMC_LMCMODELCHECKER_H_
 
 #include "pemc/lmc/lmc.h"
+#include "pemc/formula/formula.h"
 
 namespace pemc {
 
   class LmcModelChecker {
   private:
-
+      const Lmc& lmc;
   public:
-      int initialTransitionFrom = 0;
+      LmcModelChecker(const Lmc& _lmc);
 
-      LmcModelChecker();
+      Probability CalculateProbability(Formula formulaToCheck);
   };
 
 }

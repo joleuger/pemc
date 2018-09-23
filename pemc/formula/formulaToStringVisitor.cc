@@ -21,18 +21,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LCMDP_LMCMODELCHECKER_H_
-#define PEMC_LCMDP_LMCMODELCHECKER_H_
-
-#include "pemc/lcmdp/lcmdp.h"
+#include "pemc/formula/formula.h"
+#include "pemc/formula/formulaToStringVisitor.h"
+#include "pemc/formula/labelFormula.h"
+#include "pemc/formula/unaryFormula.h"
+#include "pemc/formula/binaryFormula.h"
+#include "pemc/formula/boundedUnaryFormula.h"
+#include "pemc/formula/boundedBinaryFormula.h"
 
 namespace pemc {
 
-  class LcmdpModelChecker {
-  public:
-      LcmdpModelChecker();
-  };
+  FormulaToStringVisitor::FormulaToStringVisitor(){
+  }
 
+  void FormulaToStringVisitor::VisitLabelFormula(LabelFormula* formula) {
+
+  }
+
+  void FormulaToStringVisitor::VisitUnaryFormula(UnaryFormula* formula){
+
+  }
+
+  void FormulaToStringVisitor::VisitBinaryFormula(BinaryFormula* formula){
+
+  }
+
+  void FormulaToStringVisitor::VisitBoundedUnaryFormula(BoundedUnaryFormula* formula){
+
+  }
+
+  void FormulaToStringVisitor::VisitBoundedBinaryFormula(BoundedBinaryFormula* formula){
+
+  }
 }
-
-#endif  // PEMC_LCMDP_LMCMODELCHECKER_H_

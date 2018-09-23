@@ -21,18 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LCMDP_LMCMODELCHECKER_H_
-#define PEMC_LCMDP_LMCMODELCHECKER_H_
+#ifndef PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_
+#define PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_
 
-#include "pemc/lcmdp/lcmdp.h"
+#include "pemc/formula/formulaVisitor.h"
 
 namespace pemc {
 
-  class LcmdpModelChecker {
+  class FormulaToStringVisitor {
   public:
-      LcmdpModelChecker();
+    FormulaToStringVisitor();
+    virtual ~FormulaToStringVisitor() = default;
+
+    virtual void VisitLabelFormula(LabelFormula* formula);
+    virtual void VisitUnaryFormula(UnaryFormula* formula);
+    virtual void VisitBinaryFormula(BinaryFormula* formula);
+    virtual void VisitBoundedUnaryFormula(BoundedUnaryFormula* formula);
+    virtual void VisitBoundedBinaryFormula(BoundedBinaryFormula* formula);
   };
 
 }
-
-#endif  // PEMC_LCMDP_LMCMODELCHECKER_H_
+#endif  // PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_

@@ -42,8 +42,7 @@ namespace {
                       gsl::span<PrecalculatedTransitions> &precalculations,
                       gsl::span<Probability> &xold,
                       gsl::span<Probability> &xnew,
-                      Probability startValue,
-                      std::function<bool(Probability,Probability)> order) {
+                      Probability startValue) {
         auto stateCount = lmc.getStates().size();
         for (StateIndex s = 0; s < stateCount; ++s) {
         	auto transitions = lmc.getTransitions();
@@ -73,7 +72,11 @@ namespace {
 
 namespace pemc {
 
-  LmcModelChecker::LmcModelChecker(){
+  LmcModelChecker::LmcModelChecker(const Lmc& _lmc)
+    :lmc(_lmc)
+  {
   };
+
+
 
 }

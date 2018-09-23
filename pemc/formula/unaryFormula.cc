@@ -21,18 +21,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LCMDP_LMCMODELCHECKER_H_
-#define PEMC_LCMDP_LMCMODELCHECKER_H_
-
-#include "pemc/lcmdp/lcmdp.h"
+#include "pemc/formula/unaryFormula.h"
+#include "pemc/formula/formulaVisitor.h"
 
 namespace pemc {
 
-  class LcmdpModelChecker {
-  public:
-      LcmdpModelChecker();
-  };
+    UnaryFormula::UnaryFormula(std::unique_ptr<Formula> _operand, UnaryOperator _unaryOperator, const std::string& _identifier)
+        : Formula(_identifier),
+        operand(std::move(_operand)),
+        unaryOperator(_unaryOperator){
+
+    }
+
+    void UnaryFormula::Visit(FormulaVisitor& visitor) {
+      visitor.VisitUnaryFormula(this);
+    }
 
 }
-
-#endif  // PEMC_LCMDP_LMCMODELCHECKER_H_

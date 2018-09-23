@@ -21,18 +21,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LCMDP_LMCMODELCHECKER_H_
-#define PEMC_LCMDP_LMCMODELCHECKER_H_
+#ifndef PEMC_FORMULA_UNARYFORMULA_H_
+#define PEMC_FORMULA_UNARYFORMULA_H_
 
-#include "pemc/lcmdp/lcmdp.h"
+#include "pemc/formula/formula.h"
 
 namespace pemc {
 
-  class LcmdpModelChecker {
+  enum UnaryOperator {
+    // Non-temporal operators
+		Not,
+
+		// Temporal Future operators
+		Next,
+		Finally,
+		Globally,
+
+		// Temporal Past operator (see dx.doi.org/10.1007/3-540-15648-8_16)
+		Once,
+
+		// Path operators
+		All,
+		Exists
+  };
+
+  class UnaryFormula : Formula {
+  private:
+    std::unique_ptr<Formula> operand;
+    UnaryOperator unaryOperator;
   public:
-      LcmdpModelChecker();
+    UnaryFormula(std::unique_ptr<Formula> _operand, UnaryOperator _unaryOperator, const std::string& _identifier = nullptr);
+    virtual ~UnaryFormula() = default;
+
+    virtual void Visit(FormulaVisitor& visitor);
+
   };
 
 }
-
-#endif  // PEMC_LCMDP_LMCMODELCHECKER_H_
+#endif  // PEMC_FORMULA_UNARYFORMULA_H_

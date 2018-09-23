@@ -21,18 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LCMDP_LMCMODELCHECKER_H_
-#define PEMC_LCMDP_LMCMODELCHECKER_H_
-
-#include "pemc/lcmdp/lcmdp.h"
+#include "pemc/formula/boundedBinaryFormula.h"
+#include "pemc/formula/formulaVisitor.h"
 
 namespace pemc {
 
-  class LcmdpModelChecker {
-  public:
-      LcmdpModelChecker();
-  };
+  BoundedBinaryFormula::BoundedBinaryFormula(std::unique_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::unique_ptr<Formula> _rightOperand, int _bound, const std::string& _identifier)
+    : Formula(_identifier),
+      leftOperand(std::move(_leftOperand)),
+      binaryOperator(_binaryOperator),
+      rightOperand(std::move(_rightOperand)),
+      bound(_bound){
+    }
 
+
+  void BoundedBinaryFormula::Visit(FormulaVisitor& visitor) {
+    visitor.VisitBoundedBinaryFormula(this);
+  }
 }
-
-#endif  // PEMC_LCMDP_LMCMODELCHECKER_H_

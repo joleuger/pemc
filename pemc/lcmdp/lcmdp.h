@@ -24,11 +24,14 @@
 #ifndef PEMC_LCMDP_LCMDP_H_
 #define PEMC_LCMDP_LCMDP_H_
 
+#include <string>
 #include <vector>
+#include <gsl/span>
 
 #include "pemc/basic/tscIndex.h"
 #include "pemc/basic/probability.h"
 #include "pemc/basic/label.h"
+#include "pemc/basic/modelCapacity.h"
 
 namespace pemc {
 
