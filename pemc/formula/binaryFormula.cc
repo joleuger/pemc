@@ -33,7 +33,7 @@ namespace pemc {
     : Formula(_identifier),
       leftOperand(_leftOperand),
       binaryOperator(_binaryOperator),
-      rightOperand(std::move(_rightOperand)){
+      rightOperand(_rightOperand){
     }
 
   Formula* BinaryFormula::getLeftOperand() {
