@@ -25,37 +25,43 @@
 #include "pemc/formula/binaryFormula.h"
 #include "pemc/formula/boundedUnaryFormula.h"
 #include "pemc/formula/boundedBinaryFormula.h"
+#include "pemc/formula/formulaToStringVisitor.h"
 
 #include "pemc/formula/formulaUtils.h"
 
 namespace pemc {
 
-  boost::optional<std::tuple<Formula*,Formula*,boost::optional<int>>> tryExtractPhiUntilPsiWithBound(Formula& formula) {
+  stde::optional<std::tuple<Formula*,Formula*,stde::optional<int>>> tryExtractPhiUntilPsiWithBound(Formula& formula) {
     auto asUnaryFormula = dynamic_cast<UnaryFormula*>(&formula);
     if (asUnaryFormula!=nullptr && asUnaryFormula->getOperator()==UnaryOperator::Finally) {
-      auto result = std::make_tuple( (Formula*) nullptr,asUnaryFormula->getOperand(), (boost::optional<int>) boost::none);
+      auto result = std::make_tuple( (Formula*) nullptr,asUnaryFormula->getOperand(), (stde::optional<int>) stde::nullopt);
       return result;
     }
 
     auto asBinaryFormula = dynamic_cast<BinaryFormula*>(&formula);
     if (asBinaryFormula!=nullptr && asBinaryFormula->getOperator()==BinaryOperator::Until) {
-      auto result =  std::make_tuple(asBinaryFormula->getLeftOperand(),asBinaryFormula->getRightOperand(), (boost::optional<int>) boost::none);
+      auto result =  std::make_tuple(asBinaryFormula->getLeftOperand(),asBinaryFormula->getRightOperand(), (stde::optional<int>) stde::nullopt);
       return result;
     }
 
     auto asBoundedUnaryFormula = dynamic_cast<BoundedUnaryFormula*>(&formula);
     if (asBoundedUnaryFormula!=nullptr && asBoundedUnaryFormula->getOperator()==UnaryOperator::Finally) {
-      auto result = std::make_tuple( (Formula*) nullptr,asBoundedUnaryFormula->getOperand(), (boost::optional<int>) asBoundedUnaryFormula->getBound());
+      auto result = std::make_tuple( (Formula*) nullptr,asBoundedUnaryFormula->getOperand(), (stde::optional<int>) asBoundedUnaryFormula->getBound());
       return result;
     }
 
     auto asBoundedBinaryFormula = dynamic_cast<BoundedBinaryFormula*>(&formula);
     if (asBoundedBinaryFormula!=nullptr && asBoundedBinaryFormula->getOperator()==BinaryOperator::Until) {
-      auto result =  std::make_tuple(asBoundedBinaryFormula->getLeftOperand(),asBoundedBinaryFormula->getRightOperand(), (boost::optional<int>) asBoundedBinaryFormula->getBound());
+      auto result =  std::make_tuple(asBoundedBinaryFormula->getLeftOperand(),asBoundedBinaryFormula->getRightOperand(), (stde::optional<int>) asBoundedBinaryFormula->getBound());
       return result;
     }
 
-    return boost::none;
+    return stde::nullopt;
+  }
+
+  std::string formulaToString(Formula& formula) {
+    auto visitor = FormulaToStringVisitor();
+    return visitor.getResult();
   }
 
 }

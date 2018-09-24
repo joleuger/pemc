@@ -24,6 +24,7 @@
 #ifndef PEMC_LMC_LMCMODELCHECKER_H_
 #define PEMC_LMC_LMCMODELCHECKER_H_
 
+#include "pemc/basic/configuration.h"
 #include "pemc/lmc/lmc.h"
 #include "pemc/formula/formula.h"
 
@@ -32,8 +33,9 @@ namespace pemc {
   class LmcModelChecker {
   private:
       const Lmc& lmc;
+      const Configuration& conf;
   public:
-      LmcModelChecker(const Lmc& _lmc);
+      LmcModelChecker(const Lmc& _lmc, const Configuration& _conf);
 
       Probability CalculateProbability(Formula formulaToCheck);
   };

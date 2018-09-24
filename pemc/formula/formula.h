@@ -34,13 +34,13 @@ namespace pemc {
   private:
     std::string identifier;
   protected:
-    Formula(const std::string& _identifier = nullptr);
+    Formula(const std::string& _identifier = "");
   public:
     virtual ~Formula() = default;
 
     const std::string& getIdentifier();
 
-    virtual void Visit(FormulaVisitor& visitor) = 0;
+    virtual void Visit(FormulaVisitor* visitor) = 0;
   };
 
 }

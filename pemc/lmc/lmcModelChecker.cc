@@ -74,20 +74,48 @@ namespace {
 
 namespace pemc {
 
-  LmcModelChecker::LmcModelChecker(const Lmc& _lmc)
-    :lmc(_lmc)
+  LmcModelChecker::LmcModelChecker(const Lmc& _lmc, const Configuration& _conf)
+    :lmc(_lmc),
+     conf(_conf)
   {
   };
 
   Probability LmcModelChecker::CalculateProbability(Formula formulaToCheck) {
     auto matchFormula = tryExtractPhiUntilPsiWithBound(formulaToCheck);
 
-    if (matchFormula== boost::none)
+    if (matchFormula== stde::nullopt)
       return Probability::Error();
     Formula* phi;
     Formula* psi;
-    boost::optional<int> bound;
+    stde::optional<int> bound;
     std::tie(phi, psi, bound) = *matchFormula;
+    /*
+
+    *conf.cout << "Checking formula: " << formulaToString(formulaToCheck);
+
+    var stopwatch = new Stopwatch();
+		stopwatch.Start();
+		double result;
+
+		if (bound!=boost::none)
+		{
+			result = CalculateBoundedProbability(phi, psi, *bound);
+		}
+		else
+		{
+			auto maxIterations = 50;
+			result = CalculateUnboundUntil(phi, psi, maxIterations);
+		}
+
+		//stopwatch.Stop();
+    auto elapsedTime = "stopwatch.Elapsed";
+    */
+
+		//_conf.cout << "Built-in probabilistic model checker model checking time: ")
+    //          << elapsedTime;
+		//return new Probability(result);
+
+
 
     throw NotImplementedYetException();
     return Probability::Error();

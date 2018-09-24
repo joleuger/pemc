@@ -21,6 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <ThrowAssert.hpp>
+
 #include "pemc/formula/formula.h"
 #include "pemc/formula/formulaToStringVisitor.h"
 #include "pemc/formula/labelFormula.h"
@@ -34,23 +36,120 @@ namespace pemc {
   FormulaToStringVisitor::FormulaToStringVisitor(){
   }
 
-  void FormulaToStringVisitor::VisitLabelFormula(LabelFormula* formula) {
+  std::string FormulaToStringVisitor::getResult(){
+    return output.str();
+  }
 
+  void FormulaToStringVisitor::VisitLabelFormula(LabelFormula* formula) {
+    output << formula->getLabel();
   }
 
   void FormulaToStringVisitor::VisitUnaryFormula(UnaryFormula* formula){
+    output << "(";
 
+		switch (formula->getOperator())
+		{
+			case UnaryOperator::Next:
+				output << " X ";
+				break;
+			case UnaryOperator::Finally:
+				output << " F ";
+				break;
+			case UnaryOperator::Globally:
+				output << " G ";
+				break;
+			case UnaryOperator::Not:
+				output << " ! ";
+				break;
+			case UnaryOperator::All:
+				output << " A ";
+				break;
+			case UnaryOperator::Exists:
+				output << " E ";
+				break;
+			case UnaryOperator::Once:
+				output << " Once ";
+				break;
+			default:
+        auto error = "Unknown or unsupported unary operator '"+std::to_string(formula->getOperator())+"'.";
+        throw_assert(false, error);
+				break;
+		}
+
+		formula->getOperand()->Visit(this);
+		output << ")";
   }
 
   void FormulaToStringVisitor::VisitBinaryFormula(BinaryFormula* formula){
 
+		output << "(";
+		formula->getLeftOperand()->Visit(this);
+
+		switch (formula->getOperator())
+		{
+			case BinaryOperator::And:
+				output << " && ";
+				break;
+			case BinaryOperator::Or:
+				output << " || ";
+				break;
+			case BinaryOperator::Implication:
+				output << " -> ";
+				break;
+			case BinaryOperator::Equivalence:
+				output << " <-> ";
+				break;
+			case BinaryOperator::Until:
+				output << " U ";
+				break;
+			default:
+        auto error = "Unknown or unsupported binary operator '"+std::to_string(formula->getOperator())+"'.";
+				throw_assert(false, error);
+				break;
+		}
+
+		formula->getRightOperand()->Visit(this);
+		output << ")";
   }
 
   void FormulaToStringVisitor::VisitBoundedUnaryFormula(BoundedUnaryFormula* formula){
 
+    output << "(";
+
+    switch (formula->getOperator())
+    {
+    case UnaryOperator::Finally:
+    output << " F";
+    break;
+    default:
+    auto error = "Unknown or unsupported binary operator '"+std::to_string(formula->getOperator())+"'.";
+    throw_assert(false, error);
+    break;
+    }
+    output << "<="<<formula->getBound() <<" ";
+
+    formula->getOperand()->Visit(this);
+    output << ")";
   }
 
   void FormulaToStringVisitor::VisitBoundedBinaryFormula(BoundedBinaryFormula* formula){
 
+		output << "(";
+		formula->getLeftOperand()->Visit(this);
+
+		switch (formula->getOperator())
+		{
+			case BinaryOperator::Until:
+				output << " U";
+				break;
+			default:
+        auto error = "Unknown or unsupported unary operator '"+std::to_string(formula->getOperator())+"'.";
+				throw_assert(false, error);
+				break;
+		}
+		output << "<="<<formula->getBound() <<" ";
+
+		formula->getRightOperand()->Visit(this);
+		output << ")";
   }
 }

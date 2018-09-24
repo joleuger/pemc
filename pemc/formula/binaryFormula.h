@@ -45,14 +45,17 @@ namespace pemc {
     BinaryOperator binaryOperator;
     std::shared_ptr<Formula> rightOperand;
   public:
-    BinaryFormula(std::shared_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::shared_ptr<Formula> _rightOperand, const std::string& _identifier = nullptr);
+    BinaryFormula(std::shared_ptr<Formula> _leftOperand,
+      BinaryOperator _binaryOperator,
+      std::shared_ptr<Formula> _rightOperand,
+      const std::string& _identifier = "");
     virtual ~BinaryFormula() = default;
 
     Formula* getLeftOperand();
     BinaryOperator getOperator();
     Formula* getRightOperand();
 
-    virtual void Visit(FormulaVisitor& visitor);
+    virtual void Visit(FormulaVisitor* visitor);
   };
 
 }

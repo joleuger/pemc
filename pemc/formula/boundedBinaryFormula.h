@@ -36,7 +36,11 @@ namespace pemc {
     std::shared_ptr<Formula> rightOperand;
     int bound;
   public:
-    BoundedBinaryFormula(std::shared_ptr<Formula> _leftOperand, BinaryOperator _binaryOperator, std::shared_ptr<Formula> _rightOperand, int _bound, const std::string& _identifier = nullptr);
+    BoundedBinaryFormula(std::shared_ptr<Formula> _leftOperand,
+      BinaryOperator _binaryOperator,
+      std::shared_ptr<Formula> _rightOperand,
+      int _bound,
+      const std::string& _identifier = "");
     virtual ~BoundedBinaryFormula() = default;
 
     Formula* getLeftOperand();
@@ -44,7 +48,7 @@ namespace pemc {
     Formula* getRightOperand();
     int getBound();
 
-    virtual void Visit(FormulaVisitor& visitor);
+    virtual void Visit(FormulaVisitor* visitor);
   };
 
 }

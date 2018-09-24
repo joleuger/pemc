@@ -50,13 +50,15 @@ namespace pemc {
     std::shared_ptr<Formula> operand;
     UnaryOperator unaryOperator;
   public:
-    UnaryFormula(std::shared_ptr<Formula> _operand, UnaryOperator _unaryOperator, const std::string& _identifier = nullptr);
+    UnaryFormula(std::shared_ptr<Formula> _operand,
+      UnaryOperator _unaryOperator,
+      const std::string& _identifier = "");
     virtual ~UnaryFormula() = default;
 
     Formula* getOperand();
     UnaryOperator getOperator();
 
-    virtual void Visit(FormulaVisitor& visitor);
+    virtual void Visit(FormulaVisitor* visitor);
 
   };
 

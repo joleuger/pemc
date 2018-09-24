@@ -30,12 +30,12 @@ namespace pemc {
 
   class LabelFormula : Formula {
   public:
-    LabelFormula(const std::string& _label = nullptr);
+    LabelFormula(const std::string& label = "");
     virtual ~LabelFormula() = default;
 
     const std::string& getLabel();
-    
-    virtual void Visit(FormulaVisitor& visitor);
+
+    virtual void Visit(FormulaVisitor* visitor);
   };
 
 }

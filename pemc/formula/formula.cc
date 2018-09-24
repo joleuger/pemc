@@ -21,13 +21,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#define BOOST_NO_AUTO_PTR
+
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
 #include "pemc/formula/formula.h"
+
+namespace {
+  std::string generateIdentifier() {
+    // magic static
+    static boost::uuids::random_generator gen;
+    boost::uuids::uuid u = gen();
+    return to_string(u);
+  }
+}
 
 namespace pemc {
 
-  Formula::Formula(const std::string& _identifier)
-    : identifier(_identifier){
-
+  Formula::Formula(const std::string& _identifier) {
+      if (_identifier.empty()) {
+        identifier = generateIdentifier();
+      }
+      else {
+        identifier= _identifier;
+      }
   }
 
   const std::string& Formula::getIdentifier() {

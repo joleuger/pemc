@@ -26,7 +26,9 @@
 
 namespace pemc {
 
-    UnaryFormula::UnaryFormula(std::shared_ptr<Formula> _operand, UnaryOperator _unaryOperator, const std::string& _identifier)
+    UnaryFormula::UnaryFormula(std::shared_ptr<Formula> _operand,
+      UnaryOperator _unaryOperator,
+      const std::string& _identifier)
         : Formula(_identifier),
         operand(_operand),
         unaryOperator(_unaryOperator){
@@ -41,8 +43,8 @@ namespace pemc {
       return operand.get();
     }
 
-    void UnaryFormula::Visit(FormulaVisitor& visitor) {
-      visitor.VisitUnaryFormula(this);
+    void UnaryFormula::Visit(FormulaVisitor* visitor) {
+      visitor->VisitUnaryFormula(this);
     }
 
 }

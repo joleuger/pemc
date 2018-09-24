@@ -35,14 +35,17 @@ namespace pemc {
     UnaryOperator unaryOperator;
     int bound;
   public:
-    BoundedUnaryFormula(std::shared_ptr<Formula> _operand, UnaryOperator _unaryOperator, int _bound, const std::string& _identifier = nullptr);
+    BoundedUnaryFormula(std::shared_ptr<Formula> _operand,
+      UnaryOperator _unaryOperator,
+      int _bound,
+      const std::string& _identifier = "");
     virtual ~BoundedUnaryFormula() = default;
 
     Formula* getOperand();
     UnaryOperator getOperator();
     int getBound();
 
-    virtual void Visit(FormulaVisitor& visitor);
+    virtual void Visit(FormulaVisitor* visitor);
 
   };
 

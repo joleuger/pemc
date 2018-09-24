@@ -24,14 +24,21 @@
 #ifndef PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_
 #define PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_
 
+#include <string>
+#include <sstream>
+
 #include "pemc/formula/formulaVisitor.h"
 
 namespace pemc {
 
-  class FormulaToStringVisitor {
+  class FormulaToStringVisitor : public FormulaVisitor {
+  private:
+    std::ostringstream output;
   public:
     FormulaToStringVisitor();
     virtual ~FormulaToStringVisitor() = default;
+
+    std::string getResult();
 
     virtual void VisitLabelFormula(LabelFormula* formula);
     virtual void VisitUnaryFormula(UnaryFormula* formula);
