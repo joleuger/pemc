@@ -21,22 +21,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_FORMULA_LABELFORMULA_H_
-#define PEMC_FORMULA_LABELFORMULA_H_
+#include "pemcCpp/cppFormula.h"
 
-#include "pemc/formula/formula.h"
+namespace pemc { namespace cpp {
 
-namespace pemc {
+  CppFormula::CppFormula(const std::function<bool(Model*)>& _evaluator,
+    const std::string& _identifier)
+      : LabelFormula(_identifier), evaluator(_evaluator) {
+  }
 
-  class LabelFormula : Formula {
-  public:
-    LabelFormula(const std::string& _label = "");
-    virtual ~LabelFormula() = default;
+  std::function<bool(Model*)> CppLambdaFormula::getEvaluator() {
+    return evaluator;
+  }
 
-    const std::string& getLabel();
-
-    virtual void Visit(FormulaVisitor* visitor);
-  };
-
-}
-#endif  // PEMC_FORMULA_LABELFORMULA_H_
+} }

@@ -46,7 +46,7 @@ gtest_include = include_directories('external/googletest/googletest/include')
 gtest_build_include= include_directories('external/googletest/googletest','external/googletest/googletest/include')
 gtest_dep = declare_dependency(sources : ['external/googletest/googletest/src/gtest-all.cc','external/googletest/googletest/src/gtest_main.cc'], include_directories : gtest_build_include)
 
-tests = [
+libpemctests = [
   'tests/test.cc',
   'tests/lmc/lmc.cc',
   'tests/lmc/lmcModelChecker.cc',
@@ -55,7 +55,7 @@ tests = [
 ]
 
 if meson.get_cross_property('build-tests', 'yes') == 'yes'
-   e = executable('testprog', tests,
+   e = executable('testprog', libpemctests,
       dependencies : [gtest_dep, libpemc_dep])
    test('gtest test', e)
 endif
