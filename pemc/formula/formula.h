@@ -40,7 +40,7 @@ namespace pemc {
 
     const std::string& getIdentifier();
 
-    virtual void Visit(FormulaVisitor* visitor) = 0;
+    virtual void visit(FormulaVisitor* visitor) = 0;
   };
 
 }

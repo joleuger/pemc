@@ -58,7 +58,7 @@ namespace pemc {
     Formula* getOperand();
     UnaryOperator getOperator();
 
-    virtual void Visit(FormulaVisitor* visitor);
+    virtual void visit(FormulaVisitor* visitor);
 
   };
 

@@ -38,11 +38,11 @@ namespace pemc {
   public:
     virtual ~FormulaVisitor() = default;
 
-    virtual void VisitLabelFormula(LabelFormula* formula) = 0;
-    virtual void VisitUnaryFormula(UnaryFormula* formula) = 0;
-    virtual void VisitBinaryFormula(BinaryFormula* formula) = 0;
-    virtual void VisitBoundedUnaryFormula(BoundedUnaryFormula* formula) = 0;
-    virtual void VisitBoundedBinaryFormula(BoundedBinaryFormula* formula) = 0;
+    virtual void visitLabelFormula(LabelFormula* formula) = 0;
+    virtual void visitUnaryFormula(UnaryFormula* formula) = 0;
+    virtual void visitBinaryFormula(BinaryFormula* formula) = 0;
+    virtual void visitBoundedUnaryFormula(BoundedUnaryFormula* formula) = 0;
+    virtual void visitBoundedBinaryFormula(BoundedBinaryFormula* formula) = 0;
   };
 
 }

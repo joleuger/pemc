@@ -39,6 +39,17 @@ libpemc =  static_library('pemc',
 libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpemc_include)
 
 
+libpemcCpp_include = include_directories('language')
+
+libpemcCpp =  static_library('pemcCpp',
+  'language/pemcCpp/cppFormula.cc',
+  'language/pemcCpp/generateSlowCppFormulaEvaluator.cc',
+  include_directories : [ libpemc_include, libpemcCpp_include ] )
+
+libpemcCpp_dep = declare_dependency(
+  link_with: [ libpemc, libpemcCpp ],
+  include_directories: [ libpemc_include, libpemcCpp_include ])
+
 
 # TEST
 gtest_include = include_directories('external/googletest/googletest/include')
@@ -48,14 +59,23 @@ gtest_dep = declare_dependency(sources : ['external/googletest/googletest/src/gt
 
 libpemctests = [
   'tests/test.cc',
+  'tests/formula/createUuids.cc',
   'tests/lmc/lmc.cc',
   'tests/lmc/lmcModelChecker.cc',
   'tests/lcmdp/lcmdp.cc',
   'tests/lcmdp/lcmdpModelChecker.cc'
 ]
 
+libpemcCpptests = [
+  'language/pemcCppTests/test.cc'
+]
+
 if meson.get_cross_property('build-tests', 'yes') == 'yes'
-   e = executable('testprog', libpemctests,
+   pemcExe = executable('testpemc', libpemctests,
       dependencies : [gtest_dep, libpemc_dep])
-   test('gtest test', e)
+   test('gtest test', pemcExe)
+
+   pemcCppExe = executable('testpemcCpp', libpemcCpptests,
+      dependencies : [gtest_dep, libpemcCpp_dep])
+   test('gtest test', pemcCppExe)
 endif

@@ -48,7 +48,7 @@ namespace pemc {
     return rightOperand.get();
   }
 
-  void BinaryFormula::Visit(FormulaVisitor* visitor) {
-    visitor->VisitBinaryFormula(this);
+  void BinaryFormula::visit(FormulaVisitor* visitor) {
+    visitor->visitBinaryFormula(this);
   }
 }

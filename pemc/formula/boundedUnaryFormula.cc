@@ -49,8 +49,8 @@ namespace pemc {
         return this->bound;
     }
 
-    void BoundedUnaryFormula::Visit(FormulaVisitor* visitor) {
-      visitor->VisitBoundedUnaryFormula(this);
+    void BoundedUnaryFormula::visit(FormulaVisitor* visitor) {
+      visitor->visitBoundedUnaryFormula(this);
     }
 
 }

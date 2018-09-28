@@ -31,39 +31,45 @@
 #include "pemc/formula/boundedUnaryFormula.h"
 #include "pemc/formula/boundedBinaryFormula.h"
 
+#include "pemcCpp/cppFormula.h"
+#include "pemcCpp/generateSlowCppFormulaEvaluator.h"
+
 namespace {
+  using namespace pemc;
+  using namespace pemc::cpp;
 
   #include <string>
   #include <sstream>
 
   class SlowFormulaCompilationVisitor : public FormulaVisitor {
   private:
-    std::function<bool()> result; // todo: vielleicht unique pointer
+    CppModel* model;
   public:
-    SlowFormulaCompilationVisitor();
+    std::function<bool()> result;
+
+    SlowFormulaCompilationVisitor(CppModel* _model);
     virtual ~SlowFormulaCompilationVisitor() = default;
 
-    std::string getResult();
-
-    virtual void VisitLabelFormula(LabelFormula* formula);
-    virtual void VisitUnaryFormula(UnaryFormula* formula);
-    virtual void VisitBinaryFormula(BinaryFormula* formula);
-    virtual void VisitBoundedUnaryFormula(BoundedUnaryFormula* formula);
-    virtual void VisitBoundedBinaryFormula(BoundedBinaryFormula* formula);
+    virtual void visitLabelFormula(LabelFormula* formula);
+    virtual void visitUnaryFormula(UnaryFormula* formula);
+    virtual void visitBinaryFormula(BinaryFormula* formula);
+    virtual void visitBoundedUnaryFormula(BoundedUnaryFormula* formula);
+    virtual void visitBoundedBinaryFormula(BoundedBinaryFormula* formula);
   };
 
-  SlowFormulaCompilationVisitor::SlowFormulaCompilationVisitor(){
+  SlowFormulaCompilationVisitor::SlowFormulaCompilationVisitor(CppModel* _model)
+    : FormulaVisitor(), model(_model) {
   }
 
-  std::function<bool()> FormulaToStringVisitor::getResult(){
-    return result;
+  void SlowFormulaCompilationVisitor::visitLabelFormula(LabelFormula* formula) {
+    auto cppFormula = dynamic_cast<CppFormula*>(formula);
+    throw_assert(cppFormula!=nullptr, "Could not cast LabelFormula into a CppFormula");
+    result = std::bind(cppFormula->getEvaluator(), model);
   }
 
-  void SlowFormulaCompilationVisitor::VisitLabelFormula(LabelFormula* formula) {
-    // TODO: cast to CppFormula and set result
-  }
+  void SlowFormulaCompilationVisitor::visitUnaryFormula(UnaryFormula* formula){
+  	formula->getOperand()->visit(this);
 
-  void SlowFormulaCompilationVisitor::VisitUnaryFormula(UnaryFormula* formula){
 		switch (formula->getOperator())
 		{
 			case UnaryOperator::Next:
@@ -71,68 +77,90 @@ namespace {
 			case UnaryOperator::Globally:
       case UnaryOperator::All:
       case UnaryOperator::Exists:
-      case UnaryOperator::Once:
-        auto error = "Could not compile '"+std::to_string(formula->getOperator())+"'.";
-        throw_assert(false, error);
-        break;
-			case UnaryOperator::Not:
-				// TODO:  set result
-				break;
-			default:
-        auto error = "Unknown or unsupported unary operator '"+std::to_string(formula->getOperator())+"'.";
-        throw_assert(false, error);
-				break;
+      case UnaryOperator::Once: {
+          auto error = "Could not compile '"+std::to_string(formula->getOperator())+"'.";
+          throw_assert(false, error);
+          break;
+        }
+			case UnaryOperator::Not: {
+  				result = [ operand{std::move(result)} ] { return !operand(); };
+  				break;
+        }
+			default: {
+          auto error = "Unknown or unsupported unary operator '"+std::to_string(formula->getOperator())+"'.";
+          throw_assert(false, error);
+          break;
+        }
 		}
-
-		formula->getOperand()->Visit(this);
   }
 
-  void SlowFormulaCompilationVisitor::VisitBinaryFormula(BinaryFormula* formula){
-
-		formula->getLeftOperand()->Visit(this);
+  void SlowFormulaCompilationVisitor::visitBinaryFormula(BinaryFormula* formula){
+    // https://stackoverflow.com/questions/8640393/move-capture-in-lambda
+		formula->getLeftOperand()->visit(this);
+    auto leftOperand = std::move(result);
+    formula->getRightOperand()->visit(this);
+    auto rightOperand = std::move(result);
 
 		switch (formula->getOperator())
 		{
 			case BinaryOperator::And:
-				// TODO:  set result
+				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] {
+           if (!leftOperand()) {
+             return false;
+           }
+           return rightOperand();
+        };
 				break;
 			case BinaryOperator::Or:
-				// TODO:  set result
+				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] {
+           if (leftOperand()) {
+             return true;
+           }
+           return rightOperand();
+        };
 				break;
 			case BinaryOperator::Implication:
-				// TODO:  set result
+				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] {
+           if (!leftOperand()) {
+             return true;
+           }
+           return !rightOperand();
+        };
 				break;
 			case BinaryOperator::Equivalence:
-				// TODO:  set result
+				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] {
+           return leftOperand() == rightOperand();
+        };
 				break;
-			case BinaryOperator::Until:
-        auto error = "Could not compile '"+std::to_string(formula->getOperator())+"'.";
-        throw_assert(false, error);
-				break;
-			default:
-        auto error = "Unknown or unsupported binary operator '"+std::to_string(formula->getOperator())+"'.";
-				throw_assert(false, error);
-				break;
+			case BinaryOperator::Until: {
+          auto errorUntil = "Could not compile '"+std::to_string(formula->getOperator())+"'.";
+          throw_assert(false, errorUntil);
+  				break;
+        }
+			default: {
+          auto errorDefault = "Unknown or unsupported binary operator '"+std::to_string(formula->getOperator())+"'.";
+  				throw_assert(false, errorDefault);
+  				break;
+        }
 		}
 
-		formula->getRightOperand()->Visit(this);
   }
 
-  void SlowFormulaCompilationVisitor::VisitBoundedUnaryFormula(BoundedUnaryFormula* formula){
+  void SlowFormulaCompilationVisitor::visitBoundedUnaryFormula(BoundedUnaryFormula* formula){
       auto error = "Could not compile '"+std::to_string(formula->getOperator())+"'.";
       throw_assert(false, error);
   }
 
-  void SlowFormulaCompilationVisitor::VisitBoundedBinaryFormula(BoundedBinaryFormula* formula){
+  void SlowFormulaCompilationVisitor::visitBoundedBinaryFormula(BoundedBinaryFormula* formula){
     auto error = "Could not compile '"+std::to_string(formula->getOperator())+"'.";
     throw_assert(false, error);
   }
 }
 namespace pemc { namespace cpp {
-  /*
-  std::function<bool()> generateSlowCppFormulaEvaluator(Model* model) {
-
+  std::function<bool()> generateSlowCppFormulaEvaluator(CppModel* model, Formula& formula) {
+      auto compiler = SlowFormulaCompilationVisitor(model);
+      formula.visit(&compiler);
+      return std::move(compiler.result);
   }
-  */
 
 } }

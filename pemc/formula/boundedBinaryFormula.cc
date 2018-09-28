@@ -54,7 +54,7 @@ namespace pemc {
       return this->bound;
   }
 
-  void BoundedBinaryFormula::Visit(FormulaVisitor* visitor) {
-    visitor->VisitBoundedBinaryFormula(this);
+  void BoundedBinaryFormula::visit(FormulaVisitor* visitor) {
+    visitor->visitBoundedBinaryFormula(this);
   }
 }

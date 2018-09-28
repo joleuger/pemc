@@ -21,31 +21,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_
-#define PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_
+#ifndef PEMC_CPP_CPPMODEL_H_
+#define PEMC_CPP_CPPMODEL_H_
 
-#include <string>
-#include <sstream>
+#ifndef CppModel
+#define CppModel int
+#endif
 
-#include "pemc/formula/formulaVisitor.h"
+namespace pemc { namespace cpp {
 
-namespace pemc {
+  using namespace pemc;
 
-  class FormulaToStringVisitor : public FormulaVisitor {
-  private:
-    std::ostringstream output;
-  public:
-    FormulaToStringVisitor();
-    virtual ~FormulaToStringVisitor() = default;
-
-    std::string getResult();
-
-    virtual void visitLabelFormula(LabelFormula* formula);
-    virtual void visitUnaryFormula(UnaryFormula* formula);
-    virtual void visitBinaryFormula(BinaryFormula* formula);
-    virtual void visitBoundedUnaryFormula(BoundedUnaryFormula* formula);
-    virtual void visitBoundedBinaryFormula(BoundedBinaryFormula* formula);
-  };
-
-}
-#endif  // PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_
+} }
+#endif  // PEMC_CPP_CPPMODEL_H_

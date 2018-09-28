@@ -61,6 +61,7 @@ namespace pemc {
 
   std::string formulaToString(Formula& formula) {
     auto visitor = FormulaToStringVisitor();
+    formula.visit(&visitor);
     return visitor.getResult();
   }
 

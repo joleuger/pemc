@@ -21,31 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_
-#define PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_
+#include <gtest/gtest.h>
+#include <iostream>
 
-#include <string>
-#include <sstream>
+#include "pemc/formula/labelFormula.h"
 
-#include "pemc/formula/formulaVisitor.h"
+using namespace pemc;
 
-namespace pemc {
 
-  class FormulaToStringVisitor : public FormulaVisitor {
-  private:
-    std::ostringstream output;
-  public:
-    FormulaToStringVisitor();
-    virtual ~FormulaToStringVisitor() = default;
+TEST(formula_test, uuids_are_different) {
+    auto f1 = LabelFormula();
+    auto f2 = LabelFormula();
+    std::cout << "Label f1: " << f1.getLabel() <<std::endl;
+    std::cout << "Label f2: " << f2.getLabel() <<std::endl;
 
-    std::string getResult();
-
-    virtual void visitLabelFormula(LabelFormula* formula);
-    virtual void visitUnaryFormula(UnaryFormula* formula);
-    virtual void visitBinaryFormula(BinaryFormula* formula);
-    virtual void visitBoundedUnaryFormula(BoundedUnaryFormula* formula);
-    virtual void visitBoundedBinaryFormula(BoundedBinaryFormula* formula);
-  };
-
+    ASSERT_NE(f1.getLabel(), f2.getLabel()) << "FAIL";
 }
-#endif  // PEMC_FORMULA_FORMULATOSTRINGVISITOR_H_

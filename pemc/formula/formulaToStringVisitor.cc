@@ -40,11 +40,11 @@ namespace pemc {
     return output.str();
   }
 
-  void FormulaToStringVisitor::VisitLabelFormula(LabelFormula* formula) {
+  void FormulaToStringVisitor::visitLabelFormula(LabelFormula* formula) {
     output << formula->getLabel();
   }
 
-  void FormulaToStringVisitor::VisitUnaryFormula(UnaryFormula* formula){
+  void FormulaToStringVisitor::visitUnaryFormula(UnaryFormula* formula){
     output << "(";
 
 		switch (formula->getOperator())
@@ -76,14 +76,14 @@ namespace pemc {
 				break;
 		}
 
-		formula->getOperand()->Visit(this);
+		formula->getOperand()->visit(this);
 		output << ")";
   }
 
-  void FormulaToStringVisitor::VisitBinaryFormula(BinaryFormula* formula){
+  void FormulaToStringVisitor::visitBinaryFormula(BinaryFormula* formula){
 
 		output << "(";
-		formula->getLeftOperand()->Visit(this);
+		formula->getLeftOperand()->visit(this);
 
 		switch (formula->getOperator())
 		{
@@ -108,11 +108,11 @@ namespace pemc {
 				break;
 		}
 
-		formula->getRightOperand()->Visit(this);
+		formula->getRightOperand()->visit(this);
 		output << ")";
   }
 
-  void FormulaToStringVisitor::VisitBoundedUnaryFormula(BoundedUnaryFormula* formula){
+  void FormulaToStringVisitor::visitBoundedUnaryFormula(BoundedUnaryFormula* formula){
 
     output << "(";
 
@@ -128,14 +128,14 @@ namespace pemc {
     }
     output << "<="<<formula->getBound() <<" ";
 
-    formula->getOperand()->Visit(this);
+    formula->getOperand()->visit(this);
     output << ")";
   }
 
-  void FormulaToStringVisitor::VisitBoundedBinaryFormula(BoundedBinaryFormula* formula){
+  void FormulaToStringVisitor::visitBoundedBinaryFormula(BoundedBinaryFormula* formula){
 
 		output << "(";
-		formula->getLeftOperand()->Visit(this);
+		formula->getLeftOperand()->visit(this);
 
 		switch (formula->getOperator())
 		{
@@ -149,7 +149,7 @@ namespace pemc {
 		}
 		output << "<="<<formula->getBound() <<" ";
 
-		formula->getRightOperand()->Visit(this);
+		formula->getRightOperand()->visit(this);
 		output << ")";
   }
 }

@@ -28,7 +28,7 @@
 
 #include <pemc/formula/labelFormula.h>
 
-#define Model int
+#include "pemcCpp/cppModel.h"
 
 namespace pemc { namespace cpp {
 
@@ -36,13 +36,13 @@ namespace pemc { namespace cpp {
 
   class CppFormula : public LabelFormula {
   private:
-    std::function<bool(Model*)> evaluator;
+    std::function<bool(CppModel*)> evaluator;
   public:
-    CppFormula(const std::function<bool(Model*)>& _evaluator,
+    CppFormula(const std::function<bool(CppModel*)>& _evaluator,
       const std::string& _identifier = "");
     virtual ~CppFormula() = default;
 
-    std::function<bool(Model*)> getEvaluator();
+    std::function<bool(CppModel*)> getEvaluator();
   };
 
 } }

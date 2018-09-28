@@ -34,8 +34,8 @@ namespace pemc {
     return this->getIdentifier();
   }
 
-  void LabelFormula::Visit(FormulaVisitor* visitor) {
-    visitor->VisitLabelFormula(this);
+  void LabelFormula::visit(FormulaVisitor* visitor) {
+    visitor->visitLabelFormula(this);
   }
 
 }

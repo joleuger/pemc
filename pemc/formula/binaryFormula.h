@@ -55,7 +55,7 @@ namespace pemc {
     BinaryOperator getOperator();
     Formula* getRightOperand();
 
-    virtual void Visit(FormulaVisitor* visitor);
+    virtual void visit(FormulaVisitor* visitor);
   };
 
 }

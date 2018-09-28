@@ -28,10 +28,12 @@
 
 #include "pemc/formula/formulaVisitor.h"
 
-#define Model int
+#include "pemcCpp/cppModel.h"
 
 namespace pemc { namespace cpp {
-  std::function<bool()> generateSlowCppFormulaEvaluator(Model* model);
+  using namespace pemc;
+
+  std::function<bool()> generateSlowCppFormulaEvaluator(CppModel* model, Formula* formula);
 
 } }
 #endif  // PEMC_CPP_GENERATESLOWCPPFORMULAEVALUATOR_H_

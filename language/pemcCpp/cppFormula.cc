@@ -25,12 +25,12 @@
 
 namespace pemc { namespace cpp {
 
-  CppFormula::CppFormula(const std::function<bool(Model*)>& _evaluator,
+  CppFormula::CppFormula(const std::function<bool(CppModel*)>& _evaluator,
     const std::string& _identifier)
       : LabelFormula(_identifier), evaluator(_evaluator) {
   }
 
-  std::function<bool(Model*)> CppLambdaFormula::getEvaluator() {
+  std::function<bool(CppModel*)> CppFormula::getEvaluator() {
     return evaluator;
   }
 

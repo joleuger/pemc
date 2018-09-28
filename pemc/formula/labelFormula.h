@@ -35,7 +35,7 @@ namespace pemc {
 
     const std::string& getLabel();
 
-    virtual void Visit(FormulaVisitor* visitor);
+    virtual void visit(FormulaVisitor* visitor);
   };
 
 }

@@ -43,8 +43,8 @@ namespace pemc {
       return operand.get();
     }
 
-    void UnaryFormula::Visit(FormulaVisitor* visitor) {
-      visitor->VisitUnaryFormula(this);
+    void UnaryFormula::visit(FormulaVisitor* visitor) {
+      visitor->visitUnaryFormula(this);
     }
 
 }
