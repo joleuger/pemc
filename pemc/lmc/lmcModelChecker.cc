@@ -32,7 +32,7 @@ namespace {
     using namespace pemc;
     using boost::timer::cpu_timer;
 
-    enum PrecalculatedTransition : int8_t
+    enum PrecalculatedTransition : uint8_t
     {
       Nothing = 0,
       SatisfiedDirect = 1,
@@ -72,26 +72,29 @@ namespace {
         	xnew[s] = sum;
         }
     }
-/*
+
     void PrecalculateDirectSatisfactionAndExclusion(Lmc& lmc,
                     gsl::span<PrecalculatedTransition> precalculatedTransitions,
                     Formula* phi,
                     Formula* psi,
-                    const std::ostream& cout) {
+                    std::ostream& cout) {
         cout << "Precalculate transitions that are directly satisfied or excluded. " <<std::endl;
         cpu_timer timer;
 
         auto psiEvaluator = lmc.createLabelBasedFormulaEvaluator(psi);
-        std::function<bool(TransitionIndex)> returnFalse = (TransitionIndex t) {return false;};
+        std::function<bool(TransitionIndex)> returnFalse = [](TransitionIndex t) {return false;};
         auto phiEvaluator = phi != nullptr ? lmc.createLabelBasedFormulaEvaluator(psi) : returnFalse;
 
+        //bitwise or casts uint8_t implicitly to int
+        auto satisfied = (PrecalculatedTransition) (PrecalculatedTransition::SatisfiedDirect | PrecalculatedTransition::Satisfied);
+        auto excluded = (PrecalculatedTransition) (PrecalculatedTransition::ExcludedDirect | PrecalculatedTransition::Excluded);
 
         auto transitions = lmc.getTransitions();
         for (TransitionIndex t = 0; t < precalculatedTransitions.size(); t++) {
           if (psiEvaluator(t)) {
-            precalculatedTransitions = PrecalculatedTransition::SatisfiedDirect | PrecalculatedTransition::Satisfied;
+            precalculatedTransitions[t] = satisfied;
           } else if (phiEvaluator(t)) {
-            precalculatedTransitions = PrecalculatedTransition::ExcludedDirect | PrecalculatedTransition::Excluded;
+            precalculatedTransitions[t] = excluded;
           } else {
             precalculatedTransitions[t] = PrecalculatedTransition::Nothing;
           }
@@ -102,7 +105,7 @@ namespace {
         auto elapsedTimeStr = format(elapsedTime);
         cout << "\t\tFinished in " << elapsedTimeStr << "." <<std::endl;
     }
-    */
+
 
     Probability calculateBoundedUntil(const Formula& phi, const Formula& psi, int bound, const std::ostream& cout) {
         throw NotImplementedYetException();
