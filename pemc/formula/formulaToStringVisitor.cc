@@ -25,7 +25,7 @@
 
 #include "pemc/formula/formula.h"
 #include "pemc/formula/formulaToStringVisitor.h"
-#include "pemc/formula/labelFormula.h"
+#include "pemc/formula/adaptedFormula.h"
 #include "pemc/formula/unaryFormula.h"
 #include "pemc/formula/binaryFormula.h"
 #include "pemc/formula/boundedUnaryFormula.h"
@@ -40,8 +40,8 @@ namespace pemc {
     return output.str();
   }
 
-  void FormulaToStringVisitor::visitLabelFormula(LabelFormula* formula) {
-    output << formula->getLabel();
+  void FormulaToStringVisitor::visitAdaptedFormula(AdaptedFormula* formula) {
+    output << formula->getIdentifier();
   }
 
   void FormulaToStringVisitor::visitUnaryFormula(UnaryFormula* formula){

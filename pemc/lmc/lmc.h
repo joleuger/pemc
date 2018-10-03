@@ -26,12 +26,14 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 #include <gsl/span>
 
 #include "pemc/basic/tscIndex.h"
 #include "pemc/basic/probability.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/modelCapacity.h"
+#include "pemc/formula/formula.h"
 
 namespace pemc {
 
@@ -52,13 +54,14 @@ namespace pemc {
       StateIndex stateCount = 0;
       std::vector<LmcStateEntry> states;
 
-      std::vector<std::string> labels;
+      std::vector<std::string> labelIdentifier;
   public:
       Lmc();
 
       gsl::span<LmcStateEntry> getStates();
 
-      gsl::span<std::string> getLabels();
+      gsl::span<std::string> getLabelIdentifier();
+      std::function<bool(TransitionIndex)> createLabelBasedFormulaEvaluator(Formula* formula);
 
       gsl::span<LmcTransitionEntry> getTransitions();
       gsl::span<LmcTransitionEntry> getInitialTransitions();

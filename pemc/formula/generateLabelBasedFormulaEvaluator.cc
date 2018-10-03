@@ -24,31 +24,36 @@
 #include <ThrowAssert.hpp>
 
 #include "pemc/formula/formula.h"
-#include "pemc/formula/formulaToStringVisitor.h"
+#include "pemc/formula/formulaVisitor.h"
 #include "pemc/formula/adaptedFormula.h"
 #include "pemc/formula/unaryFormula.h"
 #include "pemc/formula/binaryFormula.h"
 #include "pemc/formula/boundedUnaryFormula.h"
 #include "pemc/formula/boundedBinaryFormula.h"
-
-#include "pemcCpp/cppFormula.h"
-#include "pemcCpp/generateSlowCppFormulaEvaluator.h"
+#include "pemc/formula/generateLabelBasedFormulaEvaluator.h"
 
 namespace {
   using namespace pemc;
-  using namespace pemc::cpp;
 
   #include <string>
   #include <sstream>
 
-  class SlowFormulaCompilationVisitor : public FormulaVisitor {
-  private:
-    CppModel* model;
-  public:
-    std::function<bool()> result;
 
-    SlowFormulaCompilationVisitor(CppModel* _model);
-    virtual ~SlowFormulaCompilationVisitor() = default;
+// Try to find the identifier of a formula in the set of label identifer to be able to evaluate,
+// wheter a given label is satisfied.
+// Works a bit different than the C# version StateFormulaSetEvaluatorCompilationVisitor.cs.
+// This could be optimized by creating an optimized function object or even machine code with LLVM.
+  class LabelBasedFormulaCompilationVisitor : public FormulaVisitor {
+  private:
+    gsl::span<std::string> labelIdentifier;
+
+    bool tryToFindIdentifier(Formula* formula);
+
+  public:
+    std::function<bool(Label)> result;
+
+    LabelBasedFormulaCompilationVisitor(gsl::span<std::string> _labelIdentifier);
+    virtual ~LabelBasedFormulaCompilationVisitor() = default;
 
     virtual void visitAdaptedFormula(AdaptedFormula* formula);
     virtual void visitUnaryFormula(UnaryFormula* formula);
@@ -57,17 +62,30 @@ namespace {
     virtual void visitBoundedBinaryFormula(BoundedBinaryFormula* formula);
   };
 
-  SlowFormulaCompilationVisitor::SlowFormulaCompilationVisitor(CppModel* _model)
-    : FormulaVisitor(), model(_model) {
+  LabelBasedFormulaCompilationVisitor::LabelBasedFormulaCompilationVisitor(gsl::span<std::string> _labelIdentifier)
+    : FormulaVisitor(), labelIdentifier(_labelIdentifier) {
   }
 
-  void SlowFormulaCompilationVisitor::visitAdaptedFormula(AdaptedFormula* formula) {
-    auto cppFormula = dynamic_cast<CppFormula*>(formula);
-    throw_assert(cppFormula!=nullptr, "Could not cast AdaptedFormula into a CppFormula");
-    result = std::bind(cppFormula->getEvaluator(), model);
+  bool LabelBasedFormulaCompilationVisitor::tryToFindIdentifier(Formula* formula) {
+      for (size_t i = 0; i < labelIdentifier.size(); i++) {
+        if (labelIdentifier[i] == formula->getIdentifier()) {
+			      result = [i](Label label){ return label[i]; };
+            return true;
+        }
+      }
+      return false;
+		}
+
+  void LabelBasedFormulaCompilationVisitor::visitAdaptedFormula(AdaptedFormula* formula) {
+    if (tryToFindIdentifier(formula))
+      return;
+    throw_assert(false, "Could not compile " + formula->getIdentifier());
   }
 
-  void SlowFormulaCompilationVisitor::visitUnaryFormula(UnaryFormula* formula){
+  void LabelBasedFormulaCompilationVisitor::visitUnaryFormula(UnaryFormula* formula){
+    if (tryToFindIdentifier(formula))
+      return;
+
   	formula->getOperand()->visit(this);
 
 		switch (formula->getOperator())
@@ -83,7 +101,7 @@ namespace {
           break;
         }
 			case UnaryOperator::Not: {
-  				result = [ operand{std::move(result)} ] { return !operand(); };
+  				result = [ operand{std::move(result)} ] (Label label) { return !operand(label); };
   				break;
         }
 			default: {
@@ -94,7 +112,10 @@ namespace {
 		}
   }
 
-  void SlowFormulaCompilationVisitor::visitBinaryFormula(BinaryFormula* formula){
+  void LabelBasedFormulaCompilationVisitor::visitBinaryFormula(BinaryFormula* formula){
+    if (tryToFindIdentifier(formula))
+      return;
+
     // https://stackoverflow.com/questions/8640393/move-capture-in-lambda
 		formula->getLeftOperand()->visit(this);
     auto leftOperand = std::move(result);
@@ -104,32 +125,32 @@ namespace {
 		switch (formula->getOperator())
 		{
 			case BinaryOperator::And:
-				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] {
-           if (!leftOperand()) {
+				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] (Label label) {
+           if (!leftOperand(label)) {
              return false;
            }
-           return rightOperand();
+           return rightOperand(label);
         };
 				break;
 			case BinaryOperator::Or:
-				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] {
-           if (leftOperand()) {
+				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] (Label label) {
+           if (leftOperand(label)) {
              return true;
            }
-           return rightOperand();
+           return rightOperand(label);
         };
 				break;
 			case BinaryOperator::Implication:
-				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] {
-           if (!leftOperand()) {
+				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] (Label label) {
+           if (!leftOperand(label)) {
              return true;
            }
-           return !rightOperand();
+           return !rightOperand(label);
         };
 				break;
 			case BinaryOperator::Equivalence:
-				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] {
-           return leftOperand() == rightOperand();
+				result = [ leftOperand{std::move(leftOperand)}, rightOperand{std::move(rightOperand)} ] (Label label) {
+           return leftOperand(label) == rightOperand(label);
         };
 				break;
 			case BinaryOperator::Until: {
@@ -146,21 +167,27 @@ namespace {
 
   }
 
-  void SlowFormulaCompilationVisitor::visitBoundedUnaryFormula(BoundedUnaryFormula* formula){
-      auto error = "Could not compile '"+std::to_string(formula->getOperator())+"'.";
-      throw_assert(false, error);
+  void LabelBasedFormulaCompilationVisitor::visitBoundedUnaryFormula(BoundedUnaryFormula* formula){
+    if (tryToFindIdentifier(formula))
+      return;
+
+    auto error = "Could not compile '"+std::to_string(formula->getOperator())+"'.";
+    throw_assert(false, error);
   }
 
-  void SlowFormulaCompilationVisitor::visitBoundedBinaryFormula(BoundedBinaryFormula* formula){
+  void LabelBasedFormulaCompilationVisitor::visitBoundedBinaryFormula(BoundedBinaryFormula* formula){
+    if (tryToFindIdentifier(formula))
+      return;
+
     auto error = "Could not compile '"+std::to_string(formula->getOperator())+"'.";
     throw_assert(false, error);
   }
 }
-namespace pemc { namespace cpp {
-  std::function<bool()> generateSlowCppFormulaEvaluator(CppModel* model, Formula& formula) {
-      auto compiler = SlowFormulaCompilationVisitor(model);
-      formula.visit(&compiler);
+namespace pemc {
+  std::function<bool(Label)> generateLabelBasedFormulaEvaluator(gsl::span<std::string> labelIdentifier, Formula* formula) {
+      auto compiler = LabelBasedFormulaCompilationVisitor(labelIdentifier);
+      formula->visit(&compiler);
       return std::move(compiler.result);
   }
 
-} }
+}

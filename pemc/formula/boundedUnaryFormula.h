@@ -29,7 +29,7 @@
 
 namespace pemc {
 
-  class BoundedUnaryFormula : Formula {
+  class BoundedUnaryFormula : public Formula {
   private:
     std::shared_ptr<Formula> operand;
     UnaryOperator unaryOperator;

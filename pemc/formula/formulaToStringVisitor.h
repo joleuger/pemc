@@ -40,7 +40,7 @@ namespace pemc {
 
     std::string getResult();
 
-    virtual void visitLabelFormula(LabelFormula* formula);
+    virtual void visitAdaptedFormula(AdaptedFormula* formula);
     virtual void visitUnaryFormula(UnaryFormula* formula);
     virtual void visitBinaryFormula(BinaryFormula* formula);
     virtual void visitBoundedUnaryFormula(BoundedUnaryFormula* formula);

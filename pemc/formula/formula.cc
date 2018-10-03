@@ -45,7 +45,7 @@ namespace pemc {
         identifier = generateIdentifier();
       }
       else {
-        identifier= _identifier;
+        identifier = _identifier;
       }
   }
 

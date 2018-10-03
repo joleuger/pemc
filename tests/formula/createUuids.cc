@@ -24,16 +24,16 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include "pemc/formula/labelFormula.h"
+#include "pemc/formula/adaptedFormula.h"
 
 using namespace pemc;
 
 
 TEST(formula_test, uuids_are_different) {
-    auto f1 = LabelFormula();
-    auto f2 = LabelFormula();
-    std::cout << "Label f1: " << f1.getLabel() <<std::endl;
-    std::cout << "Label f2: " << f2.getLabel() <<std::endl;
+    auto f1 = AdaptedFormula();
+    auto f2 = AdaptedFormula();
+    std::cout << "Identifier f1: " << f1.getIdentifier() <<std::endl;
+    std::cout << "Identifier f2: " << f2.getIdentifier() <<std::endl;
 
-    ASSERT_NE(f1.getLabel(), f2.getLabel()) << "FAIL";
+    ASSERT_NE(f1.getIdentifier(), f2.getIdentifier()) << "FAIL";
 }

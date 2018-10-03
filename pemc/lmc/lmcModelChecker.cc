@@ -21,7 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <functional>
+#include <boost/timer/timer.hpp>
+#include <vector>
 
 #include "pemc/basic/exceptions.h"
 #include "pemc/formula/formulaUtils.h"
@@ -29,8 +30,9 @@
 
 namespace {
     using namespace pemc;
+    using boost::timer::cpu_timer;
 
-    enum PrecalculatedTransitions : int8_t
+    enum PrecalculatedTransition : int8_t
     {
       Nothing = 0,
       SatisfiedDirect = 1,
@@ -41,7 +43,7 @@ namespace {
     };
 
     void LmcIteration(Lmc& lmc,
-                      gsl::span<PrecalculatedTransitions> &precalculations,
+                      gsl::span<PrecalculatedTransition> &precalculations,
                       gsl::span<Probability> &xold,
                       gsl::span<Probability> &xnew,
                       Probability startValue) {
@@ -55,11 +57,11 @@ namespace {
           for (TransitionIndex t=begin; t<end; t++) {
         		auto& transition = transitions[t];
             auto& precalulated = precalculations[t];
-        		if (precalulated & PrecalculatedTransitions::Satisfied)
+        		if (precalulated & PrecalculatedTransition::Satisfied)
         		{
         			sum += transition.probability;
         		}
-        		else if (precalulated & PrecalculatedTransitions::Excluded)
+        		else if (precalulated & PrecalculatedTransition::Excluded)
         		{
         		}
         		else
@@ -70,9 +72,53 @@ namespace {
         	xnew[s] = sum;
         }
     }
+/*
+    void PrecalculateDirectSatisfactionAndExclusion(Lmc& lmc,
+                    gsl::span<PrecalculatedTransition> precalculatedTransitions,
+                    Formula* phi,
+                    Formula* psi,
+                    const std::ostream& cout) {
+        cout << "Precalculate transitions that are directly satisfied or excluded. " <<std::endl;
+        cpu_timer timer;
+
+        auto psiEvaluator = lmc.createLabelBasedFormulaEvaluator(psi);
+        std::function<bool(TransitionIndex)> returnFalse = (TransitionIndex t) {return false;};
+        auto phiEvaluator = phi != nullptr ? lmc.createLabelBasedFormulaEvaluator(psi) : returnFalse;
+
+
+        auto transitions = lmc.getTransitions();
+        for (TransitionIndex t = 0; t < precalculatedTransitions.size(); t++) {
+          if (psiEvaluator(t)) {
+            precalculatedTransitions = PrecalculatedTransition::SatisfiedDirect | PrecalculatedTransition::Satisfied;
+          } else if (phiEvaluator(t)) {
+            precalculatedTransitions = PrecalculatedTransition::ExcludedDirect | PrecalculatedTransition::Excluded;
+          } else {
+            precalculatedTransitions[t] = PrecalculatedTransition::Nothing;
+          }
+        }
+
+        timer.stop();
+        auto elapsedTime = timer.elapsed();
+        auto elapsedTimeStr = format(elapsedTime);
+        cout << "\t\tFinished in " << elapsedTimeStr << "." <<std::endl;
+    }
+    */
+
+    Probability calculateBoundedUntil(const Formula& phi, const Formula& psi, int bound, const std::ostream& cout) {
+        throw NotImplementedYetException();
+
+        cpu_timer timer;
+
+        timer.stop();
+        auto elapsedTime = timer.elapsed();
+        auto elapsedTimeStr = format(elapsedTime);
+    }
 }
 
 namespace pemc {
+
+  using boost::timer::cpu_timer;
+  namespace stde = std::experimental;
 
   LmcModelChecker::LmcModelChecker(const Lmc& _lmc, const Configuration& _conf)
     :lmc(_lmc),
@@ -89,35 +135,20 @@ namespace pemc {
     Formula* psi;
     stde::optional<int> bound;
     std::tie(phi, psi, bound) = *matchFormula;
-    /*
 
     *conf.cout << "Checking formula: " << formulaToString(formulaToCheck);
 
-    var stopwatch = new Stopwatch();
-		stopwatch.Start();
-		double result;
 
-		if (bound!=boost::none)
+		if (bound!=stde::nullopt)
 		{
-			result = CalculateBoundedProbability(phi, psi, *bound);
+			return calculateBoundedUntil(*phi, *psi, *bound, *conf.cout);
 		}
 		else
 		{
-			auto maxIterations = 50;
-			result = CalculateUnboundUntil(phi, psi, maxIterations);
+      // CalculateUnboundUntil
+      throw NotImplementedYetException();
 		}
 
-		//stopwatch.Stop();
-    auto elapsedTime = "stopwatch.Elapsed";
-    */
-
-		//_conf.cout << "Built-in probabilistic model checker model checking time: ")
-    //          << elapsedTime;
-		//return new Probability(result);
-
-
-
-    throw NotImplementedYetException();
     return Probability::Error();
   }
 

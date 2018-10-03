@@ -21,30 +21,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_CPP_CPPFORMULA_H_
-#define PEMC_CPP_CPPFORMULA_H_
+#include "pemc/formula/adaptedFormula.h"
+#include "pemc/formula/formulaVisitor.h"
 
-#include <functional>
+namespace pemc {
 
-#include <pemc/formula/adaptedFormula.h>
+  AdaptedFormula::AdaptedFormula(const std::string& _identifier)
+      : Formula(_identifier){
+  }
 
-#include "pemcCpp/cppModel.h"
+  void AdaptedFormula::visit(FormulaVisitor* visitor) {
+    visitor->visitAdaptedFormula(this);
+  }
 
-namespace pemc { namespace cpp {
-
-  using namespace pemc;
-
-  // such formulas should be static in the model classes
-  class CppFormula : public AdaptedFormula {
-  private:
-    std::function<bool(CppModel*)> evaluator;
-  public:
-    CppFormula(const std::function<bool(CppModel*)>& _evaluator,
-      const std::string& _identifier = "");
-    virtual ~CppFormula() = default;
-
-    std::function<bool(CppModel*)> getEvaluator();
-  };
-
-} }
-#endif  // PEMC_CPP_CPPFORMULA_H_
+}

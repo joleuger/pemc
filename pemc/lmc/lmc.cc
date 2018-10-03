@@ -26,6 +26,7 @@
 #include <ThrowAssert.hpp>
 
 #include "pemc/basic/exceptions.h"
+#include "pemc/formula/generateLabelBasedFormulaEvaluator.h"
 #include "pemc/lmc/lmc.h"
 
 namespace pemc {
@@ -73,9 +74,21 @@ namespace pemc {
     return std::make_tuple(from,to);
   }
 
-  gsl::span<std::string> Lmc::getLabels() {
-    return gsl::span<std::string>(labels);
+  gsl::span<std::string> Lmc::getLabelIdentifier() {
+    return gsl::span<std::string>(labelIdentifier);
   }
+
+  // generates a lambda, which takes a transitionIndex as input and returns the result of evaluating
+  // formula on this label.
+  std::function<bool(TransitionIndex)>Lmc::createLabelBasedFormulaEvaluator(Formula* formula) {
+		auto labelEvaluator = generateLabelBasedFormulaEvaluator(getLabelIdentifier(), formula);
+		std::function<bool(TransitionIndex)> evaluator = [this,labelEvaluator](TransitionIndex transitionIndex) {
+      auto transitions = this->getTransitions();
+			auto labelOfInputTransition = transitions[transitionIndex].label;
+			return labelEvaluator(labelOfInputTransition);
+		};
+		return evaluator;
+	}
 
 
   void Lmc::initialize(ModelCapacity& modelCapacity) {

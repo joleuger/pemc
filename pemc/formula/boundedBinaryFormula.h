@@ -29,7 +29,7 @@
 
 namespace pemc {
 
-  class BoundedBinaryFormula : Formula {
+  class BoundedBinaryFormula : public Formula {
   private:
     std::shared_ptr<Formula> leftOperand;
     BinaryOperator binaryOperator;

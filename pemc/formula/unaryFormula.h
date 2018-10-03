@@ -45,7 +45,7 @@ namespace pemc {
 		Exists
   };
 
-  class UnaryFormula : Formula {
+  class UnaryFormula : public Formula {
   private:
     std::shared_ptr<Formula> operand;
     UnaryOperator unaryOperator;

@@ -27,7 +27,7 @@ namespace pemc { namespace cpp {
 
   CppFormula::CppFormula(const std::function<bool(CppModel*)>& _evaluator,
     const std::string& _identifier)
-      : LabelFormula(_identifier), evaluator(_evaluator) {
+      : AdaptedFormula(_identifier), evaluator(_evaluator) {
   }
 
   std::function<bool(CppModel*)> CppFormula::getEvaluator() {

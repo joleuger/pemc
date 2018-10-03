@@ -39,7 +39,7 @@ namespace pemc {
 		Until
   };
 
-  class BinaryFormula : Formula {
+  class BinaryFormula : public Formula {
   private:
     std::shared_ptr<Formula> leftOperand;
     BinaryOperator binaryOperator;

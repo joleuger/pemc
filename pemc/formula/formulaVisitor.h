@@ -28,7 +28,8 @@
 
 namespace pemc {
 
-  class LabelFormula;
+  class Formula;
+  class AdaptedFormula;
   class UnaryFormula;
   class BinaryFormula;
   class BoundedUnaryFormula;
@@ -38,7 +39,7 @@ namespace pemc {
   public:
     virtual ~FormulaVisitor() = default;
 
-    virtual void visitLabelFormula(LabelFormula* formula) = 0;
+    virtual void visitAdaptedFormula(AdaptedFormula* formula) = 0;
     virtual void visitUnaryFormula(UnaryFormula* formula) = 0;
     virtual void visitBinaryFormula(BinaryFormula* formula) = 0;
     virtual void visitBoundedUnaryFormula(BoundedUnaryFormula* formula) = 0;

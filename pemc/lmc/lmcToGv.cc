@@ -35,7 +35,7 @@ namespace {
   void exportDistribution(Lmc& lmc, std::ostream& out,
     const std::string& sourceStateName, gsl::span<LmcTransitionEntry> transitions)
   {
-    auto labels = lmc.getLabels();
+    auto labels = lmc.getLabelIdentifier();
 
   	for (auto& transition : transitions)
   	{
