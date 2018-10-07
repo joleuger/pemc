@@ -141,6 +141,7 @@ namespace pemc {
   TransitionIndex Lmc::getPlaceForNewInitialTransitionEntries(NoOfElements number) {
     auto locationOfFirstNewEntry = getPlaceForNewTransitionEntries(number);
     initialTransitionFrom = locationOfFirstNewEntry;
+    initialTransitionElements = number;
     return locationOfFirstNewEntry;
   }
 

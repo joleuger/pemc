@@ -60,6 +60,7 @@ namespace {
         		if (precalulated & PrecalculatedTransition::Satisfied)
         		{
         			sum += transition.probability;
+
         		}
         		else if (precalulated & PrecalculatedTransition::Excluded)
         		{
@@ -161,7 +162,7 @@ namespace {
         timer.stop();
         auto elapsedTime = timer.elapsed();
         auto elapsedTimeStr = format(elapsedTime);
-        
+
         return result;
     }
 }
@@ -177,7 +178,7 @@ namespace pemc {
   {
   };
 
-  Probability LmcModelChecker::CalculateProbability(Formula formulaToCheck) {
+  Probability LmcModelChecker::calculateProbability(Formula& formulaToCheck) {
     auto matchFormula = tryExtractPhiUntilPsiWithBound(formulaToCheck);
     if (matchFormula== stde::nullopt)
       return Probability::Error();
@@ -186,7 +187,7 @@ namespace pemc {
     stde::optional<int> bound;
     std::tie(phi, psi, bound) = *matchFormula;
 
-    *conf.cout << "Checking formula: " << formulaToString(formulaToCheck);
+    *conf.cout << "Checking formula: " << formulaToString(formulaToCheck) << std::endl;
 
 		if (bound!=stde::nullopt)
 		{

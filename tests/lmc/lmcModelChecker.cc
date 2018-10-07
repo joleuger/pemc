@@ -23,14 +23,26 @@
 
 #include<gtest/gtest.h>
 
+#include "pemc/formula/binaryFormula.h"
+#include "pemc/formula/boundedUnaryFormula.h"
 #include "pemc/lmc/lmcModelChecker.h"
+
+#include "tests/lmc/lmcExamples.h"
 
 using namespace pemc;
 
 
-TEST(lmcModelChecker_test, lmc_is_constructed) {
-    Lmc lmc;
+TEST(lmcModelChecker_test, check_simple_formula) {
+    auto example = LmcExample1();
+    auto& lmc = example.lmc;
 
-    ASSERT_EQ(lmc.getStates().size(), 0) << "FAIL";
-    ASSERT_EQ(lmc.getTransitions().size(), 0) << "FAIL";
+    auto finally_f2 = std::make_shared<BoundedUnaryFormula>(example.f2,UnaryOperator::Finally,15);
+
+    auto configuration = Configuration();
+    auto mc = LmcModelChecker(lmc, configuration);
+    auto probability = mc.calculateProbability(*finally_f2);
+
+    std::cout << "Probability is " << prettyPrint(probability) << std::endl;
+
+    ASSERT_EQ(probabilityIsOne(probability,0.000001), true) << "FAIL";
 }

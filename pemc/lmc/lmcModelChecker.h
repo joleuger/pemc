@@ -37,7 +37,7 @@ namespace pemc {
   public:
       LmcModelChecker(Lmc& _lmc, const Configuration& _conf);
 
-      Probability CalculateProbability(Formula formulaToCheck);
+      Probability calculateProbability(Formula& formulaToCheck);
   };
 
 }

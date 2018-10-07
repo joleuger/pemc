@@ -11,6 +11,10 @@ if get_option('buildtype').startswith('debug')
   add_project_arguments('-DDEBUG', language : 'cpp')
 endif
 
+# external dependencies
+#boostdep = dependency('boost', modules : ['thread', 'system', 'timer'])
+boostdep = dependency('boost', modules : ['system', 'timer'])
+
 # libpemc_include = include_directories('src')
 libpemc_include = include_directories('.',
   'external/GSL/include',
@@ -38,7 +42,7 @@ libpemc =  static_library('pemc',
   'pemc/lcmdp/lcmdpModelChecker.cc',
   'pemc/lcmdp/lcmdpToGv.cc',
   include_directories : libpemc_include)
-libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpemc_include)
+libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpemc_include, dependencies: boostdep)
 
 
 libpemcCpp_include = include_directories('language')

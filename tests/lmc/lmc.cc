@@ -48,10 +48,10 @@ TEST(lmc_test, lmc_createLabelBasedFormulaEvaluator_works) {
     auto f1_and_f2 = std::make_shared<BinaryFormula>(example.f1,BinaryOperator::And,example.f2);
     auto evaluator = lmc.createLabelBasedFormulaEvaluator(f1_and_f2.get());
 
-    TransitionIndex beginOf3, endOf3 = 0;
-    std::tie(beginOf3, endOf3) = lmc.getTransitionIndexesOfState(3);
+    TransitionIndex beginOf2, endOf2 = 0;
+    std::tie(beginOf2, endOf2) = lmc.getTransitionIndexesOfState(2);
 
-    auto resultOfFirstTransitionOfState3 = evaluator(beginOf3);
+    auto resultOfFirstTransitionOfState3 = evaluator(beginOf2);
 
     ASSERT_EQ(resultOfFirstTransitionOfState3, true) << "FAIL";
 }

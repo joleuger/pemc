@@ -82,6 +82,8 @@ namespace pemc {
   bool probabilityIsValid(Probability& probability);
 
   bool probabilityIsOne(double value, double tolerance);
+
+  bool probabilityIsOne(const Probability& value, double tolerance);
 }
 
 #endif  // PEMC_BASIC_PROBABILITY_H_

@@ -21,6 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+
+#include "pemc/formula/adaptedFormula.h"
+#include "pemc/formula/binaryFormula.h"
+
 #include "tests/lmc/lmcExamples.h"
 
 using namespace pemc;
@@ -49,19 +53,19 @@ LmcExample1::LmcExample1()
 
   auto locationOfFirstInitialEntry = lmc.getPlaceForNewInitialTransitionEntries(1);
   lmc.setLmcTransitionEntry(locationOfFirstInitialEntry,
+    LmcTransitionEntry(Probability::One(), false_false, 0) );
+
+  auto locationOfFirstEntryOfState1 = lmc.getPlaceForNewTransitionEntriesOfState(0,1);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState1,
     LmcTransitionEntry(Probability::One(), false_false, 1) );
 
-  auto locationOfFirstEntryOfState1 = lmc.getPlaceForNewTransitionEntriesOfState(1,1);
-  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState1,
+  auto locationOfFirstEntryOfState2 = lmc.getPlaceForNewTransitionEntriesOfState(1,1);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState2,
     LmcTransitionEntry(Probability::One(), false_false, 2) );
 
-  auto locationOfFirstEntryOfState2 = lmc.getPlaceForNewTransitionEntriesOfState(2,1);
-  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState2,
-    LmcTransitionEntry(Probability::One(), false_false, 3) );
-
-  auto locationOfFirstEntryOfState3 = lmc.getPlaceForNewTransitionEntriesOfState(3,1);
+  auto locationOfFirstEntryOfState3 = lmc.getPlaceForNewTransitionEntriesOfState(2,1);
   lmc.setLmcTransitionEntry(locationOfFirstEntryOfState3,
-    LmcTransitionEntry(Probability::One(), true_true, 3) );
+    LmcTransitionEntry(Probability::One(), true_true, 2) );
 
   auto noOfStates = 3;
   lmc.finishCreation(noOfStates);
