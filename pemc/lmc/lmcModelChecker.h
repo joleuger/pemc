@@ -32,10 +32,10 @@ namespace pemc {
 
   class LmcModelChecker {
   private:
-      const Lmc& lmc;
+      Lmc& lmc;
       const Configuration& conf;
   public:
-      LmcModelChecker(const Lmc& _lmc, const Configuration& _conf);
+      LmcModelChecker(Lmc& _lmc, const Configuration& _conf);
 
       Probability CalculateProbability(Formula formulaToCheck);
   };

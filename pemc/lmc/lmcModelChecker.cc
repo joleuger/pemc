@@ -23,6 +23,7 @@
 
 #include <boost/timer/timer.hpp>
 #include <vector>
+#include <utility>
 
 #include "pemc/basic/exceptions.h"
 #include "pemc/formula/formulaUtils.h"
@@ -42,11 +43,10 @@ namespace {
       Mark = 16,
     };
 
-    void LmcIteration(Lmc& lmc,
-                      gsl::span<PrecalculatedTransition> &precalculations,
-                      gsl::span<Probability> &xold,
-                      gsl::span<Probability> &xnew,
-                      Probability startValue) {
+    void calculateIteration(Lmc& lmc,
+                      gsl::span<PrecalculatedTransition> precalculations,
+                      gsl::span<Probability> xold,
+                      gsl::span<Probability> xnew) {
         auto stateCount = lmc.getStates().size();
         for (StateIndex s = 0; s < stateCount; ++s) {
         	auto transitions = lmc.getTransitions();
@@ -73,7 +73,34 @@ namespace {
         }
     }
 
-    void PrecalculateDirectSatisfactionAndExclusion(Lmc& lmc,
+    Probability calculateInitialProbability(Lmc& lmc,
+                      gsl::span<PrecalculatedTransition> precalculations,
+                      gsl::span<Probability> x) {
+      	auto transitions = lmc.getTransitions();
+      	auto sum = Probability::Zero();
+        TransitionIndex begin, end = 0;
+        std::tie(begin, end) = lmc.getInitialTransitionIndexes();
+
+        for (TransitionIndex t=begin; t<end; t++) {
+      		auto& transition = transitions[t];
+          auto& precalulated = precalculations[t];
+      		if (precalulated & PrecalculatedTransition::Satisfied)
+      		{
+      			sum += transition.probability;
+      		}
+      		else if (precalulated & PrecalculatedTransition::Excluded)
+      		{
+      		}
+      		else
+      		{
+      			sum += transition.probability * x[transition.state];
+      		}
+      	}
+      	return sum;
+
+    }
+
+    void precalculateDirectSatisfactionAndExclusion(Lmc& lmc,
                     gsl::span<PrecalculatedTransition> precalculatedTransitions,
                     Formula* phi,
                     Formula* psi,
@@ -89,7 +116,6 @@ namespace {
         auto satisfied = (PrecalculatedTransition) (PrecalculatedTransition::SatisfiedDirect | PrecalculatedTransition::Satisfied);
         auto excluded = (PrecalculatedTransition) (PrecalculatedTransition::ExcludedDirect | PrecalculatedTransition::Excluded);
 
-        auto transitions = lmc.getTransitions();
         for (TransitionIndex t = 0; t < precalculatedTransitions.size(); t++) {
           if (psiEvaluator(t)) {
             precalculatedTransitions[t] = satisfied;
@@ -107,14 +133,36 @@ namespace {
     }
 
 
-    Probability calculateBoundedUntil(const Formula& phi, const Formula& psi, int bound, const std::ostream& cout) {
-        throw NotImplementedYetException();
+    Probability calculateBoundedUntil(Lmc& lmc, Formula* phi, Formula* psi, int bound, std::ostream& cout) {
 
         cpu_timer timer;
+
+        auto transitions = lmc.getTransitions();
+        std::vector<PrecalculatedTransition> precalculations(transitions.size());
+        precalculateDirectSatisfactionAndExclusion(lmc, precalculations, phi, psi, cout);
+
+        auto stateCount = lmc.getStates().size();
+        auto probablityVector1 = std::vector<Probability>(stateCount);
+        auto probablityVector2 = std::vector<Probability>(stateCount);
+        auto xold = gsl::span<Probability>(probablityVector1);
+        auto xnew = gsl::span<Probability>(probablityVector2);
+
+        for (auto i = 0; i < bound; i++) {
+          calculateIteration(lmc, precalculations, xold, xnew);
+          std::swap(xold, xnew);
+
+          if (i%10==0) {
+            cout << "Calculated " << i << " iterations" << std::endl;
+          }
+        }
+
+        auto result = calculateInitialProbability(lmc, precalculations, xold);
 
         timer.stop();
         auto elapsedTime = timer.elapsed();
         auto elapsedTimeStr = format(elapsedTime);
+        
+        return result;
     }
 }
 
@@ -123,7 +171,7 @@ namespace pemc {
   using boost::timer::cpu_timer;
   namespace stde = std::experimental;
 
-  LmcModelChecker::LmcModelChecker(const Lmc& _lmc, const Configuration& _conf)
+  LmcModelChecker::LmcModelChecker(Lmc& _lmc, const Configuration& _conf)
     :lmc(_lmc),
      conf(_conf)
   {
@@ -131,7 +179,6 @@ namespace pemc {
 
   Probability LmcModelChecker::CalculateProbability(Formula formulaToCheck) {
     auto matchFormula = tryExtractPhiUntilPsiWithBound(formulaToCheck);
-
     if (matchFormula== stde::nullopt)
       return Probability::Error();
     Formula* phi;
@@ -141,10 +188,9 @@ namespace pemc {
 
     *conf.cout << "Checking formula: " << formulaToString(formulaToCheck);
 
-
 		if (bound!=stde::nullopt)
 		{
-			return calculateBoundedUntil(*phi, *psi, *bound, *conf.cout);
+			return calculateBoundedUntil(lmc, phi, psi, *bound, *conf.cout);
 		}
 		else
 		{
