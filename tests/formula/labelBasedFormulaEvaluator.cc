@@ -36,25 +36,26 @@ namespace {
   auto f1 = std::make_shared<AdaptedFormula>("f1");
   auto f2 = std::make_shared<AdaptedFormula>("f2");
 
+  auto f1_and_f2 = std::make_shared<BinaryFormula>(f1,BinaryOperator::And,f2);
+
   auto labelIdentifier = std::vector<std::string> {"f1", "f2"};
+
+  auto false_false = std::vector<bool> { false, false };
+  auto false_true = std::vector<bool> { false, true };
+  auto true_false = std::vector<bool> { true, false };
+  auto true_true = std::vector<bool> { true, true };
 }
 
 using namespace pemc;
 
 
 TEST(formula_test, labelBasedFormulaEvaluatorOfBinaryFormula) {
-    auto f1_and_f2 = std::make_shared<BinaryFormula>(f1,BinaryOperator::And,f2);
     auto labelEvaluator = generateLabelBasedFormulaEvaluator(labelIdentifier, f1_and_f2.get());
 
-    auto label1 = std::vector<bool> { false, false };
-    auto label2 = std::vector<bool> { false, true };
-    auto label3 = std::vector<bool> { true, false };
-    auto label4 = std::vector<bool> { true, true };
-
-    auto result1 = labelEvaluator(Label(label1));
-    auto result2 = labelEvaluator(Label(label2));
-    auto result3 = labelEvaluator(Label(label3));
-    auto result4 = labelEvaluator(Label(label4));
+    auto result1 = labelEvaluator(Label(false_false));
+    auto result2 = labelEvaluator(Label(false_true));
+    auto result3 = labelEvaluator(Label(true_false));
+    auto result4 = labelEvaluator(Label(true_true));
 
     ASSERT_EQ(result1, false) << "FAIL";
     ASSERT_EQ(result2, false) << "FAIL";

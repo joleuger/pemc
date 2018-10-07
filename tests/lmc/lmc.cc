@@ -25,12 +25,33 @@
 
 #include "pemc/lmc/lmc.h"
 
+#include "tests/lmc/lmcExamples.h"
+
 using namespace pemc;
 
+namespace {
+  using namespace pemc;
+
+}
 
 TEST(lmc_test, lmc_is_constructed) {
     Lmc lmc;
 
     ASSERT_EQ(lmc.getStates().size(), 0) << "FAIL";
     ASSERT_EQ(lmc.getTransitions().size(), 0) << "FAIL";
+}
+
+TEST(lmc_test, lmc_createLabelBasedFormulaEvaluator_works) {
+    auto example = LmcExample1();
+    auto& lmc = example.lmc;
+
+    auto f1_and_f2 = std::make_shared<BinaryFormula>(example.f1,BinaryOperator::And,example.f2);
+    auto evaluator = lmc.createLabelBasedFormulaEvaluator(f1_and_f2.get());
+
+    TransitionIndex beginOf3, endOf3 = 0;
+    std::tie(beginOf3, endOf3) = lmc.getTransitionIndexesOfState(3);
+
+    auto resultOfFirstTransitionOfState3 = evaluator(beginOf3);
+
+    ASSERT_EQ(resultOfFirstTransitionOfState3, true) << "FAIL";
 }

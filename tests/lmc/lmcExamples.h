@@ -25,5 +25,21 @@
 #define TESTS_PEMC_LMC_LMC_H_
 
 #include "pemc/lmc/lmc.h"
+#include "pemc/basic/label.h"
+#include "pemc/formula/adaptedFormula.h"
+#include "pemc/formula/binaryFormula.h"
+
+using namespace pemc;
+
+class LmcExample1 {
+public:
+  LmcExample1();
+
+  Lmc lmc;
+  std::shared_ptr<Formula> f1;
+  std::shared_ptr<Formula> f2;
+
+};
+
 
 #endif  // TESTS_PEMC_LMC_LMC_H_

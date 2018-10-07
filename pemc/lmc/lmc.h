@@ -40,7 +40,13 @@ namespace pemc {
   struct LmcStateEntry { TransitionIndex from; int elements; };
 
   // Transition = Target + Probability
-  struct LmcTransitionEntry { Probability probability; Label label; StateIndex state; };
+  struct LmcTransitionEntry {
+    Probability probability; Label label; StateIndex state;
+
+    LmcTransitionEntry() = default;
+    LmcTransitionEntry(Probability _probability, Label _label, StateIndex _state)
+      : probability(_probability), label(_label), state(_state) {}
+  };
 
   class Lmc {
   private:
@@ -55,12 +61,15 @@ namespace pemc {
       std::vector<LmcStateEntry> states;
 
       std::vector<std::string> labelIdentifier;
+
+      TransitionIndex getPlaceForNewTransitionEntries(NoOfElements number);
   public:
       Lmc();
 
       gsl::span<LmcStateEntry> getStates();
 
       gsl::span<std::string> getLabelIdentifier();
+      void setLabelIdentifier(const std::vector<std::string>& _labelIdentifier);
       std::function<bool(TransitionIndex)> createLabelBasedFormulaEvaluator(Formula* formula);
 
       gsl::span<LmcTransitionEntry> getTransitions();
@@ -69,7 +78,9 @@ namespace pemc {
       gsl::span<LmcTransitionEntry> getTransitionsOfState(StateIndex state);
       std::tuple<TransitionIndex,TransitionIndex> getTransitionIndexesOfState(StateIndex state);
 
-      TransitionIndex getPlaceForNewTransitionChainElements(NoOfElements number);
+      TransitionIndex getPlaceForNewTransitionEntriesOfState(StateIndex stateIndex, NoOfElements number);
+      TransitionIndex getPlaceForNewInitialTransitionEntries(NoOfElements number);
+      void setLmcTransitionEntry(TransitionIndex index, const LmcTransitionEntry& entry);
       void createStutteringState(StateIndex stutteringStateIndex);
 
       void initialize(ModelCapacity& modelCapacity);

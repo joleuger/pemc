@@ -21,17 +21,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include<gtest/gtest.h>
-
-#include "pemc/lmc/lmc.h"
 #include "tests/lmc/lmcExamples.h"
 
 using namespace pemc;
 
+namespace {
+  using namespace pemc;
 
-TEST(lmc_test, lmc_is_constructed) {
-    Lmc lmc;
+  auto false_false = std::vector<bool> { false, false };
+  auto false_true = std::vector<bool> { false, true };
+  auto true_false = std::vector<bool> { true, false };
+  auto true_true = std::vector<bool> { true, true };
 
-    ASSERT_EQ(lmc.getStates().size(), 0) << "FAIL";
-    ASSERT_EQ(lmc.getTransitions().size(), 0) << "FAIL";
+}
+
+LmcExample1::LmcExample1()
+  : lmc(Lmc()){
+
+  f1 = std::make_shared<AdaptedFormula>("f1");
+  f2 = std::make_shared<AdaptedFormula>("f2");
+
+  auto capacity = ModelCapacityByModelSize::Small();
+  lmc.initialize(capacity);
+
+  auto labelIdentifier = std::vector<std::string> {"f1", "f2"};
+  lmc.setLabelIdentifier(labelIdentifier);
+
+  auto locationOfFirstInitialEntry = lmc.getPlaceForNewInitialTransitionEntries(1);
+  lmc.setLmcTransitionEntry(locationOfFirstInitialEntry,
+    LmcTransitionEntry(Probability::One(), false_false, 1) );
+
+  auto locationOfFirstEntryOfState1 = lmc.getPlaceForNewTransitionEntriesOfState(1,1);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState1,
+    LmcTransitionEntry(Probability::One(), false_false, 2) );
+
+  auto locationOfFirstEntryOfState2 = lmc.getPlaceForNewTransitionEntriesOfState(2,1);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState2,
+    LmcTransitionEntry(Probability::One(), false_false, 3) );
+
+  auto locationOfFirstEntryOfState3 = lmc.getPlaceForNewTransitionEntriesOfState(3,1);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState3,
+    LmcTransitionEntry(Probability::One(), true_true, 3) );
+
+  auto noOfStates = 3;
+  lmc.finishCreation(noOfStates);
+
 }

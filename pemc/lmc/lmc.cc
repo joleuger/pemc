@@ -78,6 +78,10 @@ namespace pemc {
     return gsl::span<std::string>(labelIdentifier);
   }
 
+  void Lmc::setLabelIdentifier(const std::vector<std::string>& _labelIdentifier) {
+    labelIdentifier = _labelIdentifier;
+  }
+
   // generates a lambda, which takes a transitionIndex as input and returns the result of evaluating
   // formula on this label.
   std::function<bool(TransitionIndex)>Lmc::createLabelBasedFormulaEvaluator(Formula* formula) {
@@ -118,12 +122,31 @@ namespace pemc {
     // https://stackoverflow.com/questions/21028299/is-this-behavior-of-vectorresizesize-type-n-under-c11-and-boost-container/21028912#21028912
   }
 
-  TransitionIndex Lmc::getPlaceForNewTransitionChainElements(NoOfElements number) {
+  TransitionIndex Lmc::getPlaceForNewTransitionEntries(NoOfElements number) {
 		auto locationOfFirstNewEntry = std::atomic_fetch_add( &transitionCount, number);
 		if (locationOfFirstNewEntry + number >= maxNumberOfTransitions || locationOfFirstNewEntry < 0)
 			throw OutOfMemoryException("Unable to store transitions. Try increasing the transition capacity.");
 		return locationOfFirstNewEntry ;
 	}
+
+  TransitionIndex Lmc::getPlaceForNewTransitionEntriesOfState(StateIndex stateIndex, NoOfElements number) {
+    auto locationOfFirstNewEntry = getPlaceForNewTransitionEntries(number);
+
+    auto &stateEntry = states[stateIndex];
+    stateEntry.from=locationOfFirstNewEntry;
+    stateEntry.elements=number;
+    return locationOfFirstNewEntry;
+  }
+
+  TransitionIndex Lmc::getPlaceForNewInitialTransitionEntries(NoOfElements number) {
+    auto locationOfFirstNewEntry = getPlaceForNewTransitionEntries(number);
+    initialTransitionFrom = locationOfFirstNewEntry;
+    return locationOfFirstNewEntry;
+  }
+
+  void Lmc::setLmcTransitionEntry(TransitionIndex index, const LmcTransitionEntry& entry) {
+    transitions[index]=entry;
+  }
 
 	void Lmc::createStutteringState(StateIndex stutteringStateIndex) {
 		// The stuttering state might not be reached at all.
@@ -135,7 +158,7 @@ namespace pemc {
 		throw_assert(stateEntry.from == -1 && stateEntry.elements == 0, "Stuttering state has already been created");
     #endif
 
-		auto locationOfNewEntry = getPlaceForNewTransitionChainElements(1);
+		auto locationOfNewEntry = getPlaceForNewTransitionEntries(1);
     auto &transitionEntry = transitions[locationOfNewEntry];
 		transitionEntry.label = Label();
 		transitionEntry.probability = Probability(1.0);
