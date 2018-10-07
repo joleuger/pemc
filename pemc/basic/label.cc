@@ -21,22 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_BASIC_LABEL_H_
-#define PEMC_BASIC_LABEL_H_
 
-#include <inttypes.h>
-#include <vector>
+#include <ThrowAssert.hpp>
+
+#include "pemc/basic/label.h"
+
+
+namespace {
+
+  void checkLabelCount(size_t size) {
+    throw_assert(size < 31, "Too many labels");
+  }
+}
 
 namespace pemc {
 
-  struct Label {
-    int32_t value = 0;
+  Label::Label() {
+    value = 0;
+  }
 
-    Label();
-    Label(std::vector<bool>& values);
+  Label::Label(std::vector<bool>& values) {
+      auto noOfValues = values.size();
+      checkLabelCount(noOfValues);
+      value = 0;
 
-    bool operator[](int32_t index);
-  };
+      for (auto i = 0; i < noOfValues; ++i)
+        value |= values[i] ? 1 << i : 0;
+  }
+
+  bool Label::operator[](int32_t index)
+  {
+    return (value & (1 << index)) != 0;
+  }
 
 }
-#endif  // PEMC_BASIC_LABEL_H_

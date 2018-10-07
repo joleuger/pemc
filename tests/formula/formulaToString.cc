@@ -21,22 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_BASIC_LABEL_H_
-#define PEMC_BASIC_LABEL_H_
+#include <gtest/gtest.h>
+#include <iostream>
 
-#include <inttypes.h>
-#include <vector>
+#include "pemc/formula/adaptedFormula.h"
+#include "pemc/formula/binaryFormula.h"
+#include "pemc/formula/formulaUtils.h"
 
-namespace pemc {
+using namespace pemc;
 
-  struct Label {
-    int32_t value = 0;
 
-    Label();
-    Label(std::vector<bool>& values);
+TEST(formula_test, formulaToStringOfBinaryFormula) {
+    auto f1 = std::make_shared<AdaptedFormula>("f1");
+    auto f2 = std::make_shared<AdaptedFormula>("f2");
 
-    bool operator[](int32_t index);
-  };
+    auto f1_and_f2 = std::make_shared<BinaryFormula>(f1,BinaryOperator::And,f2);
+    auto formulaString = formulaToString(*f1_and_f2);
 
+    std::cout << "Formula: " << formulaString << std::endl;
+
+    ASSERT_EQ(formulaString, "(f1 && f2)") << "FAIL";
 }
-#endif  // PEMC_BASIC_LABEL_H_

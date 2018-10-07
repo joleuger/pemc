@@ -20,6 +20,7 @@ libpemc_include = include_directories('.',
 
 libpemc =  static_library('pemc',
   'pemc/basic/probability.cc',
+  'pemc/basic/label.cc',
   'pemc/formula/formula.cc',
   'pemc/formula/adaptedFormula.cc',
   'pemc/formula/unaryFormula.cc',
@@ -61,6 +62,8 @@ gtest_dep = declare_dependency(sources : ['external/googletest/googletest/src/gt
 libpemctests = [
   'tests/test.cc',
   'tests/formula/createUuids.cc',
+  'tests/formula/formulaToString.cc',
+  'tests/formula/labelBasedFormulaEvaluator.cc',
   'tests/lmc/lmc.cc',
   'tests/lmc/lmcModelChecker.cc',
   'tests/lcmdp/lcmdp.cc',
