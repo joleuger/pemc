@@ -41,5 +41,15 @@ public:
 
 };
 
+class LmcExample2 {
+public:
+  LmcExample2();
+
+  Lmc lmc;
+  std::shared_ptr<Formula> f1;
+  std::shared_ptr<Formula> f2;
+
+};
+
 
 #endif  // TESTS_PEMC_LMC_LMC_H_

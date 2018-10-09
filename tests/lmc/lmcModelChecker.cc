@@ -32,7 +32,7 @@
 using namespace pemc;
 
 
-TEST(lmcModelChecker_test, check_simple_formula) {
+TEST(lmcModelChecker_test, check_simple_formula_1) {
     auto example = LmcExample1();
     auto& lmc = example.lmc;
 
@@ -45,4 +45,36 @@ TEST(lmcModelChecker_test, check_simple_formula) {
     std::cout << "Probability is " << prettyPrint(probability) << std::endl;
 
     ASSERT_EQ(probabilityIsOne(probability,0.000001), true) << "FAIL";
+}
+
+
+TEST(lmcModelChecker_test, check_simple_formula_2) {
+    auto example = LmcExample2();
+    auto& lmc = example.lmc;
+
+    auto configuration = Configuration();
+    auto mc = LmcModelChecker(lmc, configuration);
+
+    auto finally_f2_in_i = [&](int i) {
+      auto formula = std::make_shared<BoundedUnaryFormula>(example.f2,UnaryOperator::Finally,i);
+      return mc.calculateProbability(*formula);
+    };
+
+    auto results = std::vector<Probability>(15);
+    for (auto i=0; i < 15; i++) {
+      results[i]=finally_f2_in_i(i);
+      std::cout << "Probability for " << i << " steps is "
+        << prettyPrint(results[i]) << std::endl;
+    }
+
+    auto result200=finally_f2_in_i(200);
+    std::cout << "Probability for 200 steps is " << prettyPrint(result200) << std::endl;
+
+    ASSERT_EQ(probabilityIsAround(results[0], 0.0, 0.000001), true) << "FAIL";
+    ASSERT_EQ(probabilityIsAround(results[1], 0.1, 0.000001), true) << "FAIL";
+    ASSERT_EQ(probabilityIsAround(results[2], 0.1 + 0.9*0.09, 0.000001), true) << "FAIL";
+    ASSERT_EQ(probabilityIsAround(results[3], 0.1 + 0.9*0.09 + 0.9*0.9*0.09, 0.000001), true) << "FAIL";
+    ASSERT_EQ(probabilityIsAround(results[4], 0.1 + 0.9*0.09 + 0.9*0.9*0.09 + 0.9*0.9*0.9*0.09, 0.000001), true) << "FAIL";
+
+    ASSERT_EQ(probabilityIsAround(result200, 0.91, 0.000001), true) << "FAIL";
 }

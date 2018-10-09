@@ -77,13 +77,17 @@ namespace pemc {
     }
   };
 
-  std::string prettyPrint(Probability& probability);
+  std::string prettyPrint(const Probability& probability);
 
-  bool probabilityIsValid(Probability& probability);
+  bool probabilityIsValid(const Probability& probability);
 
   bool probabilityIsOne(double value, double tolerance);
 
+  bool probabilityIsAround(double realValue, double desiredValue, double tolerance);
+
   bool probabilityIsOne(const Probability& value, double tolerance);
+
+  bool probabilityIsAround(const Probability& realValue, double desiredValue, double tolerance);
 }
 
 #endif  // PEMC_BASIC_PROBABILITY_H_

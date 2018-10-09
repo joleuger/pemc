@@ -41,6 +41,7 @@ namespace {
 
 LmcExample1::LmcExample1()
   : lmc(Lmc()){
+    // 0----> 1 ----> 2⟲ f2
 
   f1 = std::make_shared<AdaptedFormula>("f1");
   f2 = std::make_shared<AdaptedFormula>("f2");
@@ -55,17 +56,64 @@ LmcExample1::LmcExample1()
   lmc.setLmcTransitionEntry(locationOfFirstInitialEntry,
     LmcTransitionEntry(Probability::One(), false_false, 0) );
 
-  auto locationOfFirstEntryOfState1 = lmc.getPlaceForNewTransitionEntriesOfState(0,1);
-  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState1,
+  auto locationOfFirstEntryOfState0 = lmc.getPlaceForNewTransitionEntriesOfState(0,1);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState0,
     LmcTransitionEntry(Probability::One(), false_false, 1) );
 
-  auto locationOfFirstEntryOfState2 = lmc.getPlaceForNewTransitionEntriesOfState(1,1);
-  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState2,
+  auto locationOfFirstEntryOfState1 = lmc.getPlaceForNewTransitionEntriesOfState(1,1);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState1,
     LmcTransitionEntry(Probability::One(), false_false, 2) );
 
-  auto locationOfFirstEntryOfState3 = lmc.getPlaceForNewTransitionEntriesOfState(2,1);
-  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState3,
+  auto locationOfFirstEntryOfState2 = lmc.getPlaceForNewTransitionEntriesOfState(2,1);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState2,
     LmcTransitionEntry(Probability::One(), true_true, 2) );
+
+  auto noOfStates = 3;
+  lmc.finishCreation(noOfStates);
+
+}
+
+
+LmcExample2::LmcExample2()
+  : lmc(Lmc()){
+  // 0---->
+  //  -f1-> 1⟲
+  //           ----> 2⟲
+  //           -f2-> 2
+  // 0-f2->          2
+
+  f1 = std::make_shared<AdaptedFormula>("f1");
+  f2 = std::make_shared<AdaptedFormula>("f2");
+
+  auto capacity = ModelCapacityByModelSize::Small();
+  lmc.initialize(capacity);
+
+  auto labelIdentifier = std::vector<std::string> {"f1", "f2"};
+  lmc.setLabelIdentifier(labelIdentifier);
+
+  auto locationOfFirstInitialEntry = lmc.getPlaceForNewInitialTransitionEntries(1);
+  lmc.setLmcTransitionEntry(locationOfFirstInitialEntry,
+    LmcTransitionEntry(Probability::One(), false_false, 0) );
+
+  auto locationOfFirstEntryOfState0 = lmc.getPlaceForNewTransitionEntriesOfState(0,3);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState0,
+    LmcTransitionEntry(Probability(0.6), false_false, 1) );
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState0+1,
+    LmcTransitionEntry(Probability(0.3), true_false, 1) );
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState0+2,
+    LmcTransitionEntry(Probability(0.1), false_true, 2) );
+
+  auto locationOfFirstEntryOfState1 = lmc.getPlaceForNewTransitionEntriesOfState(1,3);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState1,
+    LmcTransitionEntry(Probability(0.9), false_false, 1) );
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState1+1,
+    LmcTransitionEntry(Probability(0.01), false_false, 2) );
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState1+2,
+    LmcTransitionEntry(Probability(0.09), false_true, 2) );
+
+  auto locationOfFirstEntryOfState2 = lmc.getPlaceForNewTransitionEntriesOfState(2,1);
+  lmc.setLmcTransitionEntry(locationOfFirstEntryOfState2,
+    LmcTransitionEntry(Probability::One(), false_false, 2) );
 
   auto noOfStates = 3;
   lmc.finishCreation(noOfStates);

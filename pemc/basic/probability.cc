@@ -28,7 +28,7 @@
 
 namespace pemc {
 
-  std::string prettyPrint(Probability& probability) {
+  std::string prettyPrint(const Probability& probability) {
     // http://www.cplusplus.com/reference/cstdio/printf/
 
     char buffer [50];
@@ -63,7 +63,7 @@ namespace pemc {
       return std::string("probability.cc: failed");
   }
 
-  bool probabilityIsValid(Probability& probability) {
+  bool probabilityIsValid(const Probability& probability) {
     return probability.value > 0.0 && probability.value <= 1.0;
   }
 
@@ -71,7 +71,15 @@ namespace pemc {
     return value >= 1.0 - tolerance && value <= 1.0 + tolerance;
   }
 
+  bool probabilityIsAround(double realValue, double desiredValue, double tolerance) {
+    return realValue >= desiredValue - tolerance && realValue <= desiredValue + tolerance;
+  }
+
   bool probabilityIsOne(const Probability& value, double tolerance) {
     return probabilityIsOne(value.value, tolerance);
+  }
+
+  bool probabilityIsAround(const Probability& realValue, double desiredValue, double tolerance) {
+    return probabilityIsAround(realValue.value, desiredValue, tolerance);
   }
 }
