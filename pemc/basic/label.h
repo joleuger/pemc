@@ -24,7 +24,7 @@
 #ifndef PEMC_BASIC_LABEL_H_
 #define PEMC_BASIC_LABEL_H_
 
-#include <inttypes.h>
+#include <cstdint>
 #include <vector>
 
 namespace pemc {

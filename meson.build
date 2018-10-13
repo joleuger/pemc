@@ -34,13 +34,14 @@ libpemc =  static_library('pemc',
   'pemc/formula/formulaToStringVisitor.cc',
   'pemc/formula/generateLabelBasedFormulaEvaluator.cc',
   'pemc/formula/formulaUtils.cc',
-  'pemc/lcmdp/lcmdp.cc',
-  'pemc/lmc/lmc.cc',
-  'pemc/lmc/lmcModelChecker.cc',
-  'pemc/lmc/lmcToGv.cc',
+  'pemc/genericTraverser/stateStorage.cc',
   'pemc/lcmdp/lcmdp.cc',
   'pemc/lcmdp/lcmdpModelChecker.cc',
   'pemc/lcmdp/lcmdpToGv.cc',
+  'pemc/lmc/lmc.cc',
+  'pemc/lmc/lmcModelChecker.cc',
+  'pemc/lmc/lmcToGv.cc',
+  'pemc/lmcTraverser/lmcBuilder.cc',
   include_directories : libpemc_include)
 libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpemc_include, dependencies: boostdep)
 

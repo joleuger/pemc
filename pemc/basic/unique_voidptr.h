@@ -21,21 +21,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_BASIC_TSINDEX_H_
-#define PEMC_BASIC_TSINDEX_H_
+#ifndef PEMC_BASIC_UNIQUE_VOIDPTR_H_
+#define PEMC_BASIC_UNIQUE_VOIDPTR_H_
 
-#include <cstdint>
+// idea from
+// https://stackoverflow.com/questions/39288891/why-is-shared-ptrvoid-legal-while-unique-ptrvoid-is-ill-formed
 
 namespace pemc {
 
-  using StateIndex = int32_t; // StateIndex must allow the value -1.
-  using TransitionIndex = int32_t;
-  using TargetIndex = int32_t;
-  using ChoiceIndex = int32_t;
-  using NoOfElements = int32_t;
+  using deleter_t = std::function<void(void *)>;
+  using unique_void_ptr = std::unique_ptr<void, deleter_t>;
 
-  // pemc byte
-  using pbyte = int8_t; // use until std::byte is included
+  void deleter(void *data) {
+      ::operator delete(data);
+  }
+
+  unique_void_ptr unique_void(void* ptr) {
+      return unique_void_ptr(ptr, &deleter);
+  }
+
 }
 
-#endif  // PEMC_BASIC_TSINDEX_H_
+#endif  // PEMC_BASIC_UNIQUE_VOIDPTR_H_

@@ -37,7 +37,7 @@
 
 namespace pemc {
 
-  struct LmcStateEntry { TransitionIndex from; int elements; };
+  struct LmcStateEntry { TransitionIndex from; int32_t elements; };
 
   // Transition = Target + Probability
   struct LmcTransitionEntry {
@@ -50,13 +50,13 @@ namespace pemc {
 
   class Lmc {
   private:
-      int maxNumberOfTransitions = 0;
+      TransitionIndex maxNumberOfTransitions = 0;
       std::atomic<TransitionIndex> transitionCount = 0;
       std::vector<LmcTransitionEntry> transitions;
       TransitionIndex initialTransitionFrom = -1; //is uninitialized at first, but may be something else than 0
-      int initialTransitionElements = 0;
+      int32_t initialTransitionElements = 0;
 
-      int maxNumberOfStates = 0;
+      StateIndex maxNumberOfStates = 0;
       StateIndex stateCount = 0;
       std::vector<LmcStateEntry> states;
 
