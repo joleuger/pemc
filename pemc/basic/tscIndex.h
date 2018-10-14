@@ -33,9 +33,6 @@ namespace pemc {
   using TargetIndex = int32_t;
   using ChoiceIndex = int32_t;
   using NoOfElements = int32_t;
-
-  // pemc byte
-  using pbyte = int8_t; // use until std::byte is included
 }
 
 #endif  // PEMC_BASIC_TSINDEX_H_

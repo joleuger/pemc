@@ -34,7 +34,7 @@
 #include "pemc/basic/probability.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/modelCapacity.h"
-#include "pemc/basic/unique_voidptr.h"
+#include "pemc/basic/rawMemory.h"
 #include "pemc/formula/formula.h"
 
 namespace pemc {
@@ -54,6 +54,9 @@ namespace pemc {
 
       // The number of buckets that can be stored in a cache line.
       static const size_t BucketsPerCacheLine = CacheLineSize / sizeof(StateIndex);
+
+      // special std::vector that is aligned for more speed
+      using alignedStateIndexVector = std::vector<std::atomic<StateIndex>, boost::alignment::aligned_allocator<std::atomic<StateIndex>, CacheLineSize> >;
 
       // The length in bytes of a state vector required for the analysis model.
       int32_t modelStateVectorSize;
@@ -78,7 +81,7 @@ namespace pemc {
       pbyte* pStateMemory;
       std::unique_ptr<std::vector<std::atomic<StateIndex>>> indexMapper;
       // hashes in next line should be aligned for more speed
-      std::unique_ptr<std::vector<std::atomic<StateIndex>, boost::alignment::aligned_allocator<std::atomic<StateIndex>, CacheLineSize> >> hashes;
+      std::unique_ptr<alignedStateIndexVector> hashes;
 
       void resizeStateBuffer();
 

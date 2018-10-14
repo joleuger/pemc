@@ -23,8 +23,9 @@ libpemc_include = include_directories('.',
 )
 
 libpemc =  static_library('pemc',
-  'pemc/basic/probability.cc',
   'pemc/basic/label.cc',
+  'pemc/basic/probability.cc',
+  'pemc/basic/rawMemory.cc',
   'pemc/formula/formula.cc',
   'pemc/formula/adaptedFormula.cc',
   'pemc/formula/unaryFormula.cc',
