@@ -1,0 +1,149 @@
+%uses biblatex, biber, lualatex
+
+\documentclass[fontsize=12pt,twoside,twocolumn=false,draft=false]{scrbook}
+
+
+% Komaskript
+
+
+\usepackage[american,ngerman]{babel}
+\usepackage[hyphens,spaces,obeyspaces]{url}
+\usepackage{booktabs}
+\usepackage{pbox}
+\usepackage{scrpage2}
+\usepackage{microtype}
+\usepackage{paralist}
+\usepackage{xspace}
+\usepackage{float}
+\usepackage{placeins} 
+\usepackage{mathrsfs}
+\usepackage{amsfonts}
+\usepackage{stmaryrd}
+\usepackage[fleqn,leqno]{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{relsize}
+\usepackage{scalerel}
+
+\usepackage{graphicx}
+\usepackage{subcaption}
+\newsavebox{\temporaryimage}
+\newsavebox{\temporarydatastructure}
+
+
+\DeclareFontFamily{U}{customfontimport1}{} 
+\DeclareFontShape{U}{customfontimport1}{m}{n}{ 
+      <5> <6> <7> <8> <9> <10>
+      <10.95> <12> <14.4> <17.28> <20.74> <24.88>
+      mathx10
+      }{}
+\DeclareSymbolFont{customfontimport1}{U}{customfontimport1}{m}{n}
+\DeclareMathAccent{\widecheck}{0}{customfontimport1}{"71}
+\DeclareMathAccent{\wideparen}{0}{customfontimport1}{"75}
+
+% Anchor (from arev. see arevsymbols.tex)
+\DeclareSymbolFont{customfontimport2}{U}{zavm}{m}{n}
+\DeclareMathSymbol{\anchorsymbol}{\mathalpha}{customfontimport2}{123}
+\newcommand*{\anchorhelper}{\scalebox{0.6}{$\anchorsymbol$}}
+\newcommand*{\anchor}{{\scalerel*{\anchorsymbol}{>}}}
+
+
+\DeclareFontEncoding{LS1}{}{}
+\DeclareFontSubstitution{LS1}{stix}{m}{n}
+\DeclareSymbolFont{customfontimport4}{LS1}{stix}{m}{it}
+\DeclareMathAccent{\stixleftarrowaccent}{\mathalpha}{customfontimport4}{"91}   % \leftarrowaccent
+\DeclareMathAccent{\stixrightarrowaccent}{\mathalpha}{customfontimport4}{"92}   % \rightarrowaccent
+
+\mathchardef\mhyphen="2D % Define a "math hyphen"
+
+\DeclareMathAlphabet{\mathcaldutch}{U}{dutchcal}{m}{n}
+
+
+
+
+%%%%%%%%% SCHRIFTEN %%%%%%%%%
+\usepackage{lmodern}
+\usepackage[mathcal]{eucal}
+
+\usepackage[math]{mathspec}
+
+\usepackage[nameinlink,noabbrev]{cleveref} %capitalise noabbrev nameinlink
+
+
+%%%%%%%%% DEFINITIONEN %%%%%%%%%
+
+\usepackage{thmtools}
+\declaretheoremstyle[
+%    headfont=\normalsize\bfseries\fontfamily{cmr}, 
+    bodyfont=\itshape\normalsize\fontfamily{lmr}\selectfont{}, %lmr
+    spacebelow=\parsep,
+    spaceabove=\topsep,    
+]{standarditalics}
+
+
+\theoremstyle{definition} % definition means text in roman + spacing
+\newtheorem{definition}{Definition}[chapter]  % \definition mit dem Textnamen Definition, Zählung anpassen an chapter
+\theoremstyle{remark} % definition means text in roman + no-spacing
+\newtheorem*{remark}{Remark}  % * makes unnumbered
+\theoremstyle{standarditalics}
+\theoremstyle{definition}
+\newtheorem{theorem}[definition]{Theorem} % \theorem (satz) mit dem Textnamen Theorem, Zählung mit gleichem Zähler wie definition
+\newtheorem{corollary}[definition]{Corollary} % Zählung mit gleichem Zähler wie definition
+\newtheorem{proposition}[definition]{Proposition} % Zählung mit gleichem Zähler wie definition
+\newtheorem{lemma}[definition]{Lemma}
+
+
+
+\theoremstyle{definition}
+\newtheorem{example}[definition]{Example} 
+\newtheorem*{example*}{Example}
+
+\newcounter{equationstore}
+\AtBeginEnvironment{proof}{\setcounter{equationstore}{\value{equation}}
+\setcounter{equation}{0}\renewcommand{\theequation}{\arabic{equation}}}
+\AtEndEnvironment{proof}{\setcounter{equation}{\value{equationstore}}}
+
+\setlength{\marginparwidth}{18mm}
+\newcommand*{\defAmRand}[1]{\marginpar{#1}}
+
+
+\usepackage[noend]{algpseudocode}
+\usepackage{mdframed}
+\algrenewcommand\alglinenumber[1]{\tiny\rmfamily #1}
+
+
+\theoremstyle{definition}
+
+
+\definecolor{algorithmbackground}{rgb}{.95,.95,.95}
+
+\mdfdefinestyle{algorithmstyle}{%
+linecolor=black,linewidth=0.5pt,%
+backgroundcolor=algorithmbackground,
+}
+\mdtheorem[style=algorithmstyle]{numberedAlgorithm}{Algorithm}[chapter]
+
+
+\newenvironment{algorithmbox}[1][]{%
+\bgroup \footnotesize
+  \begin{numberedAlgorithm}[#1]%\hspace*{0.0mm}%
+}
+{\end{numberedAlgorithm}\egroup}
+
+\newcommand*{\probabilisticsystemscalefactor}{0.6}
+
+\usepackage[style=alphabetic,maxbibnames=99,minalphanames=2,maxalphanames=3,backend=biber,date=long,dateabbrev=false,firstinits=true]{biblatex}
+\addbibresource{bibliography.bib}
+
+
+
+
+ 
+
+\begin{document}
+\include{content}
+
+\printbibliography
+
+\end{document}

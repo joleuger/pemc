@@ -1,0 +1,719 @@
+\selectlanguage{american}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% BASE MATH %%%%%%%%%%%%%
+
+\newcommand*{\natrange}[3]{ #2 \le #1 \le #3 }   % #1 in {#2 .. #3} or #2 \le #1 \le #3
+\newcommand*{\natrangeex}[3]{ #2 \le #1 < #3 } % #2 \le #1 < #3
+\newcommand*{\natbelow}[2]{{  #1 \le #2}}
+\newcommand*{\natabove}[2]{{ #1 \ge #2}}
+\newcommand*{\natzero}[1]{{ #1 \ge 0}} % 1 \leq i
+\newcommand*{\posnats}{ \mathbb{Z}^{+} } % 1,2,3,...
+\newcommand*{\intabove}[2]{{ #1 \ge #2}} % 1 \leq i
+
+
+\newcommand*{\bigdjunion}{\bigcup} % union of disjoint sets \bigsqcup
+\newcommand*{\djunion}{\cup} % union of disjoint sets \sqcup
+
+\newcommand{\init}{\mathit{init}}
+
+%Proposition Logic
+\newcommand*{\false}{\mathrm{false}}
+\newcommand*{\true}{\mathrm{true}}
+
+
+%Temporal Logic
+\newcommand*{\TlFinally}{\mathbf{F}\,}    % \operatorname
+\newcommand*{\TlUntil}{\,\mathbf{U}\,}
+\newcommand*{\TlFinallyBounded}[1]{\mathbf{F}_{\le #1}\,}
+\newcommand*{\TlUntilBounded}[1]{\,\mathbf{U}_{\le #1}\,}
+\newcommand*{\TlOnce}{\,\mathbf{O}\,}
+
+%Probabilistic
+\newcommand*{\prob}{p}
+\newcommand*{\ProbDomain}{\mathbb{Q}} %or Interval {q\in \mathbb{Q}| 0\le q\le 1}
+\newcommand*{\ProbRange}{[0,1]}
+\newcommand*{\ProbNonZeroRange}{(0,1]}
+\newcommand*{\Prob}{\mathit{Pr}}
+\newcommand*{\ProbOf}[1]{\Prob^{#1}}
+\newcommand*{\ProbInState}[1]{\Prob_{#1}}
+\newcommand*{\ProbOfInState}[2]{\ProbInState{#2}^{#1}}
+\newcommand*{\ProbSampleSpace}{\Omega}
+\newcommand*{\ProbSetOfEvents}{\mathfrak{E}} %\mathit{Events}
+\newcommand*{\ExpectedProb}{E}
+
+
+
+
+%Generic Transition systems
+\newcommand{\InfPathName}{InfPaths}
+
+\newcommand{\emptysequence}{\scalebox{0.8}{$\varnothing$}}
+\newcommand{\state}{s}
+\newcommand{\AtProps}{P}
+\newcommand{\States}{S}
+\newcommand*{\Labels}{L}
+\newcommand*{\lbl}{\ell}
+\newcommand*{\infpath}{\widehat{\pi}}
+\newcommand*{\initinfpath}{\widehat{\pi}_\init}
+\newcommand*{\ancpath}{\infpath_{\anchor}}
+\newcommand*{\dotspath}{\dotso}
+\newcommand*{\finpath}{\pi}
+\newcommand*{\initfinpath}{\pi_\init}
+\newcommand*{\ancfinpath}{\finpath_{\anchor}}
+\newcommand*{\anctuple}[2]{[#1,#2]}
+\newcommand*{\cpath}{\varrho}   
+\newcommand*{\finobspath}{\finpath_o}
+\newcommand*{\infobspath}{\infpath_o}
+\newcommand{\pathprefix}[1]{\infpath[..#1]}
+\newcommand{\ancpathprefix}[1]{\ancpath[..#1]}
+\newcommand{\Paths}{\mathit{\InfPathName}}
+\newcommand{\InitPaths}{\mathit{\InfPathName}_\init}
+\newcommand{\AncPaths}{\mathit{\InfPathName}_{\anchor}}
+\newcommand{\AncPathsStartingFrom}[1]{\mathit{\InfPathName}_{#1}}
+\newcommand*{\firstStateOfAncpath}[1]{\mathit{first}(#1)}
+\newcommand{\FinPaths}{\mathit{FinPaths}}
+\newcommand{\InitFinPaths}{\mathit{FinPaths}_\init}
+\newcommand{\AncEmptyPaths}{\mathit{EmptyPaths}}
+\newcommand{\AncFinPaths}{\mathit{FinPaths}_{\anchor}} 
+\newcommand{\AncFinPathsStartingFrom}[1]{\mathit{FinPaths}_{#1}}
+\newcommand*{\AncFinPathsOfInterest}{\Pi}
+\newcommand*{\AncFinPathsOfInterestStartingFrom}[1]{{\restrictTo{\AncFinPathsOfInterest}{}{#1}}}
+\newcommand*{\FinObservablePathsOf}[1]{\mathit{\InfPathName}_{\mathit{fobs}}^{#1}}
+\newcommand*{\ObservablePathsOf}[1]{\mathit{\InfPathName}_{\mathit{obs}}^{#1}}
+\newcommand*{\ChoicePathsOf}[1]{\mathit{Paths}_{\mathit{choice}}^{#1}}
+\newcommand*{\AncPathsOfInterest}{\hat{\Pi}}
+\newcommand*{\AncPathsOfInterestStartingFrom}[1]{{\restrictTo{\Pi}{}{#1}}}
+\newcommand*{\SetOfAncPaths}{\AncPathsOfInterest_{\anchor}}
+\newcommand*{\LtLabel}{\Lambda}
+\newcommand*{\Trans}{R}
+\newcommand*{\Targets}{\Theta}
+\newcommand*{\target}{\theta}
+\newcommand*{\targetstate}{\tau}
+\newcommand*{\righttargetstate}{\tau}
+\newcommand*{\Prefixes}{\mathit{Pref}}
+\newcommand*{\AncPrefixes}{\mathit{Pref}}
+\newcommand*{\StateRootChoice}{C}
+\newcommand*{\initialRootChoice}{\cmdpChoice_\init}
+\newcommand*{\choiceTrans}{\mathit{succ}}
+\newcommand*{\tsleadsto}{\rightsquigarrow}
+\newcommand*{\pathlength}[1]{\left| #1 \right|}
+\newcommand*{\pathconcat}[2]{#1{}#2}
+\newcommand*{\pathjoin}[2]{#1{}#2}
+
+%Both, Mdps and Dtmcs
+\newcommand*{\Dists}{\mathit{Dists}}
+\newcommand*{\dist}{\mu}
+\newcommand*{\initialdist}{\mu_\init}
+\newcommand*{\Scheduler}{\mathfrak{s}}
+\newcommand*{\Schedulers}{\mathfrak{S}}
+\newcommand*{\Cylinder}[1]{#1\raisebox{\depth}{\scalebox{0.8}{$\uparrow$}}}
+\newcommand*{\restrictTo}[3]{#1\mathop{\hspace{-0.2em}\upharpoonright^{#2}_{#3}}}
+\newcommand*{\CylinderOf}[2]{\Cylinder{#2}^{#1}}
+
+
+%Labeled Transition system structures
+\newcommand{\Lts}{\mathit{LTS}}
+\newcommand{\LtsTrans}{\mathit{R}}
+\newcommand{\LtsInit}{\mathit{I}}
+
+%Markov Chains
+\newcommand*{\Mc}{\mathcal{M}}
+\newcommand*{\McStates}{\States^{\Mc}}
+\newcommand*{\McTargets}{\Targets^{\Mc}}
+\newcommand*{\McDists}{\mathit{Dists}}
+\newcommand*{\mcdiststarget}{\theta}
+\newcommand*{\Mctargetstate}{\targetstate^{\Mc}}
+\newcommand*{\Mcinitialdist}{\initialdist^{\Mc}}
+\newcommand*{\McCylinder}[1]{\CylinderOf{\Mc}{#1}}
+\newcommand*{\McSamples}{\ProbSampleSpace^{\Mc}}
+\newcommand*{\McSamplesInState}[1]{\ProbSampleSpace_{#1}^{\Mc}}
+\newcommand*{\McEvents}{\ProbSetOfEvents^{\Mc}}
+\newcommand*{\McEventsInState}[1]{\ProbSetOfEvents_{#1}^{\Mc}}
+\newcommand*{\McProb}{\ProbOf{\Mc}}
+\newcommand*{\McProbInState}[1]{\ProbOfInState{\Mc}{#1}}
+
+\newcommand{\mcdist}{\dist}
+\newcommand*{\distOfState}[1]{\dist_{#1}}
+\newcommand{\McTrans}{\Trans^{\Mc}}
+\newcommand*{\McPaths}{\Paths^{\Mc}}
+\newcommand*{\McInitPaths}{\InitPaths^{\Mc}}
+\newcommand*{\McAncPaths}{\AncPaths^{\Mc}}
+\newcommand*{\McAncPathsStartingFrom}[1]{\AncPathsStartingFrom{#1}^{\Mc}}
+\newcommand*{\McFinPaths}{\FinPaths^{\Mc}}
+\newcommand*{\McAncEmptyPaths}{\AncEmptyPaths^{\Mc}}
+\newcommand*{\McInitFinPaths}{\InitFinPaths^{\Mc}}
+\newcommand*{\McAncFinPaths}{\AncFinPaths^{\Mc}}
+\newcommand*{\McAncFinPathsStartingFrom}[1]{\AncFinPathsStartingFrom{#1}^{\Mc}}
+
+
+
+
+%Mdps
+\newcommand*{\Mdp}{\mathcal{M}}
+\newcommand*{\MdpDists}{\McDists}
+\newcommand*{\MdpSteps}{\mathit{Steps}}  % \mathitcmr
+
+%Choice-aware Markov Decision Processes
+\newcommand*{\Choices}{\mathcal{C}}
+\newcommand*{\ChoiceScheduler}{\mathfrak{c}}
+\newcommand*{\choiceSchedulerWithChoiceSchedulerDistOfState}[2]{\dist^{#1}_{#2}}
+\newcommand*{\choiceSchedulerDistOfState}[1]{\choiceSchedulerWithChoiceSchedulerDistOfState{\ChoiceScheduler}{#1}}
+\newcommand*{\choiceSchedulerInitialDist}{\initialdist^{\ChoiceScheduler}}
+\newcommand*{\StepScheduler}{\Scheduler} %
+\newcommand*{\MaxStepScheduler}{\mathrm{max}}
+\newcommand*{\MinStepScheduler}{\mathrm{min}}
+\newcommand*{\ChoiceSchedulers}{\mathfrak{C}}
+\newcommand*{\StepSchedulers}{\Schedulers}
+\newcommand*{\choicepathtarget}{\righttargetstate}
+\newcommand*{\choiceschedulerLeadsWithProbTo}[2]{\overset{#2}{\tsleadsto}_{#1}}
+
+\newcommand*{\AncStepSchedulerPaths}{\AncPaths^\StepScheduler}
+\newcommand*{\AncStepSchedulerPathsStartingFrom}[1]{\AncPathsStartingFrom{#1}^\StepScheduler}
+\newcommand*{\AncFinStepSchedulerPathsStartingFrom}[1]{\AncFinPathsStartingFrom{#1}^\StepScheduler}
+\newcommand*{\AncFinStepSchedulerPaths}{\AncFinPaths^\StepScheduler}
+\newcommand*{\AncStepSchedulerPathsOfInterest}{{\restrictTo{\AncPathsOfInterest}{\StepScheduler}{}}}
+\newcommand*{\AncStepSchedulerPathsOfInterestStartingFrom}[1]{{\restrictTo{\AncPathsOfInterest}{\StepScheduler}{#1}}}
+\newcommand*{\AncFinStepSchedulerPathsOfInterest}{{\restrictTo{\AncFinPathsOfInterest}{\StepScheduler}{}}}
+\newcommand*{\AncFinStepSchedulerPathsOfInterestStartingFrom}[1]{{\restrictTo{\AncFinPathsOfInterest}{\StepScheduler}{#1}}}
+\newcommand*{\MidwayStepScheduler}[1]{{\Scheduler[#1]}}
+\newcommand*{\InitFinStepSchedulerPathsOfInterest}{{\restrictTo{\AncFinPathsOfInterest}{\StepScheduler,\ChoiceScheduler_\init}{}}}
+
+
+\newcommand*{\Cmdp}{\mathcal{M}}
+\newcommand*{\CmdpChoices}{\Choices^{\Cmdp}}
+\newcommand*{\cmdpChoice}{c}
+\newcommand*{\CmdpStateRootChoice}{\StateRootChoice^{\Cmdp}}
+\newcommand*{\cmdpInitialRootChoice}{\initialRootChoice^{\Cmdp}}
+\newcommand*{\cmdpChoiceTrans}{\choiceTrans^{\Cmdp}}
+\newcommand*{\cmdpLeadsto}{\tsleadsto_{\Cmdp}}
+
+\newcommand*{\CmdpStates}{\States^{\Cmdp}}
+\newcommand*{\CmdpTargets}{\Targets^{\Cmdp}}
+
+\newcommand*{\CmdpScheduler}{\Scheduler^{\Cmdp}}
+\newcommand*{\CmdpFinPaths}{\FinPaths^{\Cmdp}}
+\newcommand*{\CmdpFinObservablePaths}{\FinObservablePathsOf{\Cmdp}}
+\newcommand*{\CmdpObservablePaths}{\ObservablePathsOf{\Cmdp}}
+\newcommand*{\CmdpChoicePaths}{\ChoicePathsOf{\Cmdp}}
+\newcommand*{\cmdpdist}{\mu}
+\newcommand*{\CmdpPaths}{\Paths^{\Cmdp}}
+\newcommand*{\CmdpInitPaths}{\InitPaths^{\Cmdp}}
+\newcommand*{\CmdpInitFinPaths}{\InitFinPaths^{\Cmdp}}
+\newcommand*{\CmdpAncPaths}{\AncPaths^{\Cmdp}}
+\newcommand*{\CmdpAncPathsStartingFrom}[1]{\AncPathsStartingFrom{#1}^{\Cmdp}}
+\newcommand*{\CmdpAncFinPaths}{\AncFinPaths^{\Cmdp}}
+\newcommand*{\CmdpAncEmptyPaths}{\AncEmptyPaths^{\Cmdp}}
+\newcommand*{\CmdpAncFinPathsStartingFrom}[1]{\AncFinPathsStartingFrom{#1}^{\Cmdp}}
+\newcommand*{\CmdpAncStepSchedulerPaths}{\AncPaths^{\Cmdp,\StepScheduler}}
+\newcommand*{\CmdpAncFinStepSchedulerPaths}{\AncFinPaths^{\Cmdp,\StepScheduler}}
+\newcommand*{\CmdpAncStepSchedulerPathsStartingFrom}[1]{\AncPathsStartingFrom{#1}^{\Cmdp,\StepScheduler}}
+\newcommand*{\CmdpAncFinStepSchedulerPathsStartingFrom}[1]{\AncFinPathsStartingFrom{#1}^{\Cmdp,\StepScheduler}}
+
+
+% First parameter here is \StepScheduler
+\newcommand*{\cmdpLeadstoAdheringScheduler}[1]{\tsleadsto_{#1}} %\Cmdp,#1
+\newcommand*{\CmdpFinPathsAdheringScheduler}[1]{\FinPaths^{\Cmdp,#1}}
+\newcommand*{\CmdpChoicePathsAdheringScheduler}[1]{\ChoicePathsOf{\Cmdp,#1}}
+\newcommand*{\CmdpCylinder}[2]{\CylinderOf{\Cmdp,#1}{#2}}
+\newcommand*{\CmdpProb}[1]{\ProbOf{\Cmdp,#1}}
+\newcommand*{\CmdpProbInState}[2]{\ProbOfInState{\Cmdp,#1}{#2}}
+\newcommand*{\CmdpSamples}[1]{\ProbSampleSpace^{\Cmdp,#1}}
+\newcommand*{\CmdpSamplesInState}[2]{\ProbSampleSpace_{#2}^{\Cmdp,#1}}
+\newcommand*{\CmdpEvents}[1]{\ProbSetOfEvents^{\Cmdp,#1}}
+\newcommand*{\CmdpEventsInState}[2]{\ProbSetOfEvents_{#2}^{\Cmdp,#1}}
+\newcommand*{\correspondingOfCmdp}{{}}
+\newcommand*{\correspondingOfMc}{{\stixleftarrowaccent{c}}}
+
+
+
+% For Expressions
+\newcommand*{\expr}{e}
+\newcommand*{\dsformula}[1]{\expr{}#1}
+\newcommand*{\dsvariablevaluation}[2]{$\textrm{\code{#1}}=#2$}
+
+
+
+%=============   NAME MACROS   =============%
+\let\depth\relax
+\newcommand{\CSharp}{{\protect\settoheight{\dimen0}{C}C\kern-.05em \protect\resizebox{!}{\dimen0}{\protect\raisebox{\depth}{\#}}}\xspace}
+% https://tex.stackexchange.com/questions/44528/how-to-make-the-correct-hash-symbol-in-c-sharp-c
+\newcommand{\SSharp}{{\protect\settoheight{\dimen0}{S}S\kern-.05em \protect\resizebox{!}{\dimen0}{\protect\raisebox{\depth}{\#}}}\xspace}
+
+
+
+
+
+
+
+\chapter{Probabilistic Systems}\label{ch:FormalFoundations}
+
+In the literature, various formal underpinnings have been proposed to reason about the probability of specific events in a dynamically behaving system.
+In this document, such formal underpinnings are summarized under the term \emph{probabilistic systems}.
+This chapter introduces two probabilistic systems, namely \emph{generic Markov chains} and \emph{choice-aware Markov decision processes}.
+These are later used for the probabilistic safety analysis of executable models.
+
+Roughly speaking, a Markov chain (MC) contains for each state a probability distribution over potential successor states.
+MCs can be used for the analysis of purely probabilistic models, i.e., models containing no nondeterministic choice.
+\Cref{sec:FormalFoundations:GMC} describes generic Markov chains, a slightly generalized version of MCs that have been developed to better suit to executable models than standard MCs.
+
+Markov decision processes (MDPs) combine nondeterministic choice and probabilistic choice:
+for each state, a MDP contains a nondeterministic choice between different probability distributions over potential successor states.
+An intuitive way to look at a transition in a MDP is that \emph{first} one probability distribution of the active state is selected \emph{nondeterministically}, and \emph{secondly}, this probability distribution is used to select a successor state \emph{probabilistically}. 
+Choice-aware Markov decision processes (CMDPs) are a major extension of the well-known MDPs:
+to define the transitions of a state, there may be multiple consecutive nondeterministic and probabilistic choices in any order, in contrast to MDPs, which are limited to exactly one nondeterministic choice and afterwards exactly one probabilistic choice per transition.
+In CMDPs, the choices are ``saved'' explicitly in the structure (hence ``choice-aware'').
+CMDPs enable the probabilistic analysis of executable models that contain both probabilistic and nondeterministic choices, and are described in more detail in \cref{sec:FormalFoundations:CMDP}.
+
+
+Both \cref{sec:FormalFoundations:GMC} (discussing generic MCs) and \cref{sec:FormalFoundations:CMDP} (discussing generic CMDPs) have the same outline.
+This approach is useful because the definitions and proofs of the generic CMDPs are based on those of the generic MCs.
+First, the probabilistic systems are introduced formally.
+Afterwards, paths and a probability measure based on that paths are defined for the respective system.
+
+
+Generic MCs have been published in \cite{Leupolz2017}.
+Descriptions about standard Markov chains and standard Markov decision processes have been discussed by many authors before, e.g., in~\cite{BaierKatoen,BaierHabil}.
+The definitions of generic MCs and CMDPs are structurally close to their standard counterparts.
+This chapter is an excerpt from the thesis ``Probabilistic Safety Analysis of Executable models''~\cite{LeupolzPhD}.
+More details can be found there.
+
+
+\section{Generic Markov Chains}\label{sec:FormalFoundations:GMC}
+
+As the first probabilistic system, generic Markov chains (generic MCs/GMCs), which are suited to model purely probabilistic systems, are introduced. 
+
+\begin{definition}[Generic Markov Chain] A generic Markov chain $\Mc$ is represented by the tuple $(\States, \Targets, \targetstate, \Trans)$ consisting of
+\label{def:mc}
+\begin{compactitem}
+\item a countable set $\States$ of \emph{states}, and
+\item a countable set $\Targets$ of \emph{targets} with a \emph{target state} function $\targetstate : \Targets \to \States$, and
+\item a \emph{transition distribution} function $\Trans : \States \to \Dists(\Targets)$
+\end{compactitem}
+where $\Dists(\Targets) = \{ \dist : \Targets \to \ProbRange \mid \sum_{\target \in \Targets} \mu(\target) = 1 \}$.
+\end{definition}
+Let $\distOfState{\state}$ be a shorthand for $\Trans(\state)$.
+By convention $\McStates$ stands for $\Mc$'s states, $\McTargets$ for $\Mc$'s targets, and so on.
+This is used in the remainder, when the corresponding generic Markov chain is not clear from the context.
+
+
+By choosing the states as targets, i.e., $\Targets = \States$, and the identity function as $\targetstate$, a probabilistic system is obtained that is commonly known as Markov chains.
+Such Markov chains are identified as \emph{standard Markov chains} in the remainder.
+
+This work introduces another useful manifestation of generic Markov chains, the so called labeled Markov chains.
+\defAmRand{$\Labels$-labeled MC}
+An \emph{$\Labels$-labeled Markov chain} is a generic Markov chain where $\Targets$ is chosen to be $\Labels \times \States$ for some set of \emph{labels} $\Labels$ with $\targetstate(\lbl, \state) = \state$.
+In contrast to approaches where states are labeled, the labeling belongs to the transitions.
+Shifting the labeling on the transitions is one reason for the efficiency of the implemented algorithms.
+
+{
+\newcommand{\introExampleLmcTargets}{
+	\begin{tabular}{@{}cl@{}}
+	\toprule
+		target		&	label	\\
+	\midrule
+		$\target_1$		& $\dsformula{0}$ \\
+		$\target_2$		& $\dsformula{0}$ \\
+		$\target_3$		& $\dsformula{0}, \dsformula{1}$ \\  %\emph{f, t}. 3,4,5 must not be equal
+		$\target_4$		&  \\
+		$\target_5$		& $\dsformula{0}$ \\
+	\bottomrule
+	\end{tabular}
+}
+\begin{figure}[h]	
+	\centering
+	\sbox{\temporaryimage}{\includegraphics*{intro_lmc}}
+	\begin{minipage}[c]{\probabilisticsystemscalefactor\wd\temporaryimage}
+		\resizebox{\textwidth}{!}{\usebox{\temporaryimage}}
+	\end{minipage}%
+	\hspace{.8cm}
+	\begin{minipage}[c]{2cm}
+		\resizebox{2cm}{!}{\introExampleLmcTargets}
+	\end{minipage}
+	\caption{Labeled Markov chain with 3 states}
+	\label{fig:introLmcExample}
+\end{figure}
+}
+
+\Cref{fig:introLmcExample} depicts an example of a $2^{\{\dsformula{0},\dsformula{1}\}}$-labeled MC.
+The squared nodes represent the states, e.g., node $1$ represents $\state_1$.
+The distribution function of a state is depicted by the white-headed outgoing arcs of its corresponding node.
+Each arc is associated with a target, e.g., the reflexive arc of state $1$ is associated with $\target_1$.
+The target node of an arc corresponds to the target state of its target, e.g., $\targetstate(\target_{1})=\state_2$.
+The labels of each target are given in the table.
+This labeled Markov chain can be used to calculate the probability that eventually a label like $\dsformula{0}$ is reached from a specific state.
+How this can be formally expressed and calculated is topic of the remainder of this subsection.
+
+
+\subsection{Paths and Probability Measure}
+
+Let $\Mc=(\States, \Targets, \targetstate, \Trans)$ be a generic MC.
+
+A finite path\defAmRand{$\finpath$} $\finpath = \target_1\dotspath\,\target_n \in \Targets^*$ of $\Mc$ is a sequence of targets where $\distOfState{\targetstate(\target_i)}(\target_{i+1}) > 0$ for all $\natrangeex{i}{1}{n}$.
+%
+The empty sequence is also a valid finite path;
+$\emptysequence$ denotes the empty sequence.
+$\McFinPaths$ is the set of all finite paths of $\Mc$.
+%
+\defAmRand{$\ancfinpath$}
+An anchored finite path $\ancfinpath = \anctuple{\state}{\target_1\,\target_2\dotspath\,\target_n} \in \States \times \McFinPaths$ of $\Mc$ is a pair of a state and a finite path where $\distOfState{\state}(\target_1) > 0$.
+\defAmRand{$\pathlength{\ancfinpath}$}
+Let $\pathlength{\ancfinpath}=n$ be the path length of $\ancfinpath=\anctuple{\state}{\target_1\,\target_2\dotspath\,\target_n}$.
+$\McAncFinPaths$ is the set of all anchored finite paths of $\Mc$. 
+$\McAncFinPathsStartingFrom{\state} = (\{\state\} \times \McFinPaths) \cap \McAncFinPaths$ is the set of all anchored finite paths starting from $\state$. 
+%
+\defAmRand{$\righttargetstate$}
+Let $\righttargetstate : \McAncFinPaths \rightarrow \States$ be a function that returns the last state of an anchored finite path, i.e., $\righttargetstate(\anctuple{\state}{\emptysequence})=\state$, and $\righttargetstate(\anctuple{\state}{\target_1\dotspath\target_n})=\targetstate(\target_n)$ otherwise. 
+%
+Given an anchored finite path $\ancfinpath=\anctuple{\state}{\target_1\dotspath\target_n}$ and a target $\target$, let $\pathconcat{\ancfinpath}{\target} = \anctuple{\state}{\target_1\dotspath\target_n\,\target}$ be the concatenation of the finite path with the target. 
+Sometimes, a subset $\AncFinPathsOfInterest\subseteq\McAncFinPaths$ is from interest; then, such a subset $\AncFinPathsOfInterest$ is called \emph{paths of interest}.
+
+An infinite path\defAmRand{$\infpath$} $\infpath = \target_1\,\target_2\,\target_3\dotspath \in \Targets^{\omega}$ of $\Mc$ is a sequence of targets where  for all $\intabove{i}{1}$, $\distOfState{\targetstate(\target_i)}(\target_{i+1}) > 0$.
+%
+$\McPaths$ is the set of all infinite paths of $\Mc$.
+%
+\defAmRand{$\ancpath$}
+An anchored infinite path $\ancpath = \anctuple{\state}{\target_1\,\target_2\,\target_3\dotspath} \in \States \times \McPaths$ of $\Mc$ is a pair of a state and an infinite path where $\distOfState{\state}(\target_1) > 0$.
+$\McAncPaths$ is the set of all infinite anchored infinite paths of $\Mc$.
+$\McAncPathsStartingFrom{\state} = (\{\state\} \times \McPaths) \cap \McAncPaths$ is the set of all anchored infinite paths starting from $\state$.
+%
+\defAmRand{$\pathprefix{k}$}
+Let $\pathprefix{k}=\mcdiststarget_1\dots\mcdiststarget_k$ denote the $k$-th prefix of $\infpath = \target_1\,\target_2\,\target_3\dotspath$, and let $\Prefixes(\infpath)=\{ \finpath' \mid \finpath' \ \text{is prefix of}\ \infpath \}$ denote the set of all prefixes of $\infpath$.
+Note that $\emptysequence$ is a prefix of all infinite paths.
+Also, let $\AncPrefixes(\anctuple{\state}{\infpath})=\{\anctuple{\state}{\finpath} \mid \finpath \in \Prefixes(\infpath) \}$ denote the set of all anchored prefixes of $\anctuple{\state}{\infpath}$.
+
+In the remainder, both finite and infinite paths are sometimes just called paths when it is clear from the context which one is meant.
+
+The \emph{cylinder set} $\McCylinder{\ancfinpath}$ of the anchored finite path $\ancfinpath \in \McAncFinPaths$ contains all anchored infinite paths of $\Mc$ that start with $\ancfinpath$.
+\defAmRand{$\McCylinder{\ancfinpath}$}
+More formally, $\McCylinder{\ancfinpath}=\{ \ancpath' \in \McAncPaths \mid \ancfinpath \in \Prefixes(\ancpath') \}$.
+Let $\AncFinPathsOfInterest\subseteq\McFinPaths$, then $\McCylinder{\AncFinPathsOfInterest} = \bigcup_{\ancfinpath\in\AncFinPathsOfInterest} \McCylinder{\ancfinpath}$.
+\defAmRand{$\McCylinder{\AncFinPathsOfInterest}$}
+If $\Mc$ is clear from the context, $\Cylinder{\ancfinpath}$ abbreviates $\McCylinder{\ancfinpath}$,
+\defAmRand{$\Cylinder{\ancfinpath}$, $\Cylinder{\AncFinPathsOfInterest}$}
+and $\Cylinder{\AncFinPathsOfInterest}$ abbreviates $\McCylinder{\AncFinPathsOfInterest}$.
+
+
+
+The cylinder sets of a generic Markov chain are the basic elements to define its probability measure.
+\begin{definition}[Probability Space of a Generic Markov Chain starting in a certain state]
+\label{def:probspace_mc}
+The probability space $(\McSamplesInState{\state},\McEventsInState{\state},\McProbInState{\state})$ of a generic Markov chain $\Mc=(\States, \Targets, \targetstate, \Trans)$ starting in state $\state\in\McStates$ consists of
+\begin{compactitem}
+\item the sample space $\McSamplesInState{\state} = \McAncPathsStartingFrom{\state}$, and 
+\item the events $\McEventsInState{\state}$ as the smallest $\sigma$-algebra on $\McSamplesInState{\state}$ that contains
+        \begin{equation*}
+         \{ \Cylinder{\ancfinpath}\mid \ancfinpath \in \McAncFinPathsStartingFrom{\state} \}
+         \ \text{, and}
+      \end{equation*}
+\item the probability measure $\McProbInState{\state}$ with
+		\begin{equation*}%\textstyle
+  			\McProbInState{\state}(\Cylinder{\anctuple{\state}{\target_1\dotspath\,\target_n}}) =
+  			\distOfState{\state}(\target_1) \cdot \prod_{\natrangeex{i}{1}{n}} \distOfState{\targetstate(\target_i)}(\target_{i+1}) \ \text{.}
+		\end{equation*}
+\end{compactitem}
+\end{definition}
+
+Using this probability measure, the probability of a countable set of anchored finite paths $\AncFinPathsOfInterest$ starting from state $\state$ which are non-overlapping, i.e., $\Cylinder{\ancfinpath} \cap \Cylinder{\ancfinpath'} = \emptyset$ for all $\ancfinpath \neq \ancfinpath' \in \AncFinPathsOfInterest$, can be calculated.
+This can be achieved by summing up the probabilities of each anchored finite path in the set, i.e.
+\begin{equation*}
+	\McProbInState{\state}(\Cylinder{\AncFinPathsOfInterest}) =
+	\McProbInState{\state}(\bigdjunion_{\ancfinpath\in\AncFinPathsOfInterest} \Cylinder{\ancfinpath}) =
+	\sum_{\ancfinpath \in \AncFinPathsOfInterest} \McProbInState{\state}(\Cylinder{\ancfinpath})
+	\ \text{.}
+\end{equation*}
+The non-overlapping property ensures that each path is counted exactly once.
+%
+To allow this simple summation, $\AncFinPathsOfInterest$ needs to be a subset of $\McAncFinPathsStartingFrom{\state}$.
+Otherwise, this set may contain paths starting at different states for which the probabilities are defined in other probability spaces.
+In general, summing up probabilities from different probability spaces is not well defined.
+Such sums may even have values greater than $1$.
+%
+For that reason, given an arbitrary $\AncFinPathsOfInterest \subseteq \McAncFinPaths$, the probability of that paths cannot be calculated.
+But the probability of those paths in $\AncFinPathsOfInterest$ that start from state $\state$ can be calculated.
+\defAmRand{$\AncFinPathsOfInterestStartingFrom{\state}$}
+Therefore, the \emph{restriction} to those paths is defined as $\AncFinPathsOfInterestStartingFrom{\state} = \AncFinPathsOfInterest \cap \McAncFinPathsStartingFrom{\state}$.
+
+To conclude this subsection, a lemma that ``extracts'' the first distribution from an anchored path is given that is used in later proofs.
+\begin{lemma} \label{lemma:ExtractFirstElementFromPath}
+Let $(\States, \Targets, \targetstate, \Trans)$ be a generic Markov chain and $\anctuple{\state}{\target_1\dotspath\,\target_n}$ a finite path with $\intabove{n}{1}$, then
+\begin{equation*}%\textstyle
+	\McProbInState{\state}(\McCylinder{\anctuple{\state}{\target_1\dotspath\,\target_n}}) =
+	\distOfState{\state}(\target_1) \cdot \McProbInState{\targetstate(\target_1)}(\Cylinder{\anctuple{\targetstate(\target_1)}{\target_2\dotspath\,\target_n}})
+	\ \text{.}
+\end{equation*}
+\end{lemma}
+\begin{proof}
+By expanding the definitions, we get
+\begin{gather*}
+			\McProbInState{\state}(\Cylinder{\anctuple{\state}{\target_1\dotspath\,\target_n}})\\
+\qquad =	\distOfState{\state}(\target_1) \cdot \prod_{\natrangeex{i}{1}{n}} \distOfState{\targetstate(\target_1)}(\target_{i+1})\\
+\qquad =	\distOfState{\state}(\target_1) \cdot \distOfState{\targetstate(\target_1)}(\target_2) \cdot \prod_{\natrangeex{i}{2}{n}} \distOfState{\targetstate(\target_i)}(\target_{i+1})\\
+\qquad =	\distOfState{\state}(\target_1) \cdot \McProbInState{\targetstate(\target_1)}(\Cylinder{\anctuple{\targetstate(\target_1)}{\target_2\dotspath\,\target_n}})
+\ \text{.} \qedhere
+\end{gather*}
+\end{proof}
+
+
+\newcommand*{\PoiPaths}{\AncFinPathsOfInterest}
+\newcommand*{\midwayPathProbPoi}{\midwayPathProb_{*}}
+\newcommand*{\midwayPathProbPoiAtStep}[1]{\midwayPathProb_{#1}}    % Maybe rename to \midwayPathProbMaxLength
+\newcommand*{\PoiPathsFromEndOf}[1]{{ \{ \ancfinpath^{*} \mid \pathjoin{#1}{\ancfinpath^{*}} \in \PoiPaths \} }}
+
+\newcommand*{\PoiPathsFromEndOfAtStep}[2]{{ \{ \ancfinpath^{*} \mid \pathjoin{#1}{\ancfinpath^{*}} \in \PoiPaths \land \pathlength{\midwayPath^*} \le #2 \} }}
+
+
+
+
+\newpage
+\section{Choice-Aware Markov Decision Processes}\label{sec:FormalFoundations:CMDP}
+
+After the explanations of the generic Markov chains, choice-aware Markov decision process (CMDPs) are introduced as the second probabilistic system.
+CMDPs are well-suited for models that comprise both probabilistic and nondeterministic choice.
+Before CMDPs are defined, its choices and its choice transition function are introduced, which enable CMDPs to have multiple consecutive nondeterministic and probabilistic choices in any order.
+
+Let $\Targets$ be a finite set of targets, and
+$\Choices$ a finite set of choices, and
+$\Dists(\Choices) = \{ \dist_{\Choices} : \Choices \to \ProbRange \mid \sum_{\cmdpChoice \in \Choices} \dist_{\Choices}(\cmdpChoice) = 1 \}$ be the probability distributions for the choices $\Choices$.
+Furthermore, let $\choiceTrans : \Choices \rightarrow \Targets + \Dists(\Choices) + 2^{\Choices}$ be the choice transition function that maps each choice to either a target, a probability distribution, or a non-empty set of choices.
+A set of choices is used to model nondeterminism.
+\defAmRand{$\cpath$}
+The sequence of choices $\cpath = \cmdpChoice_0\,\cmdpChoice_1\dotspath\,\cmdpChoice_n \in \Choices^*$ is a choice path of the choice transition function $\choiceTrans$ if for all non-final choices,
+$\choiceTrans$ returns a probability distribution with a probability greater 0 to its successor (probabilism),
+or $\choiceTrans$ returns a set of choices that includes the successor (nondeterminism);
+more formally,
+for all $\natrangeex{i}{0}{n}$ either $\dist_{\Choices}=\choiceTrans(\cmdpChoice_{i})$ with $\dist_{\Choices}(\cmdpChoice_{i+1})>0$ or $\cmdpChoice_{i+1}\in\choiceTrans(\cmdpChoice_{i})$.
+A choice path $\cmdpChoice_0\,\cmdpChoice_1\dotspath\,\cmdpChoice_n$ with $\intabove{n}{1}$ forms a cycle if the $\cmdpChoice_0=\cmdpChoice_n$.
+A choice transition function $\choiceTrans$ is acyclic, if there exists no choice path of $\choiceTrans$ that forms a cycle.
+A choice path $\cmdpChoice_0\,\cmdpChoice_1\dotspath\,\cmdpChoice_n$ is terminal if $\choiceTrans(\cmdpChoice_n)\in\Targets$.
+Note that it makes sense to call an acyclic choice transition function also terminal or finite, because applying the function iteratively on its result finally terminates.
+
+\begin{definition}[Choice-aware Markov Decision Process]
+\label{def:CMDP}
+A choice-aware Markov decision process $\Cmdp$ is represented by the tuple $(\States, \Targets, \targetstate, \Choices, \choiceTrans, \StateRootChoice)$ consisting of
+\begin{compactitem}
+\item a finite set $\States$ of \emph{states}, and
+\item a finite set $\Targets$ of \emph{targets} with a \emph{target state} function $\targetstate : \Targets \to \States$, and
+\item a finite set $\Choices$ of \emph{choices} with an acyclic \emph{choice transition} function $\choiceTrans : \Choices \rightarrow \Targets + \Dists(\Choices) + 2^{\Choices}$, and
+\item a function $\StateRootChoice : \States \rightarrow \Choices$ that determines the root choice of each state,
+\end{compactitem}
+where $\Dists(\Choices) = \{ \dist_{\Choices} : \Choices \to \ProbRange \mid \sum_{\cmdpChoice \in \Choices} \dist_{\Choices}(\cmdpChoice) = 1 \}$.
+\end{definition}
+
+
+By convention $\CmdpStates$ stands for $\Cmdp$'s states, $\CmdpTargets$ for $\Cmdp$'s targets, and so on.
+This is used in the remainder, when the corresponding choice-aware Markov decision process is not clear from the context.
+
+
+This work introduces another useful manifestation of choice-aware Markov decision processes, the so called labeled choice-aware Markov decision processes.
+\defAmRand{$\Labels$-labeled CMDP}
+An \emph{$\Labels$-labeled choice-aware Markov decision processes} is a choice-aware Markov decision process where $\Targets$ is chosen to be $\Labels \times \States$ for some set of \emph{labels} $\Labels$ with $\targetstate(\lbl, \state) = \state$.
+{
+\newcommand{\introExampleLmcTargets}{
+	\begin{tabular}{@{}cl@{}}
+	\toprule
+		target		&	label	\\
+	\midrule
+		$\target_1$		& $\dsformula{0}$ \\
+		$\target_2$		& $\dsformula{0}$ \\
+		$\target_3$		& $\dsformula{0}, \dsformula{1}$ \\  %\emph{f, t}. 3,4,5 must not be equal
+		$\target_4$		&  \\
+		$\target_5$		& $\dsformula{0}$ \\
+	\bottomrule
+	\end{tabular}
+}
+\begin{figure}[t]	
+	\centering
+	\sbox{\temporaryimage}{\includegraphics*{intro_cmdp}}
+	\begin{minipage}[c]{\probabilisticsystemscalefactor\wd\temporaryimage}
+		\resizebox{\textwidth}{!}{\includegraphics*{intro_cmdp}}
+	\end{minipage}%
+	\hspace{.8cm}
+	\begin{minipage}[c]{2cm}
+		\resizebox{2cm}{!}{\introExampleLmcTargets}
+	\end{minipage}
+	\caption{Example of labeled choice-aware Markov decision process}
+	\label{fig:cmdp_example1b}
+\end{figure}
+}
+
+
+\Cref{fig:cmdp_example1b} depicts an example of a $2^{\{\dsformula{0},\dsformula{1}\}}$-labeled CMDP.
+The round-bordered smaller squared nodes represent choices,
+and the larger squared nodes with a number in the brackets represent the states, e.g., state node $[1]$ represents $\state_1$.
+The brackets in state nodes make it easier to distinguish them from choice nodes.
+The root choice of a state is depicted by a sole arc from the corresponding state node to a choice node.
+If the choice transition function returns a probabilistic distribution for a choice, the outgoing, white-headed arcs from the choice depict the distribution (with the probabilities as labels),
+e.g., the outgoing arcs from choice node $1$ to choice nodes $2$ and $3$.
+Black-headed arcs without labels are used for nondeterministic choices, e.g., $2$ to choice nodes $4$ and $5$.
+Black-headed arcs with targets as labels are used for target choices; the destination node of such an arc is the corresponding state node of the target's target state, e.g., choice node $4$ to state node $[1]$.
+The labels of each target are given in the table.
+This labeled CMDP can be used to calculate the worst case and the best case probability that eventually a label like $\dsformula{0}$ is reached from a specific state.
+How this can be formally expressed and calculated is topic of the remainder of this subsection.
+
+
+\subsection{Paths and Probability Measure}
+
+Let $\Cmdp=(\States, \Targets, \targetstate, \Choices, \choiceTrans, \StateRootChoice)$ be a CMDP with choice transition function $\choiceTrans$.
+
+A choice path $\cpath = \cmdpChoice_0\,\cmdpChoice_1\dotspath\,\cmdpChoice_n \in \Choices^*$ of $\Cmdp$ is a choice path of $\choiceTrans$.
+$\CmdpChoicePaths$ is the set of all choice paths of $\Cmdp$. \defAmRand{$\CmdpChoicePaths$}
+Given a choice path $\cpath = \cmdpChoice_0\,\cmdpChoice_1\dotspath\,\cmdpChoice_n$,
+\defAmRand{$\cpath[i]$}
+let $\cpath[i]=\cmdpChoice_i$ denote the $i$-th choice for all $\natrange{i}{0}{n}$.
+Given a terminal choice path $\cpath = \cmdpChoice_0\,\cmdpChoice_1\dotspath\,\cmdpChoice_n$, let  $\choicepathtarget(\cpath)$ be the choice path target of $\cpath$, i.e.,  $\choicepathtarget(\cpath)=\choiceTrans(\cmdpChoice_n)$; this is properly defined, because in a terminal choice path $\choiceTrans(\cmdpChoice_n)\in\Targets$.
+%
+Let $\state \cmdpLeadsto \target$ (read as `$\state$ leads to $\target$') be satisfied, if and only if there exists a terminal choice path $\cpath$ with $\StateRootChoice(\state)=\cpath[0]$ and $\choicepathtarget(\cpath)=\target$.
+
+
+A finite path $\finpath = \target_1\,\target_2\dotspath\,\target_n \in \Targets^*$ of $\Cmdp$ is a sequence of targets
+where $\targetstate(\target_i) \cmdpLeadsto \target_{i+1}$ for all $\natrangeex{i}{1}{n}$.
+\defAmRand{$\finpath$}
+The empty sequence $\emptysequence$ is also a valid finite path.
+$\CmdpFinPaths$ is the set of all finite paths of $\Cmdp$.
+%
+\defAmRand{$\ancfinpath$}
+An anchored finite path $\ancfinpath = \anctuple{\state}{\target_1\,\target_2\dotspath\,\target_n} \in \States \times \CmdpFinPaths$ of $\Cmdp$ is a pair of a state and a finite path
+where $\state \cmdpLeadsto \target_1$.
+%
+\defAmRand{$\pathlength{\ancfinpath}$}
+Let $\pathlength{\ancfinpath}=n$ be the path length of $\ancfinpath=\anctuple{\state}{\target_1\,\target_2\dotspath\,\target_n}$.
+%
+$\CmdpAncFinPaths$ is the set of all anchored finite paths of $\Cmdp$. 
+$\firstStateOfAncpath{\ancfinpath}=\state$ be the anchor or the anchored finite path. 
+$\CmdpAncFinPathsStartingFrom{\state} = (\{\state\} \times \CmdpFinPaths) \cap \CmdpAncFinPaths$ is the set of all anchored finite paths starting from $\state$.
+%
+Let $\righttargetstate : \CmdpAncFinPaths \rightarrow \CmdpStates$ be the last state of an anchored finite path $\anctuple{\state}{\target_1\dotspath\target_n}$, i.e., $\righttargetstate(\anctuple{\state}{\emptysequence})=\state$ and $\righttargetstate(\anctuple{\state}{\target_1\dotspath\target_n})=\targetstate(\target_n)$ otherwise. 
+%
+Given an anchored finite path $\ancfinpath=\anctuple{\state}{\target_1\dotspath\target_n}$ and a target $\target$, let $\pathconcat{\ancfinpath}{\target} = \anctuple{\state}{\target_1\dotspath\target_n\,\target}$ be the concatenation of the finite path with the target. 
+
+An infinite path $\infpath = \target_1\,\target_2\,\target_3\dotspath \in \Targets^{\omega}$ of $\Cmdp$ is a sequence of choice paths
+where $\targetstate(\target_i) \cmdpLeadsto \target_{i+1}$ for all $\intabove{i}{1}$.
+\defAmRand{$\infpath$}
+$\CmdpPaths$ is the set of all infinite paths of $\Cmdp$.
+%
+\defAmRand{$\ancpath$}
+An anchored infinite path $\ancpath = \anctuple{\state}{\target_1\,\target_2\,\target_3\dotspath} \in \States \times \CmdpPaths$ of $\Cmdp$ is a pair of a state and an infinite path
+where $\state \cmdpLeadsto \target_1$.
+$\CmdpAncPaths$ is the set of all anchored infinite paths of $\Cmdp$.
+$\CmdpAncPathsStartingFrom{\state} = (\{\state\} \times \CmdpPaths) \cap \CmdpAncPaths$ is the set of all anchored infinite paths starting from $\state$.
+%
+\defAmRand{$\pathprefix{k}$}
+Let $\pathprefix{k}=\target_1\,\target_2\dotspath\,\target_k$ denote the $k$-th prefix of $\infpath = \target_1\,\target_2\,\target_3\dotspath$ and let $\Prefixes(\infpath)=\{ \finpath' \mid \finpath' \ \text{is prefix of}\ \infpath \}$ denote the set of all prefixes of $\infpath$.
+Also, let $\AncPrefixes(\anctuple{\state}{\infpath})=\{\anctuple{\state}{\finpath} \mid \finpath \in \Prefixes(\infpath) \}$ denote the set of all anchored prefixes of $\anctuple{\state}{\infpath}$.
+
+In the remainder, both finite and infinite paths are sometimes just called paths when it is clear from the context which one is meant.
+
+
+A probability measure cannot be defined directly for a CMDP, because a nondeterministic choice is not a ``probabilistic construct''.
+With a so called scheduler, the nondeterminism in a CMDP can be resolved, which results in a GMC with a properly defined probability measure.
+GMCs that are the result of such schedulers provide a view onto the CMDP from the schedulers' perspective.
+By using different schedulers, a broader view onto the CMDP can be obtained.
+By consulting all schedulers, minimum and maximum probabilities can be derived.
+There are two kinds of schedulers in CMDPs: \emph{choice scheduler}, which resolve the nondeterministic choices of choice paths, and \emph{step scheduler}, which select the choice scheduler for each step between two states.
+
+
+\begin{definition}[Choice Scheduler of a Choice-aware Markov Decision Process]
+\label{def:CMDP_choicescheduler}
+Let $\Cmdp=(\States, \Targets, \targetstate, \Choices, \choiceTrans, \StateRootChoice)$ be a CMDP. A \emph{choice scheduler} for $\Cmdp$ is a partial function $\ChoiceScheduler : \Choices \rightharpoonup \Choices$ such that for all $\cmdpChoice \in \Choices$, $\choiceTrans(\cmdpChoice)\in 2^{\Choices}$ implies $\ChoiceScheduler(\cmdpChoice) \in \choiceTrans(\cmdpChoice)$.
+\end{definition}
+%
+Let $\ChoiceSchedulers(\Cmdp)$ be the finite set of all possible choice schedulers for $\Cmdp$;
+\defAmRand{$\ChoiceSchedulers$}
+let $\ChoiceSchedulers$ denote $\ChoiceSchedulers(\Cmdp)$ if $\Cmdp$ is clear from the context.
+Note that the numbers of $\ChoiceSchedulers(\Cmdp)$ is finite, because $\Choices$ is finite and there is only a limited number of combinations of possible successors for the nondeterministic choices.
+%
+%
+The choice path $\cpath = \cmdpChoice_0\,\cmdpChoice_1\dotspath\,\cmdpChoice_n$ of $\Cmdp$ is a $\ChoiceScheduler$-path if and only if the choice scheduler $\ChoiceScheduler$ agrees with all its nondeterministic choices, i.e., if and only if for all $\natrangeex{i}{0}{n}$, $\choiceTrans(\cmdpChoice_i)\in 2^{\Choices}$ implies $\ChoiceScheduler(\cmdpChoice_i)=\cmdpChoice_{i+1}$.
+
+\begin{definition}[Markov Chain of a Choice Scheduler]
+\label{def:mc_of_choicescheduler}
+Let $\Cmdp=(\States, \Targets, \targetstate, \Choices, \choiceTrans, \StateRootChoice)$ be a CMDP with choice transition function $\choiceTrans$, and $\ChoiceScheduler$ a \emph{choice scheduler} for $\Cmdp$. The standard Markov Chain $\Mc^\ChoiceScheduler$ induced by $\ChoiceScheduler$ is given by
+$\Mc^\ChoiceScheduler=(\Choices \cup \Targets, \Trans)$
+where
+\begin{compactitem}
+\item       $\Trans(\cmdpChoice)(\choiceTrans(\cmdpChoice))=1$ if $\choiceTrans(\cmdpChoice) \in \Targets$, and
+\item       $\Trans(\cmdpChoice)=\choiceTrans(\cmdpChoice)$ if $\choiceTrans(\cmdpChoice) \in \Dists(\Choices)$, and
+\item       $\Trans(\cmdpChoice)(\cmdpChoice')=1$ if $\choiceTrans(\cmdpChoice)\in 2^{\Choices}$ and $\ChoiceScheduler(\cmdpChoice)=\cmdpChoice'$, and
+\item       $\Trans(\target)(\target)=1$, and
+\item       $\Trans(\cdot)(\cdot)=0$ otherwise.
+\end{compactitem}
+\end{definition}
+
+For state $\state$ and choice scheduler $\ChoiceScheduler$, let $\choiceSchedulerDistOfState{\state}$ be the choice distribution with $\choiceSchedulerDistOfState{\state}(\target)=\ProbInState{\StateRootChoice(\state)}^{\Mc^\ChoiceScheduler}(\TlFinally \target)$.
+
+
+\begin{definition}[Step Scheduler of a Choice-aware Markov Decision Process]
+\label{def:CMDP_stepscheduler}
+Let $\Cmdp=(\States, \Targets, \targetstate, \Choices, \choiceTrans, \StateRootChoice)$ be a CMDP. A \emph{step scheduler} for $\Cmdp$ is a function $\StepScheduler : \CmdpAncFinPaths \rightarrow (\Choices \rightharpoonup \Choices)$ such that for all anchored finite paths $\ancfinpath \in \CmdpAncFinPaths$, $\StepScheduler(\ancfinpath)$ is a choice scheduler for $\Cmdp$.
+\end{definition}
+Let $\StepSchedulers(\Cmdp)$ be the countable set of all possible step schedulers for $\Cmdp$;
+\defAmRand{$\StepSchedulers$}
+let $\StepSchedulers$ denote $\StepSchedulers(\Cmdp)$ if $\Cmdp$ is clear from the context.
+Let $\state \cmdpLeadstoAdheringScheduler{\ChoiceScheduler} \target$ (read as `by adhering to $\ChoiceScheduler$, $\state$ leads to $\target$') be satisfied, if and only if there exists a terminal choice path $\cpath$ with $\CmdpStateRootChoice(\state)=\cpath[0]$ and $\choicepathtarget(\cpath)=\target$ and for all $1 \le i < n$, $\choiceTrans(\cmdpChoice_i)\in 2^{\Choices}$ implies $\ChoiceScheduler(\cmdpChoice_i)=\cmdpChoice_{i+1}$.
+
+The finite anchored path $\anctuple{\state}{\target_1\,\target_2\dotspath\,\target_n}$ of $\Cmdp$ is a finite $\StepScheduler$-path if the scheduler $\StepScheduler$ agrees with all its nondeterministic choices,
+i.e., iff $\state \cmdpLeadstoAdheringScheduler{\ChoiceScheduler_0} \target_1$ with $\ChoiceScheduler_0=\StepScheduler({\anctuple{\state}{\emptysequence}})$,
+     and for all $1 \le i < n$, $\targetstate(\target_i) \cmdpLeadstoAdheringScheduler{\ChoiceScheduler_{i}} \target_{i+1}$ with $\ChoiceScheduler_{i}=\StepScheduler(\anctuple{\state}{\target_1\,\target_2\dotspath\,\target_{i}})$.
+Let $\CmdpAncFinStepSchedulerPaths$ denote the set of all finite $\StepScheduler$-paths of $\Cmdp$, and
+$\CmdpAncFinStepSchedulerPathsStartingFrom{\state}=\CmdpAncFinPathsStartingFrom{\state} \cap \CmdpAncFinStepSchedulerPaths$ denote the set of all finite $\StepScheduler$-paths of $\Cmdp$ starting from $\state$.
+
+Analogously,
+the anchored infinite path $\ancpath = \anctuple{\state}{\target_1\,\target_2\,\target_3\dotspath}$ of $\Cmdp$ is a $\StepScheduler$-path if the scheduler $\StepScheduler$ agrees with all its nondeterministic choices,
+i.e., iff $\state \cmdpLeadstoAdheringScheduler{\ChoiceScheduler_0} \target_0$ with $\ChoiceScheduler_0=\StepScheduler({\anctuple{\state}{\emptysequence}})$,
+     and for all $1 \le i$, $\targetstate(\target_i) \cmdpLeadstoAdheringScheduler{\ChoiceScheduler_{i}} \target_{i+1}$ with $\ChoiceScheduler_{i}=\StepScheduler(\anctuple{\state}{\target_1\,\target_2\dotspath\,\target_{i}})$.
+Let $\CmdpAncStepSchedulerPaths$ denote the set of all infinite $\StepScheduler$-paths of $\Cmdp$, and
+$\CmdpAncStepSchedulerPathsStartingFrom{\state}=\CmdpAncPathsStartingFrom{\state} \cap \CmdpAncStepSchedulerPaths$ denote the set of all infinite $\StepScheduler$-paths of $\Cmdp$ starting from $\state$.
+
+\begin{definition}[Markov Chain of a Step Scheduler]
+\label{def:mc_of_CMDP_inducedby_stepscheduler}
+Let $\Cmdp=(\States, \Targets, \targetstate, \Choices, \choiceTrans, \StateRootChoice)$ be a CMDP and $\StepScheduler$ a \emph{step scheduler} for $\Cmdp$. The standard Markov Chain $\Mc^\StepScheduler$ induced by $\StepScheduler$ is given by
+$(\CmdpAncFinStepSchedulerPaths, \Trans^\StepScheduler)$
+with
+%the \emph{target state} function is the identity function,
+%and
+the \emph{transition distribution} function $\Trans^\StepScheduler : \CmdpAncFinStepSchedulerPaths \to \Dists(\CmdpAncFinStepSchedulerPaths)$
+	where $\Trans^\StepScheduler(\ancfinpath) = \dist$
+	and $\ChoiceScheduler=\StepScheduler(\ancfinpath)$
+	such that $\dist( \pathconcat{\ancfinpath}{\target_{n+1}} ) = \choiceSchedulerDistOfState{\righttargetstate(\ancfinpath)}(\target_{n+1})$.
+	%when $\targetstate(\target_i) \cmdpLeadstoAdheringScheduler{\ChoiceScheduler_{i}} \target_{i+1}$ and $\dist( \target_0\,\target_1\dotspath\,\target_n\,\target_{n+1} )=0$ otherwise.	
+\end{definition}
+
+
+Each finite $\StepScheduler$-path $\anctuple{\state}{\target_1\,\target_2\dotspath\,\target_n} \in \CmdpAncFinStepSchedulerPaths$ of $\Cmdp$ has a corresponding anchored finite path 
+%\ancfinpath^\correspondingOfMc =
+$\anctuple{\anctuple{\state}{\emptysequence}}{\anctuple{\state}{\target_1}\,\allowbreak{}\anctuple{\state}{\target_1\,\target_2}\dotspath\,\allowbreak{}\anctuple{\state}{\target_1\,\target_2\dotspath\,\target_n}}  \in \AncFinPaths^{\Mc^\StepScheduler}$ in the MC $\Mc^{\StepScheduler}$, and vice versa.
+%
+Analogously, each infinite $\StepScheduler$-path $\ancpath^\correspondingOfCmdp \in \CmdpAncFinStepSchedulerPaths$ of the CMDP $\Cmdp$
+has a corresponding anchored infinite path $\ancpath^\correspondingOfMc$ in the generic Markov chain $\Mc^\StepScheduler$, and the other way around.
+
+
+This correspondence makes it possible to use the probability measure $\ProbOfInState{\Mc^\StepScheduler}{\state}$ induced by MC $\Mc^\StepScheduler$ to define the probability space of the choice-aware Markov decision process $\Mc$ with its associated step scheduler $\StepScheduler$.
+
+The \emph{cylinder set} $\CmdpCylinder{\StepScheduler}{\ancfinpath}$
+\defAmRand{$\CmdpCylinder{\StepScheduler}{\ancfinpath}$}
+of the anchored finite path $\ancfinpath$ contains all anchored paths of $\Cmdp$ that start with $\ancfinpath$ and adhere to $\StepScheduler$. More formally, $\CmdpCylinder{\StepScheduler}{\ancfinpath}=\{ \ancpath' \in \CmdpAncStepSchedulerPaths \mid \ancfinpath \in \Prefixes(\ancpath') \}$.
+Let $\AncFinPathsOfInterest\subseteq\CmdpAncFinStepSchedulerPathsStartingFrom{\state}$, then $\CmdpCylinder{\StepScheduler}{\AncFinPathsOfInterest} = \bigcup_{\ancfinpath\in\AncFinPathsOfInterest} \CmdpCylinder{\StepScheduler}{\ancfinpath}$.
+
+
+\begin{definition}[Probability Space of a Choice-aware Markov Decision Process induced by a Step Scheduler starting in a certain state]
+\label{def:probspace_CMDP_stepscheduler}
+%Let $\Cmdp=(\States, \Targets, \targetstate, \Choices, \choiceTrans, \StateRootChoice)$ be a CMDP and $\StepScheduler$ a \emph{step scheduler} for $\Cmdp$. 
+The probability space $(\CmdpSamplesInState{\StepScheduler}{\state},\CmdpEventsInState{\StepScheduler}{\state},\CmdpProbInState{\StepScheduler}{\state})$ of a Choice-aware Markov Decision Process $\Cmdp$ induced by a Step Scheduler $\StepScheduler$ starting in state $\state\in\CmdpStates$ consists of
+\begin{compactitem}
+\item the sample space $\CmdpSamplesInState{\StepScheduler}{\state} = \CmdpAncStepSchedulerPathsStartingFrom{\state}$, and 
+\item the events $\CmdpEventsInState{\StepScheduler}{\state}$ as the smallest $\sigma$-algebra on $\CmdpSamplesInState{\StepScheduler}{\state}$ that contains $\{ \CmdpCylinder{\StepScheduler}{\ancfinpath}\mid \ancfinpath \in \CmdpAncFinStepSchedulerPathsStartingFrom{\state} \}$, and
+\item the probability measure $\CmdpProbInState{\StepScheduler}{\state}$ with $\CmdpProbInState{\StepScheduler}{\state}(\CmdpCylinder{\StepScheduler}{\ancfinpath^\correspondingOfCmdp})=\ProbOfInState{\Mc^\StepScheduler}{\anctuple{\state}{\emptysequence}}(\CylinderOf{\Mc^\StepScheduler}{\ancfinpath^c})$ where $\ancfinpath^c$ is the corresponding path of $\ancfinpath$.
+\end{compactitem}
+\end{definition}
+
+
+Note that the probability measure cannot generally be used on the union of paths of different step schedulers, even if the paths all start in the same state.
+Thus, given an arbitrary $\AncFinPathsOfInterest \subseteq \CmdpAncFinPaths$, the probability of that paths cannot be calculated.
+But the probability of the $\StepScheduler$-paths in $\AncFinPathsOfInterest$ that start from state $\state$ can be calculated.
+\defAmRand{$\AncFinStepSchedulerPathsOfInterestStartingFrom{\state}$}
+Therefore, the \emph{restriction} to those paths is defined as $\AncFinStepSchedulerPathsOfInterestStartingFrom{\state} = \AncFinPathsOfInterest \cap \CmdpAncFinStepSchedulerPathsStartingFrom{\state}$.
+
+
+
