@@ -43,6 +43,7 @@ namespace pemc {
   ///   Therefore, we use state hashes and one level of indirection.
   ///   The hashes are stored in a separate array, using open addressing,
   ///   see Laarman, "Scalable Multi-Core Model Checking", Algorithm 2.3.
+  ///   Note: Must be cleared before used.
   class StateStorage {
   private:
 

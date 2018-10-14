@@ -70,6 +70,7 @@ libpemctests = [
   'tests/formula/createUuids.cc',
   'tests/formula/formulaToString.cc',
   'tests/formula/labelBasedFormulaEvaluator.cc',
+  'tests/genericTraverser/stateStorage.cc',
   'tests/lmc/lmcExamples.cc',
   'tests/lmc/lmc.cc',
   'tests/lmc/lmcModelChecker.cc',
