@@ -435,33 +435,7 @@ But the probability of those paths in $\AncFinPathsOfInterest$ that start from s
 \defAmRand{$\AncFinPathsOfInterestStartingFrom{\state}$}
 Therefore, the \emph{restriction} to those paths is defined as $\AncFinPathsOfInterestStartingFrom{\state} = \AncFinPathsOfInterest \cap \McAncFinPathsStartingFrom{\state}$.
 
-To conclude this subsection, a lemma that ``extracts'' the first distribution from an anchored path is given that is used in later proofs.
-\begin{lemma} \label{lemma:ExtractFirstElementFromPath}
-Let $(\States, \Targets, \targetstate, \Trans)$ be a generic Markov chain and $\anctuple{\state}{\target_1\dotspath\,\target_n}$ a finite path with $\intabove{n}{1}$, then
-\begin{equation*}%\textstyle
-	\McProbInState{\state}(\McCylinder{\anctuple{\state}{\target_1\dotspath\,\target_n}}) =
-	\distOfState{\state}(\target_1) \cdot \McProbInState{\targetstate(\target_1)}(\Cylinder{\anctuple{\targetstate(\target_1)}{\target_2\dotspath\,\target_n}})
-	\ \text{.}
-\end{equation*}
-\end{lemma}
-\begin{proof}
-By expanding the definitions, we get
-\begin{gather*}
-			\McProbInState{\state}(\Cylinder{\anctuple{\state}{\target_1\dotspath\,\target_n}})\\
-\qquad =	\distOfState{\state}(\target_1) \cdot \prod_{\natrangeex{i}{1}{n}} \distOfState{\targetstate(\target_1)}(\target_{i+1})\\
-\qquad =	\distOfState{\state}(\target_1) \cdot \distOfState{\targetstate(\target_1)}(\target_2) \cdot \prod_{\natrangeex{i}{2}{n}} \distOfState{\targetstate(\target_i)}(\target_{i+1})\\
-\qquad =	\distOfState{\state}(\target_1) \cdot \McProbInState{\targetstate(\target_1)}(\Cylinder{\anctuple{\targetstate(\target_1)}{\target_2\dotspath\,\target_n}})
-\ \text{.} \qedhere
-\end{gather*}
-\end{proof}
 
-
-\newcommand*{\PoiPaths}{\AncFinPathsOfInterest}
-\newcommand*{\midwayPathProbPoi}{\midwayPathProb_{*}}
-\newcommand*{\midwayPathProbPoiAtStep}[1]{\midwayPathProb_{#1}}    % Maybe rename to \midwayPathProbMaxLength
-\newcommand*{\PoiPathsFromEndOf}[1]{{ \{ \ancfinpath^{*} \mid \pathjoin{#1}{\ancfinpath^{*}} \in \PoiPaths \} }}
-
-\newcommand*{\PoiPathsFromEndOfAtStep}[2]{{ \{ \ancfinpath^{*} \mid \pathjoin{#1}{\ancfinpath^{*}} \in \PoiPaths \land \pathlength{\midwayPath^*} \le #2 \} }}
 
 
 
