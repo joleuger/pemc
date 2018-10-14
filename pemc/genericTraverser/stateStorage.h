@@ -27,6 +27,8 @@
 #include <vector>
 #include <gsl/span>
 #include <cstdint>
+#include <atomic>
+#include <boost/align/aligned_allocator.hpp>
 
 #include "pemc/basic/tscIndex.h"
 #include "pemc/basic/probability.h"
@@ -43,6 +45,16 @@ namespace pemc {
   ///   see Laarman, "Scalable Multi-Core Model Checking", Algorithm 2.3.
   class StateStorage {
   private:
+
+      // The assumed size of a cache line in bytes.
+      static const size_t CacheLineSize = 64;
+
+      // The number of attempts that are made to find an empty bucket.
+      static const size_t ProbeThreshold = 1000;
+
+      // The number of buckets that can be stored in a cache line.
+      static const size_t BucketsPerCacheLine = CacheLineSize / sizeof(StateIndex);
+
       // The length in bytes of a state vector required for the analysis model.
       int32_t modelStateVectorSize;
       // Extra bytes in state vector for traversal modifiers.
@@ -52,7 +64,7 @@ namespace pemc {
       int32_t stateVectorSize;
 
       // The number of saved states
-      StateIndex savedStates = 0;
+      std::atomic<StateIndex> savedStates = 0;
   	  // The number of states that can be cached and the number of reserved states.
       StateIndex totalCapacity;
       // The number of states that can be cached.
@@ -64,10 +76,9 @@ namespace pemc {
       // unique_ptr are not used, because they do not support void.
       unique_void_ptr stateMemory;
       pbyte* pStateMemory;
-      unique_void_ptr hashes;
-      StateIndex* pHashes;
-      unique_void_ptr indexMapper;
-      StateIndex* pIndexMapper;
+      std::unique_ptr<std::vector<std::atomic<StateIndex>>> indexMapper;
+      // hashes in next line should be aligned for more speed
+      std::unique_ptr<std::vector<std::atomic<StateIndex>, boost::alignment::aligned_allocator<std::atomic<StateIndex>, CacheLineSize> >> hashes;
 
       void resizeStateBuffer();
 

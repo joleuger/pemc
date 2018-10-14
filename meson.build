@@ -13,7 +13,7 @@ endif
 
 # external dependencies
 #boostdep = dependency('boost', modules : ['thread', 'system', 'timer'])
-boostdep = dependency('boost', modules : ['system', 'timer'])
+boostdep = dependency('boost', modules : ['system', 'timer', 'align'], version : '>=1.6.8')
 
 # libpemc_include = include_directories('src')
 libpemc_include = include_directories('.',

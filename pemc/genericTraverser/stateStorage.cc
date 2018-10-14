@@ -31,18 +31,13 @@
 namespace {
   using namespace pemc;
 
-	// The number of attempts that are made to find an empty bucket.
-	const size_t ProbeThreshold = 1000;
-
-	// The assumed size of a cache line in bytes.
-	const size_t CacheLineSize = 64;
-
-	// The number of buckets that can be stored in a cache line.
-	const size_t BucketsPerCacheLine = CacheLineSize / sizeof(StateIndex);
 
   void zeroMemory();
 
   void minusOneMemory();
+
+  //memory compare und hashen
+  //bei comparen parameter nehmen, sequential consistency beachten mit "atomic_thread_fence"
 }
 
 namespace pemc {
@@ -60,20 +55,7 @@ namespace pemc {
 
 		resizeStateBuffer();
 
-		indexMapper = unique_void(::operator new(totalCapacity * sizeof(StateIndex)) );
-		pIndexMapper = reinterpret_cast<StateIndex*>(indexMapper.get());
-
-		// We allocate enough space so that we can align the returned pointer such that index 0 is the start of a cache line
-    hashes = unique_void(::operator new(totalCapacity * sizeof(StateIndex) + CacheLineSize) );
-	  pHashes = reinterpret_cast<StateIndex*>(hashes.get());
-
-    // Improve memory allignment of pHashes, because it is used very often
-		if ((uintptr_t)pHashes % CacheLineSize != 0) {
-      auto allignedAddress = reinterpret_cast<uintptr_t>(pHashes) + (CacheLineSize - (uintptr_t)pHashes % CacheLineSize);
-      pHashes = reinterpret_cast<StateIndex*>(allignedAddress);
-    }
-
-		//throw_assert((ulong)_hashMemory - (ulong)_hashBuffer.Pointer, 0ul, (ulong)CacheLineSize);
-		//throw_assert((ulong)_hashMemory % CacheLineSize == 0, "Invalid buffer alignment.");
+    indexMapper = std::make_unique<std::vector<std::atomic<StateIndex>>>(totalCapacity);
+    hashes = std::make_unique<std::vector<std::atomic<StateIndex>, boost::alignment::aligned_allocator<std::atomic<StateIndex>, CacheLineSize> >>(totalCapacity);
   }
 }
