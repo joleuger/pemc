@@ -28,17 +28,6 @@
 #include "pemc/basic/exceptions.h"
 #include "pemc/genericTraverser/stateStorage.h"
 
-namespace {
-  using namespace pemc;
-
-
-  void zeroMemory();
-
-  void minusOneMemory();
-
-  //memory compare und hashen
-  //bei comparen parameter nehmen, sequential consistency beachten mit "atomic_thread_fence"
-}
 
 namespace pemc {
 
@@ -57,6 +46,8 @@ namespace pemc {
 
     indexMapper = std::make_unique<std::vector<std::atomic<StateIndex>>>(totalCapacity);
     hashes = std::make_unique<alignedStateIndexVector>(totalCapacity);
+
+    throw_assert(sizeof(StateIndex)==4, "Used StateStorage not compatible with size of StateIndex");
   }
 
 
@@ -80,41 +71,46 @@ namespace pemc {
     // which is _cachedStatesCapacity+BucketsPerCacheLine-1.
     // returnIndex is in range of capacityToReserve, so this is save.
     auto hashBasedIndex = cachedStatesCapacity + BucketsPerCacheLine;
-    (*indexMapper)[hashBasedIndex] = freshCompactIndex;
+    (*indexMapper)[hashBasedIndex].store(freshCompactIndex);
 
     throw_assert(hashBasedIndex >= 0 && hashBasedIndex <= totalCapacity + BucketsPerCacheLine, "idx not in range");
 
     return freshCompactIndex;
   }
 
-  /*
   bool StateStorage::addState(pbyte* state, StateIndex& index){
 
 			// We don't have to do any out of bounds checks here
-			var hash = MemoryBuffer.Hash(state, _stateVectorSize, 0);
-			for (var i = 1; i < ProbeThreshold; ++i)
-			{
+			auto hash = hashBuffer(state, stateVectorSize, 0);
+			for (auto i = 1; i < ProbeThreshold; ++i) {
 				// We store 30 bit hash values as 32 bit integers, with the most significant bit #31 being set
 				// indicating the 'written' state and bit #30 indicating whether writing is not yet finished
 				// 'empty' is represented by 0
 				// We ignore two most significant bits of the original hash, which has no influence on the
 				// correctness of the algorithm, but might result in more state comparisons
-				var hashedIndex = MemoryBuffer.Hash((byte*)&hash, sizeof(int), i * 8345723) % _cachedStatesCapacity;
-				var memoizedHash = hashedIndex & 0x3FFFFFFF;
-				var cacheLineStart = (hashedIndex / BucketsPerCacheLine) * BucketsPerCacheLine;
+				auto hashedIndex = hashBuffer(reinterpret_cast<pbyte*>(&hash), sizeof(StateIndex), i * 8345723) % cachedStatesCapacity;
+				auto memoizedHash = hashedIndex & 0x3FFFFFFF;
+				auto cacheLineStart = (hashedIndex / BucketsPerCacheLine) * BucketsPerCacheLine;
 
-				for (var j = 0; j < BucketsPerCacheLine; ++j)
+				for (auto j = 0; j < BucketsPerCacheLine; ++j)
 				{
-					var offset = (int)(cacheLineStart + (hashedIndex + j) % BucketsPerCacheLine);
-					var currentValue = Volatile.Read(ref _hashMemory[offset]);
+					auto offset = static_cast<int32_t>(cacheLineStart + (hashedIndex + j) % BucketsPerCacheLine);
+					auto currentValue = (*hashes)[offset].load();
 
-					if (currentValue == 0 && Interlocked.CompareExchange(ref _hashMemory[offset], (int)memoizedHash | (1 << 30), 0) == 0)
-					{
-						var freshCompactIndex = InterlockedExtensions.IncrementReturnOld(ref _savedStates);
-						Volatile.Write(ref _indexMapperMemory[offset], freshCompactIndex);
+          auto expected = 0;
+          auto desired = (StateIndex)memoizedHash | (1 << 30);
+          auto successFullyChanged = (*hashes)[offset].compare_exchange_strong(expected, desired);
 
-						MemoryBuffer.Copy(state, this[freshCompactIndex], _stateVectorSize);
-						Volatile.Write(ref _hashMemory[offset], (int)memoizedHash | (1 << 31));
+					if (currentValue == 0 && successFullyChanged) {
+						auto freshCompactIndex = savedStates.fetch_add(1); //returns old value
+						(*indexMapper)[offset].store(freshCompactIndex);
+
+						copyBuffers(state, this->operator[](freshCompactIndex).data(), stateVectorSize);
+            // add memory fence to ensure the buffer was copied completely
+            // memory_order_release should be enough (could change to sequential consistency)
+            std::atomic_thread_fence(std::memory_order_release);
+
+						(*hashes)[offset].store((StateIndex)memoizedHash | (1 << 31));
 
 
 						index = freshCompactIndex;
@@ -122,16 +118,18 @@ namespace pemc {
 					}
 
 					// We have to read the hash value again as it might have been written now where it previously was not
-					currentValue = Volatile.Read(ref _hashMemory[offset]);
-					if ((currentValue & 0x3FFFFFFF) == memoizedHash)
-					{
+					currentValue = (*hashes)[offset].load();
+					if ((currentValue & 0x3FFFFFFF) == memoizedHash) {
 						while ((currentValue & 1 << 31) == 0)
-							currentValue = Volatile.Read(ref _hashMemory[offset]);
+							currentValue = (*hashes)[offset].load();
 
-						var compactIndex = Volatile.Read(ref _indexMapperMemory[offset]);
+						auto compactIndex = (*indexMapper)[offset].load();
 
-						if (compactIndex!=-1 && MemoryBuffer.AreEqual(state, this[compactIndex], _stateVectorSize))
-						{
+            // add memory fence to ensure the buffer was copied to completely (in another thread)
+            // memory_order_acquire should be enough (could change to sequential consistency)
+            std::atomic_thread_fence(std::memory_order_acquire);
+            // now compare
+						if (compactIndex!=-1 && areBuffersEqual(state, this->operator[](compactIndex).data(), stateVectorSize)) {
 							index = compactIndex;
 							return false;
 						}
@@ -142,7 +140,6 @@ namespace pemc {
 			throw OutOfMemoryException(
 				"Failed to find an empty hash table slot within a reasonable amount of time. Try increasing the state capacity.");
 	}
-  */
 
   void StateStorage::resizeStateBuffer(){
     stateVectorSize = modelStateVectorSize + traversalModifierStateVectorSize;
@@ -150,16 +147,16 @@ namespace pemc {
     pStateMemory = static_cast<pbyte*>(stateMemory.get());
   }
 
-  void StateStorage::clear(int traversalModifierStateVectorSize){
-    traversalModifierStateVectorSize = traversalModifierStateVectorSize;
+  void StateStorage::clear(int32_t _traversalModifierStateVectorSize){
+    traversalModifierStateVectorSize = _traversalModifierStateVectorSize;
 		resizeStateBuffer();
      //zeros memory of hashes
      for (auto& entry : *hashes) {
-       entry = 0;
+       entry.store(0);
      }
      // set -1 to memory of _indexMapper
      for (auto& entry : *indexMapper) {
-       entry = -1;
+       entry.store(-1);
      }
   }
 }

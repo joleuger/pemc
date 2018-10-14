@@ -127,7 +127,7 @@ namespace pemc {
       const uint32_t m = 5;
       const uint32_t n = 0xe6546b64;
 
-      auto hash = (uint32_t)seed;
+      auto hash = static_cast<uint32_t>(seed);
       auto numBlocks = sizeInBytes / 4;
       auto blocks = reinterpret_cast<uint32_t*>(buffer);
 
@@ -146,18 +146,18 @@ namespace pemc {
 
       switch (sizeInBytes & 3) {
         case 3:
-          k1 ^= (uint32_t)tail[2] << 16;
+          k1 ^= static_cast<uint32_t>(tail[2]) << 16;
         case 2:
-          k1 ^= (uint32_t)tail[1] << 8;
+          k1 ^= static_cast<uint32_t>(tail[1]) << 8;
         case 1:
-          k1 ^= tail[0];
+          k1 ^= static_cast<uint32_t>(tail[0]);
           k1 *= c1;
           k1 = (k1 << r1) | (k1 >> (32 - r1));
           k1 *= c2;
           hash ^= k1;
       }
 
-      hash ^= (uint32_t)sizeInBytes;
+      hash ^= static_cast<uint32_t>(sizeInBytes);
       hash ^= hash >> 16;
       hash *= (0x85ebca6b);
       hash ^= hash >> 13;

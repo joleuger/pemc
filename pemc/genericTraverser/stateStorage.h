@@ -93,7 +93,7 @@ namespace pemc {
       StateIndex getNumberOfSavedStates();
       StateIndex reserveStateIndex();
       bool addState(pbyte* state, StateIndex& index);
-      void clear(int traversalModifierStateVectorSize);
+      void clear(int32_t _traversalModifierStateVectorSize);
   };
 
 }

@@ -24,12 +24,11 @@
 #ifndef PEMC_BASIC_RAWMEMORY_H_
 #define PEMC_BASIC_RAWMEMORY_H_
 
-
+#include <gsl/gsl_byte>
 
 namespace pemc {
 
-  // pemc byte
-  using pbyte = int8_t; // use until std::byte is included
+  using pbyte = gsl::byte; // pemc byte, use until std::byte is included
 
   using deleter_t = std::function<void(void *)>;
 
