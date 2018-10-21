@@ -64,7 +64,7 @@ namespace pemc {
   void PathTracker::pushFrame(){
     auto indexOfFirstStateIndexEntry = 0;
     if (pathFrames.size() != 0) {
-      auto lastFrame = pathFrames.back();
+      auto& lastFrame = pathFrames.back();
       indexOfFirstStateIndexEntry = lastFrame.indexOfFirstStateIndexEntry + lastFrame.count;
     }
     auto newFrame = PathFrame();
@@ -75,11 +75,12 @@ namespace pemc {
   }
 
   void PathTracker::pushStateIndex(StateIndex stateIndex){
-    auto pathFrame = pathFrames.back();
+    auto& pathFrame = pathFrames.back();
 
     #ifdef DEBUG
     auto indexOfStateIndexEntry = pathFrame.indexOfFirstStateIndexEntry + pathFrame.count;
-    throw_assert(stateIndexEntries.size() != indexOfStateIndexEntry, "BUG!");
+    throw_assert(stateIndexEntries.size() == indexOfStateIndexEntry,
+      "BUG! " + std::to_string(stateIndexEntries.size()) + "!=" + std::to_string(indexOfStateIndexEntry));
     if (indexOfStateIndexEntry >= capacity) {
     	throw OutOfMemoryException(
     		"Unable to allocate an additional depth first search state. Try increasing the size of the path tracker.");
@@ -96,7 +97,7 @@ namespace pemc {
 
   bool PathTracker::tryGetStateIndex(StateIndex& stateIndex){
     while (pathFrames.size() != 0) {
-      auto lastFrame = pathFrames.back();
+      auto& lastFrame = pathFrames.back();
       if (lastFrame.count > 0) {
         // Return the frame's topmost state but do not yet remove the state as it might
         // be needed later when constructing the counter example
@@ -111,7 +112,7 @@ namespace pemc {
       pathFrames.pop_back();
 
       if (pathFrames.size() > 0) {
-        auto newLastFrame = pathFrames.back();
+        auto& newLastFrame = pathFrames.back();
         // the last state was erased
         newLastFrame.count -= 1;
         // Erase all remaining stateIndexEntries of the previous frames.
@@ -186,7 +187,7 @@ namespace pemc {
     auto path = std::vector<StateIndex>(steps);
 
     for (size_t i = 0; i < steps; ++i) {
-      auto currentPathFrame = pathFrames[i];
+      auto& currentPathFrame = pathFrames[i];
       if (currentPathFrame.count > 0) {
         auto indexOfStateIndexEntry = currentPathFrame.indexOfFirstStateIndexEntry + currentPathFrame.count - 1;
         path.push_back(stateIndexEntries[indexOfStateIndexEntry]);
