@@ -32,12 +32,45 @@ namespace {
 
 }
 
-TEST(genericTraverser_test, pathTracker) {
+TEST(genericTraverser_test, pathTracker_works) {
     auto pathTracker = PathTracker(5000);
     pathTracker.pushFrame();
     pathTracker.pushStateIndex(1);
     pathTracker.pushStateIndex(5);
     pathTracker.pushStateIndex(8);
+    StateIndex get1;
+    auto get1success = pathTracker.tryGetStateIndex(get1);
 
+    ASSERT_EQ(get1, 8) << "FAIL";
+    ASSERT_EQ(get1success, true) << "FAIL";
     ASSERT_EQ(pathTracker.canSplit(), true) << "FAIL";
+}
+
+
+TEST(genericTraverser_test, pathTracker_gets_empty) {
+    auto pathTracker = PathTracker(5000);
+    // initially, we find 3 states (from root)
+    pathTracker.pushFrame();
+    pathTracker.pushStateIndex(1);
+    pathTracker.pushStateIndex(5);
+    pathTracker.pushStateIndex(8);
+    // then no state (from 8)
+    pathTracker.pushFrame();
+    StateIndex get1;
+    auto get1success = pathTracker.tryGetStateIndex(get1);
+    // then no state (from 5)
+    pathTracker.pushFrame();
+    StateIndex get2;
+    auto get2success = pathTracker.tryGetStateIndex(get2);
+    // then no state (from 1)
+    pathTracker.pushFrame();
+    StateIndex get3;
+    auto get3success = pathTracker.tryGetStateIndex(get3);
+
+    ASSERT_EQ(get1, 5) << "FAIL";
+    ASSERT_EQ(get1success, true) << "FAIL";
+    ASSERT_EQ(get2, 1) << "FAIL";
+    ASSERT_EQ(get2success, true) << "FAIL";
+    ASSERT_EQ(get3, 0) << "FAIL";
+    ASSERT_EQ(get3success, false) << "FAIL";
 }
