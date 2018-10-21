@@ -21,47 +21,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_BASIC_EXCEPTIONS_H_
-#define PEMC_BASIC_EXCEPTIONS_H_
+#include<gtest/gtest.h>
 
-#include <string>
-#include <exception>
+#include "pemc/genericTraverser/pathTracker.h"
 
-namespace pemc {
+using namespace pemc;
 
-  class OutOfMemoryException : public std::exception {
-  private:
-      std::string completeMessage;
-  public:
-    OutOfMemoryException(const std::string& message) {
-        completeMessage = "OutOfMemoryException: " + message;
-    }
-    ~OutOfMemoryException() = default;
-
-    virtual const char* what() const throw() {
-      return completeMessage.c_str();
-    }
-  };
-
-  class NotImplementedYetException : public std::exception {
-  public:
-    NotImplementedYetException() = default;
-    ~NotImplementedYetException() = default;
-
-    virtual const char* what() const throw() {
-      return "NotImplementedYetException";
-    }
-  };
-
-    class NotTestedYetException : public std::exception {
-    public:
-      NotTestedYetException() = default;
-      ~NotTestedYetException() = default;
-
-      virtual const char* what() const throw() {
-        return "NotTestedYetException";
-      }
-    };
+namespace {
+  using namespace pemc;
 
 }
-#endif  // PEMC_BASIC_EXCEPTIONS_H_
+
+TEST(genericTraverser_test, pathTracker) {
+    auto pathTracker = PathTracker(5000);
+    pathTracker.pushFrame();
+    pathTracker.pushStateIndex(1);
+    pathTracker.pushStateIndex(5);
+    pathTracker.pushStateIndex(8);
+
+    ASSERT_EQ(pathTracker.canSplit(), true) << "FAIL";
+}
