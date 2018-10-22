@@ -47,30 +47,87 @@ TEST(genericTraverser_test, pathTracker_works) {
 }
 
 
-TEST(genericTraverser_test, pathTracker_gets_empty) {
+TEST(genericTraverser_test, pathTracker_gets_empty_1) {
     auto pathTracker = PathTracker(5000);
+    // iteration 1: initial states
     // initially, we find 3 states (from root)
     pathTracker.pushFrame();
     pathTracker.pushStateIndex(1);
     pathTracker.pushStateIndex(5);
     pathTracker.pushStateIndex(8);
-    // then no state (from 8)
-    pathTracker.pushFrame();
+
+    // then no state (from 8); therefore, the next state is 5
     StateIndex get1;
     auto get1success = pathTracker.tryGetStateIndex(get1);
-    // then no state (from 5)
     pathTracker.pushFrame();
+
+    // then no state (from 5); therefore, the next state is 1
     StateIndex get2;
     auto get2success = pathTracker.tryGetStateIndex(get2);
-    // then no state (from 1)
     pathTracker.pushFrame();
+
+    // then no state (from 1); therefore, no next state
     StateIndex get3;
     auto get3success = pathTracker.tryGetStateIndex(get3);
+    pathTracker.pushFrame();
 
-    ASSERT_EQ(get1, 5) << "FAIL";
+    // finally, we recognize there is nothing to do...
+    StateIndex get4;
+    auto get4success = pathTracker.tryGetStateIndex(get4);
+
+    ASSERT_EQ(get1, 8) << "FAIL";
     ASSERT_EQ(get1success, true) << "FAIL";
-    ASSERT_EQ(get2, 1) << "FAIL";
+    ASSERT_EQ(get2, 5) << "FAIL";
     ASSERT_EQ(get2success, true) << "FAIL";
-    ASSERT_EQ(get3, 0) << "FAIL";
-    ASSERT_EQ(get3success, false) << "FAIL";
+    ASSERT_EQ(get3, 1) << "FAIL";
+    ASSERT_EQ(get3success, true) << "FAIL";
+    ASSERT_EQ(get4, 0) << "FAIL";
+    ASSERT_EQ(get4success, false) << "FAIL";
+}
+
+
+TEST(genericTraverser_test, pathTracker_gets_empty_2) {
+    auto pathTracker = PathTracker(5000);
+    // iteration 1: initial states
+    // initially, we find 3 states (from root)
+    pathTracker.pushFrame();
+    pathTracker.pushStateIndex(1);
+    pathTracker.pushStateIndex(5);
+    pathTracker.pushStateIndex(8);
+
+    // then no state (from 8); therefore, the next state is 5
+    StateIndex get1;
+    auto get1success = pathTracker.tryGetStateIndex(get1);
+    pathTracker.pushFrame();
+
+    // then one state (from 5); therefore, the next state is 22
+    StateIndex get2;
+    auto get2success = pathTracker.tryGetStateIndex(get2);
+    pathTracker.pushFrame();
+    pathTracker.pushStateIndex(22);
+
+    // then no state (from 22); therefore, no next state
+    StateIndex get3;
+    auto get3success = pathTracker.tryGetStateIndex(get3);
+    pathTracker.pushFrame();
+
+    // then no state (from 1); therefore, no next state
+    StateIndex get4;
+    auto get4success = pathTracker.tryGetStateIndex(get4);
+    pathTracker.pushFrame();
+
+    // finally, we recognize there is nothing to do...
+    StateIndex get5;
+    auto get5success = pathTracker.tryGetStateIndex(get5);
+
+    ASSERT_EQ(get1, 8) << "FAIL";
+    ASSERT_EQ(get1success, true) << "FAIL";
+    ASSERT_EQ(get2, 5) << "FAIL";
+    ASSERT_EQ(get2success, true) << "FAIL";
+    ASSERT_EQ(get3, 22) << "FAIL";
+    ASSERT_EQ(get3success, true) << "FAIL";
+    ASSERT_EQ(get4, 1) << "FAIL";
+    ASSERT_EQ(get4success, true) << "FAIL";
+    ASSERT_EQ(get5, 0) << "FAIL";
+    ASSERT_EQ(get5success, false) << "FAIL";
 }
