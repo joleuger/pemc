@@ -131,3 +131,30 @@ TEST(genericTraverser_test, pathTracker_gets_empty_2) {
     ASSERT_EQ(get5, 0) << "FAIL";
     ASSERT_EQ(get5success, false) << "FAIL";
 }
+
+
+TEST(genericTraverser_test, pathTracker_space_gets_reused) {
+    auto pathTracker = PathTracker(3);
+    // iteration 1: initial states
+    // initially, we find 3 states (from root)
+    pathTracker.pushFrame();
+    pathTracker.pushStateIndex(1);
+    pathTracker.pushStateIndex(5);
+    pathTracker.pushStateIndex(8);
+
+    // now 3 states are tracked pathTracker.
+    StateIndex get1;
+    auto get1success = pathTracker.tryGetStateIndex(get1);
+    pathTracker.pushFrame();
+
+    // calling tryGetStateIndex(...) on the empty Frame removes the last state;
+    // thus, there is one vacant place to be filled by pushStateIndex(...)
+    StateIndex get2;
+    auto get2success = pathTracker.tryGetStateIndex(get2);
+    pathTracker.pushFrame();
+    pathTracker.pushStateIndex(22);
+    ASSERT_EQ(get1, 8) << "FAIL";
+    ASSERT_EQ(get1success, true) << "FAIL";
+    ASSERT_EQ(get2, 5) << "FAIL";
+    ASSERT_EQ(get2success, true) << "FAIL";
+}
