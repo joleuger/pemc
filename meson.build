@@ -35,6 +35,7 @@ libpemc =  static_library('pemc',
   'pemc/formula/formulaToStringVisitor.cc',
   'pemc/formula/generateLabelBasedFormulaEvaluator.cc',
   'pemc/formula/formulaUtils.cc',
+  'pemc/genericTraverser/genericTraverser.cc',
   'pemc/genericTraverser/pathTracker.cc',
   'pemc/genericTraverser/stateStorage.cc',
   'pemc/lcmdp/lcmdp.cc',
@@ -44,6 +45,7 @@ libpemc =  static_library('pemc',
   'pemc/lmc/lmcModelChecker.cc',
   'pemc/lmc/lmcToGv.cc',
   'pemc/lmcTraverser/lmcBuilder.cc',
+  'pemc/modelExecutor/modelExecutor.cc',
   include_directories : libpemc_include)
 libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpemc_include, dependencies: boostdep)
 
@@ -71,6 +73,7 @@ libpemctests = [
   'tests/formula/createUuids.cc',
   'tests/formula/formulaToString.cc',
   'tests/formula/labelBasedFormulaEvaluator.cc',
+  'tests/genericTraverser/genericTraverser.cc',
   'tests/genericTraverser/pathTracker.cc',
   'tests/genericTraverser/stateStorage.cc',
   'tests/lmc/lmcExamples.cc',
