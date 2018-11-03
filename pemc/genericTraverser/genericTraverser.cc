@@ -34,6 +34,58 @@ namespace {
   using namespace pemc;
 
   class Worker {
+  private:
+    std::unique_ptr<ITransitionsCalculator> transitionsCalculator;
+    std::vector<std::unique_ptr<IPreStateStorageModifier>> preStateStorageModifiers;
+    std::vector<std::unique_ptr<IPostStateStorageModifier>> postStateStorageModifiers;
+    PathTracker pathTracker;
+
+  public:
+    Worker(const Configuration& conf, GenericTraverser& traverser)
+      : pathTracker(PathTracker(conf.maximalSearchDepth))
+      {
+      // currently only single core traversal implemented.
+
+      // instantiate an instance of ITransitionsCalculator, which can calculate
+      // the successor transitions of a given state (ModelExecutor is the most common
+      // example of an ITransitionsCalculator).
+      transitionsCalculator = traverser.transitionsCalculatorCreator();
+
+      // Now the state state storage is initialized with the stateVectorSize
+      auto modelStateVectorSize = transitionsCalculator->getStateVectorSize();
+      if (!traverser.stateStorage) {
+        // the first worker has to create the state storage.
+        // Note that the workers must not be created at the same time.
+        traverser.stateStorage = std::make_unique<StateStorage>(modelStateVectorSize, conf.modelCapacity->getMaximalStates());
+      }
+
+      // create an instance of each IPreStateStorageModifier
+      preStateStorageModifiers = std::vector<std::unique_ptr<IPreStateStorageModifier>>(traverser.preStateStorageModifierCreators.size());
+      std::transform(traverser.preStateStorageModifierCreators.begin(),
+                     traverser.preStateStorageModifierCreators.end(),
+                     std::back_inserter(preStateStorageModifiers),
+        [](std::function<std::unique_ptr<IPreStateStorageModifier>()> creator){ return creator();} );
+
+      // create an instance of each IPostStateStorageModifier
+      postStateStorageModifiers = std::vector<std::unique_ptr<IPostStateStorageModifier>>(traverser.postStateStorageModifierCreators.size());
+      std::transform(traverser.postStateStorageModifierCreators.begin(),
+                     traverser.postStateStorageModifierCreators.end(),
+                     std::back_inserter(postStateStorageModifiers),
+        [](std::function<std::unique_ptr<IPostStateStorageModifier>()> creator){ return creator();} );
+
+    }
+
+    void handleTransitions(gsl::span<TraversalTransition> transitions) {
+      // traverse initial transitions
+      for (auto& transition : transitions) {
+      }
+    }
+
+    void traverse() {
+          // traverse initial transitions
+      auto initialTransitions = transitionsCalculator->calculateInitialTransitions();
+      handleTransitions(initialTransitions);
+    }
 
   };
 }
@@ -51,30 +103,8 @@ namespace pemc {
 
   void GenericTraverser::traverse() {
     // currently only single core traversal implemented.
-
-    // instantiate an instance of ITransitionsCalculator, which can calculate
-    // the successor transitions of a given state (ModelExecutor is the most common
-    // example of an ITransitionsCalculator).
-    auto transitionsCalculator = transitionsCalculatorCreator();
-
-    // Now the state state storage is initialized with the stateVectorSize
-    auto modelStateVectorSize = transitionsCalculator->getStateVectorSize();
-    stateStorage = std::make_unique<StateStorage>(modelStateVectorSize, conf.modelCapacity->getMaximalStates());
-
-    // create an instance of each IPreStateStorageModifier
-    auto preStateStorageModifiers = std::vector<std::unique_ptr<IPreStateStorageModifier>>(preStateStorageModifierCreators.size());
-    std::transform(preStateStorageModifierCreators.begin(), preStateStorageModifierCreators.end(), std::back_inserter(preStateStorageModifiers),
-      [](std::function<std::unique_ptr<IPreStateStorageModifier>()> creator){ return creator();} );
-
-    // create an instance of each IPostStateStorageModifier
-    auto postStateStorageModifiers = std::vector<std::unique_ptr<IPostStateStorageModifier>>(postStateStorageModifierCreators.size());
-    std::transform(postStateStorageModifierCreators.begin(), postStateStorageModifierCreators.end(), std::back_inserter(postStateStorageModifiers),
-      [](std::function<std::unique_ptr<IPostStateStorageModifier>()> creator){ return creator();} );
-
-    auto pathTracker = PathTracker(conf.maximalSearchDepth);
-
-    // now start with the actual traversal
-    auto initialTransitions = transitionsCalculator->calculateInitialTransitions();
+    auto worker = Worker(conf,*this);
+    worker.traverse();
 
   }
 
