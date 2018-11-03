@@ -61,10 +61,10 @@ namespace pemc {
 
       // The length in bytes of a state vector required for the analysis model.
       int32_t modelStateVectorSize;
-      // Extra bytes in state vector for traversal modifiers.
-      int32_t traversalModifierStateVectorSize;
+      // Extra bytes in state vector for preStateStorage modifiers.
+      int32_t preStateStorageStateVectorSize;
       // The length in bytes of the state vector of the analysis model with the extra bytes
-		  // required for the traversal
+		  // required for the preStateStorage modifiers
       int32_t stateVectorSize;
 
       // The number of saved states
@@ -94,7 +94,7 @@ namespace pemc {
       StateIndex getNumberOfSavedStates();
       StateIndex reserveStateIndex();
       bool addState(pbyte* state, StateIndex& index);
-      void clear(int32_t _traversalModifierStateVectorSize);
+      void clear(int32_t _preStateStorageStateVectorSize);
   };
 
 }

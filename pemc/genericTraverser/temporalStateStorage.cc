@@ -21,31 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_BASIC_CONFIGURATION_H_
-#define PEMC_BASIC_CONFIGURATION_H_
+#include <limits>
+#include <algorithm>
+#include <ThrowAssert.hpp>
 
-#include <functional>
-#include <iostream>
+#include "pemc/basic/exceptions.h"
+#include "pemc/genericTraverser/temporalStateStorage.h"
 
-#include "pemc/basic/modelCapacity.h"
 
 namespace pemc {
 
-  struct Configuration {
-
-    // Output stream to write output to.
-    // Note: Memory of cout is not managed. If memory management is required,
-    // then let coutManaged handle the memory management of the class and
-    // forward cout to coutManaged.get().
-    std::ostream* cout = &std::cout;
-    std::shared_ptr<std::ostream> coutManaged = nullptr;
-
-    bool printGraphViz = false;
-
-    int32_t maximalSearchDepth = 1 << 21;
-
-    std::shared_ptr<ModelCapacity> modelCapacity = std::make_shared<ModelCapacityByModelSize>(ModelCapacityByModelSize::Small());
-  };
-
 }
-#endif  // PEMC_BASIC_CONFIGURATION_H_

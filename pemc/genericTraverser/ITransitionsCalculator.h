@@ -36,6 +36,7 @@
 #include "pemc/basic/modelCapacity.h"
 #include "pemc/basic/rawMemory.h"
 #include "pemc/formula/formula.h"
+#include "pemc/genericTraverser/traversalTransition.h"
 
 namespace pemc {
 
@@ -45,6 +46,10 @@ namespace pemc {
       virtual ~ITransitionsCalculator() = default;
 
       virtual int32_t getStateVectorSize() = 0;
+
+      virtual gsl::span<TraversalTransition> calculateInitialTransitions() = 0;
+
+      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(StateIndex state) = 0;
   };
 
 }

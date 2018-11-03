@@ -142,13 +142,13 @@ namespace pemc {
 	}
 
   void StateStorage::resizeStateBuffer(){
-    stateVectorSize = modelStateVectorSize + traversalModifierStateVectorSize;
+    stateVectorSize = modelStateVectorSize + preStateStorageStateVectorSize;
     stateMemory = unique_void(::operator new(totalCapacity * stateVectorSize) );
     pStateMemory = static_cast<pbyte*>(stateMemory.get());
   }
 
-  void StateStorage::clear(int32_t _traversalModifierStateVectorSize){
-    traversalModifierStateVectorSize = _traversalModifierStateVectorSize;
+  void StateStorage::clear(int32_t _preStateStorageStateVectorSize){
+    preStateStorageStateVectorSize = _preStateStorageStateVectorSize;
 		resizeStateBuffer();
      //zeros memory of hashes
      for (auto& entry : *hashes) {

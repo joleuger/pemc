@@ -28,6 +28,7 @@
 #include "pemc/basic/exceptions.h"
 #include "pemc/genericTraverser/genericTraverser.h"
 #include "pemc/genericTraverser/pathTracker.h"
+#include "pemc/genericTraverser/traversalTransition.h"
 
 namespace {
   using namespace pemc;
@@ -70,7 +71,10 @@ namespace pemc {
     std::transform(postStateStorageModifierCreators.begin(), postStateStorageModifierCreators.end(), std::back_inserter(postStateStorageModifiers),
       [](std::function<std::unique_ptr<IPostStateStorageModifier>()> creator){ return creator();} );
 
+    auto pathTracker = PathTracker(conf.maximalSearchDepth);
 
+    // now start with the actual traversal
+    auto initialTransitions = transitionsCalculator->calculateInitialTransitions();
 
   }
 

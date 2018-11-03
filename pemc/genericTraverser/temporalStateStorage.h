@@ -21,50 +21,57 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_EXECUTABLEMODEL_MODELEXECUTOR_H_
-#define PEMC_EXECUTABLEMODEL_MODELEXECUTOR_H_
+#ifndef PEMC_GENERICTRAVERSER_TEMPORALSTATESTORAGE_H_
+#define PEMC_GENERICTRAVERSER_TEMPORALSTATESTORAGE_H_
 
 #include <vector>
 #include <gsl/span>
 #include <cstdint>
 #include <atomic>
-#include <stack>
-#include <limits>
-#include <functional>
+#include <boost/align/aligned_allocator.hpp>
 
 #include "pemc/basic/tscIndex.h"
+#include "pemc/basic/probability.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/modelCapacity.h"
 #include "pemc/basic/rawMemory.h"
 #include "pemc/formula/formula.h"
-#include "pemc/genericTraverser/ITransitionsCalculator.h"
-#include "pemc/genericTraverser/IPreStateStorageModifier.h"
-#include "pemc/genericTraverser/IPostStateStorageModifier.h"
-#include "pemc/executableModel/IChoiceResolver.h"
-#include "pemc/executableModel/abstractModel.h"
 
 namespace pemc {
 
-  class ModelExecutor : public ITransitionsCalculator {
+  ///   We store states in a contiguous array, indexed by a continuous variable.
+  class TemporalStateStorage {
   private:
-      std::unique_ptr<IChoiceResolver> choiceResolver;
-      std::unique_ptr<AbstractModel> model;
 
-      // create a vector of transitions that can be reused for different calculations.
-      // this should prevent garbage.
-      std::vector<TraversalTransition> transitions;
+      // The length in bytes of a state vector required for the analysis model.
+      int32_t modelStateVectorSize;
+      // Extra bytes in state vector for traversal modifiers.
+      int32_t traversalModifierStateVectorSize;
+      // The length in bytes of the state vector of the analysis model with the extra bytes
+		  // required for the traversal
+      int32_t stateVectorSize;
+
+      // The number of saved states
+      std::atomic<StateIndex> savedStates = 0;
+  	  // The number of states that can be saved.
+      StateIndex totalCapacity;
+
+      // The unique_void_ptr keeps track of the memory to avoid leaks.
+      // unique_ptr are not used, because they do not support void.
+      unique_void_ptr stateMemory;
+      pbyte* pStateMemory
+
+      void resizeStateBuffer();
+
   public:
-      ModelExecutor();
+      TemporalStateStorage(int32_t _modelStateVectorSize, StateIndex _capacity);
 
-      void setModel(std::unique_ptr<AbstractModel> _model);
+      gsl::span<pbyte> operator [](size_t idx);
 
-      virtual int32_t getStateVectorSize();
-
-      virtual gsl::span<TraversalTransition> calculateInitialTransitions();
-
-      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(StateIndex state);
+      pbyte* state addState(pbyte* state);
+      void clear(int32_t _traversalModifierStateVectorSize);
   };
 
 }
 
-#endif  // PEMC_EXECUTABLEMODEL_MODELEXECUTOR_H_
+#endif  // PEMC_GENERICTRAVERSER_TEMPORALSTATESTORAGE_H_
