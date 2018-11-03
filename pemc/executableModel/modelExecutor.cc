@@ -21,38 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_MODELEXECUTOR_MODELEXECUTOR_H_
-#define PEMC_MODELEXECUTOR_MODELEXECUTOR_H_
-
-#include <vector>
-#include <gsl/span>
-#include <cstdint>
-#include <atomic>
-#include <stack>
 #include <limits>
-#include <functional>
+#include <algorithm>
+#include <ThrowAssert.hpp>
 
-#include "pemc/basic/tscIndex.h"
-#include "pemc/basic/label.h"
-#include "pemc/basic/modelCapacity.h"
-#include "pemc/basic/rawMemory.h"
-#include "pemc/formula/formula.h"
-#include "pemc/genericTraverser/ITransitionsOfStateCalculator.h"
-#include "pemc/genericTraverser/IPreStateStorageModifier.h"
-#include "pemc/genericTraverser/IPostStateStorageModifier.h"
-#include "pemc/modelExecutor/IChoiceResolver.h"
-#include "pemc/modelExecutor/abstractModel.h"
+#include "pemc/basic/exceptions.h"
+#include "pemc/executableModel/modelExecutor.h"
+
+namespace {
+  using namespace pemc;
+
+  class Worker {
+
+  };
+}
 
 namespace pemc {
 
-  class ModelExecutor : public ITransitionsOfStateCalculator {
-  private:
-      std::unique_ptr<IChoiceResolver> choiceResolver;
-      std::unique_ptr<AbstractModel> model;
-  public:
-      ModelExecutor();
-  };
+  ModelExecutor::ModelExecutor() {
+  }
 
 }
-
-#endif  // PEMC_MODELEXECUTOR_MODELEXECUTOR_H_

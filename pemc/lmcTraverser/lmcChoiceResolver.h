@@ -24,7 +24,7 @@
 #ifndef PEMC_LMCTRAVERSER_LMCCHOICERESOLVER_H_
 #define PEMC_LMCTRAVERSER_LMCCHOICERESOLVER_H_
 
-#include "pemc/modelExecutor/IChoiceResolver.h"
+#include "pemc/executableModel/IChoiceResolver.h"
 
 namespace pemc {
   class LmcChoiceResolver : public IChoiceResolver {

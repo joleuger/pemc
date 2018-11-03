@@ -21,22 +21,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <limits>
-#include <algorithm>
-#include <ThrowAssert.hpp>
-
-#include "pemc/basic/exceptions.h"
-#include "pemc/modelExecutor/abstractModel.h"
-
-namespace {
-  using namespace pemc;
-
-}
+#ifndef PEMC_EXECUTABLEMODEL_ICHOICERESOLVER_H_
+#define PEMC_EXECUTABLEMODEL_ICHOICERESOLVER_H_
 
 namespace pemc {
-
-  void AbstractModel::setChoiceResolver(IChoiceResolver* _choiceResolver) {
-    choiceResolver = _choiceResolver;
+  class IChoiceResolver {
+  private:
+  public:
+      IChoiceResolver();
   };
 
 }
+
+#endif  // PEMC_EXECUTABLEMODEL_ICHOICERESOLVER_H_

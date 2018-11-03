@@ -47,8 +47,8 @@ libpemc =  static_library('pemc',
   'pemc/lmcTraverser/addTransitionsToLmcModifier.cc',
   'pemc/lmcTraverser/lmcBuilder.cc',
   'pemc/lmcTraverser/lmcChoiceResolver.cc',
-  'pemc/modelExecutor/abstractModel.cc',
-  'pemc/modelExecutor/modelExecutor.cc',
+  'pemc/executableModel/abstractModel.cc',
+  'pemc/executableModel/modelExecutor.cc',
   'pemc/pemc.cc',
   include_directories : libpemc_include)
 libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpemc_include, dependencies: boostdep)

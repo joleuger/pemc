@@ -24,13 +24,16 @@
 #ifndef PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFMODEL_H_
 #define PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFMODEL_H_
 
-#ifndef SimpleModel
-#define SimpleModel int
-#endif
+#include "pemc/executableModel/abstractModel.h"
 
 namespace pemc { namespace cpp {
 
   using namespace pemc;
+
+  class SimpleModel : public AbstractModel {
+  private:
+    int32_t state;
+  };
 
 } }
 #endif  // PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFMODEL_H_

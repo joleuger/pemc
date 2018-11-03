@@ -30,7 +30,7 @@
 #include "pemc/formula/formula.h"
 #include "pemc/basic/probability.h"
 #include "pemc/lmc/lmc.h"
-#include "pemc/modelExecutor/abstractModel.h"
+#include "pemc/executableModel/abstractModel.h"
 
 namespace pemc {
 

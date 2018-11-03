@@ -24,13 +24,16 @@
 #ifndef PEMC_CPP_CPPMODEL_H_
 #define PEMC_CPP_CPPMODEL_H_
 
-#ifndef CppModel
-#define CppModel int
-#endif
+#include "pemc/executableModel/abstractModel.h"
 
 namespace pemc { namespace cpp {
 
   using namespace pemc;
+
+  class CppModel : public AbstractModel {
+  private:
+    int32_t state;
+  };
 
 } }
 #endif  // PEMC_CPP_CPPMODEL_H_
