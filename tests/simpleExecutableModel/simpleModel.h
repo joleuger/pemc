@@ -21,34 +21,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_MODELEXECUTOR_IMODEL_H_
-#define PEMC_MODELEXECUTOR_IMODEL_H_
+#ifndef PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFMODEL_H_
+#define PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFMODEL_H_
 
-#include <vector>
-#include <gsl/span>
-#include <cstdint>
-#include <atomic>
-#include <stack>
-#include <limits>
-#include <functional>
+#ifndef SimpleModel
+#define SimpleModel int
+#endif
 
-#include "pemc/basic/tscIndex.h"
-#include "pemc/basic/label.h"
-#include "pemc/basic/modelCapacity.h"
-#include "pemc/basic/rawMemory.h"
-#include "pemc/formula/formula.h"
-#include "pemc/genericTraverser/ITransitionsOfStateCalculator.h"
-#include "pemc/genericTraverser/IPreStateStorageModifier.h"
-#include "pemc/genericTraverser/IPostStateStorageModifier.h"
+namespace pemc { namespace cpp {
 
-namespace pemc {
+  using namespace pemc;
 
-  class IModel {
-  private:
-  public:
-      IModel();
-  };
-
-}
-
-#endif  // PEMC_MODELEXECUTOR_IMODEL_H_
+} }
+#endif  // PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFMODEL_H_

@@ -21,18 +21,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_LMCBUILDER_H_
-#define PEMC_LMCTRAVERSER_LMCBUILDER_H_
+#ifndef PEMC_MODELEXECUTOR_ABSTRACTMODEL_H_
+#define PEMC_MODELEXECUTOR_ABSTRACTMODEL_H_
 
-#include "pemc/lmc/lmc.h"
+#include <vector>
+#include <gsl/span>
+#include <gsl/gsl_byte>
+#include <cstdint>
+#include <atomic>
+#include <stack>
+#include <limits>
+#include <functional>
+
+#include "pemc/basic/tscIndex.h"
+#include "pemc/basic/label.h"
+#include "pemc/basic/modelCapacity.h"
+#include "pemc/basic/rawMemory.h"
+#include "pemc/formula/formula.h"
+#include "pemc/genericTraverser/ITransitionsOfStateCalculator.h"
+#include "pemc/genericTraverser/IPreStateStorageModifier.h"
+#include "pemc/genericTraverser/IPostStateStorageModifier.h"
+#include "pemc/modelExecutor/IChoiceResolver.h"
 
 namespace pemc {
-  class LmcBuilder {
+
+  class AbstractModel {
   private:
+      IChoiceResolver* choiceResolver;
   public:
-      LmcBuilder();
+      AbstractModel();
+      void setChoiceResolver(IChoiceResolver* _choiceResolver);
+      void serialize(gsl::byte* position);
+      void deserialize(gsl::byte* position);
   };
 
 }
 
-#endif  // PEMC_LMCTRAVERSER_LMCBUILDER_H_
+#endif  // PEMC_MODELEXECUTOR_ABSTRACTMODEL_H_

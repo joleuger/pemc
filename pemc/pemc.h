@@ -21,18 +21,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_LMCBUILDER_H_
-#define PEMC_LMCTRAVERSER_LMCBUILDER_H_
+#ifndef PEMC_PEMC_H_
+#define PEMC_PEMC_H_
 
+#include <functional>
+
+#include "pemc/basic/configuration.h"
+#include "pemc/formula/formula.h"
+#include "pemc/basic/probability.h"
 #include "pemc/lmc/lmc.h"
+#include "pemc/modelExecutor/abstractModel.h"
 
 namespace pemc {
-  class LmcBuilder {
+
+  // Pemc is the facade, which facilitates calculating probabilities of formulas in executable
+  // models.
+  class Pemc {
   private:
+      Configuration conf;
+
   public:
-      LmcBuilder();
+      Pemc();
+      Pemc(const Configuration& _conf);
+
+      // The modelCreator creates an instance of an executable model.
+      // The formulas are the formulas to include as labels.
+      std::unique_ptr<Lmc> buildLmcFromExecutableModel(std::function<AbstractModel()> modelCreator, std::vector<Formula> formulas);
+
+      // Lmc is a Labeled Markov chain. This method calculates the probability to reach
+      Probability calculateProbabilityToReachStateWithinBound(Lmc& lmc, Formula &formula, int32_t bound);
   };
 
 }
 
-#endif  // PEMC_LMCTRAVERSER_LMCBUILDER_H_
+#endif  // PEMC_PEMC_H_

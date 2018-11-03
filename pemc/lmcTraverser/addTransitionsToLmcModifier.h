@@ -21,18 +21,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_LMCBUILDER_H_
-#define PEMC_LMCTRAVERSER_LMCBUILDER_H_
+#ifndef PEMC_LMCTRAVERSER_ADDTRANSITIONSTOLMCMODIFIER_H_
+#define PEMC_LMCTRAVERSER_ADDTRANSITIONSTOLMCMODIFIER_H_
 
 #include "pemc/lmc/lmc.h"
+#include "pemc/genericTraverser/IPostStateStorageModifier.h"
 
 namespace pemc {
-  class LmcBuilder {
+  class AddTransitionsToLmcModifier : public IPostStateStorageModifier {
   private:
   public:
-      LmcBuilder();
+      AddTransitionsToLmcModifier();
   };
 
 }
 
-#endif  // PEMC_LMCTRAVERSER_LMCBUILDER_H_
+#endif  // PEMC_LMCTRAVERSER_ADDTRANSITIONSTOLMCMODIFIER_H_

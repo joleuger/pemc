@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_GENERICTRAVERSER_TRAVERSER_H_
-#define PEMC_GENERICTRAVERSER_TRAVERSER_H_
+#ifndef PEMC_GENERICTRAVERSER_GENERICTRAVERSER_H_
+#define PEMC_GENERICTRAVERSER_GENERICTRAVERSER_H_
 
 #include <vector>
 #include <gsl/span>
@@ -44,12 +44,23 @@
 namespace pemc {
 
   class GenericTraverser {
-  private:
-      std::function<ITransitionsOfStateCalculator()> createTransitionsOfStateCalculator();
+  protected:
+      // a transitionsOfStateCalculator calculates the successors of a given state.
+      std::function<ITransitionsOfStateCalculator()> transitionsOfStateCalculatorCreator();
+
+      // preStateStorageModifier can access and modify the transistions returned by
+      // the transitionsOfStateCalculator before the corresponding states are added to the StateStorage.
+      // The states in the array are given as byte vectors.
+      std::vector<std::function<IPreStateStorageModifier()>> preStateStorageModifierCreators();
+
+      // postStateStorageModifier can access and modify the transistions returned by
+      // the transitionsOfStateCalculator after the corresponding states are added to the StateStorage.
+      // The states in the array are given as indexes into the stateStorage.
+      std::vector<std::function<IPostStateStorageModifier()>> postStateStorageModifierCreators();
   public:
       GenericTraverser();
   };
 
 }
 
-#endif  // PEMC_GENERICTRAVERSER_TRAVERSER_H_
+#endif  // PEMC_GENERICTRAVERSER_GENERICTRAVERSER_H_

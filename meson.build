@@ -44,8 +44,12 @@ libpemc =  static_library('pemc',
   'pemc/lmc/lmc.cc',
   'pemc/lmc/lmcModelChecker.cc',
   'pemc/lmc/lmcToGv.cc',
+  'pemc/lmcTraverser/addTransitionsToLmcModifier.cc',
   'pemc/lmcTraverser/lmcBuilder.cc',
+  'pemc/lmcTraverser/lmcChoiceResolver.cc',
+  'pemc/modelExecutor/abstractModel.cc',
   'pemc/modelExecutor/modelExecutor.cc',
+  'pemc/pemc.cc',
   include_directories : libpemc_include)
 libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpemc_include, dependencies: boostdep)
 
@@ -80,7 +84,9 @@ libpemctests = [
   'tests/lmc/lmc.cc',
   'tests/lmc/lmcModelChecker.cc',
   'tests/lcmdp/lcmdp.cc',
-  'tests/lcmdp/lcmdpModelChecker.cc'
+  'tests/lcmdp/lcmdpModelChecker.cc',
+  'tests/simpleExecutableModel/generateSlowSimpleFormulaEvaluator.cc',
+  'tests/simpleExecutableModel/simpleFormula.cc'
 ]
 
 libpemcCpptests = [

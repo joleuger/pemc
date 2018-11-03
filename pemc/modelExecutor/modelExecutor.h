@@ -40,11 +40,15 @@
 #include "pemc/genericTraverser/ITransitionsOfStateCalculator.h"
 #include "pemc/genericTraverser/IPreStateStorageModifier.h"
 #include "pemc/genericTraverser/IPostStateStorageModifier.h"
+#include "pemc/modelExecutor/IChoiceResolver.h"
+#include "pemc/modelExecutor/abstractModel.h"
 
 namespace pemc {
 
   class ModelExecutor : public ITransitionsOfStateCalculator {
   private:
+      std::unique_ptr<IChoiceResolver> choiceResolver;
+      std::unique_ptr<AbstractModel> model;
   public:
       ModelExecutor();
   };

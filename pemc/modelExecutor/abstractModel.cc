@@ -21,18 +21,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_LMCBUILDER_H_
-#define PEMC_LMCTRAVERSER_LMCBUILDER_H_
+#include <limits>
+#include <algorithm>
+#include <ThrowAssert.hpp>
 
-#include "pemc/lmc/lmc.h"
+#include "pemc/basic/exceptions.h"
+#include "pemc/modelExecutor/abstractModel.h"
 
-namespace pemc {
-  class LmcBuilder {
-  private:
-  public:
-      LmcBuilder();
-  };
+namespace {
+  using namespace pemc;
 
 }
 
-#endif  // PEMC_LMCTRAVERSER_LMCBUILDER_H_
+namespace pemc {
+
+  void AbstractModel::setChoiceResolver(IChoiceResolver* _choiceResolver) {
+    choiceResolver = _choiceResolver;
+  };
+
+}

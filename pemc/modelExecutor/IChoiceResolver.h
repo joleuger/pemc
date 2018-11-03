@@ -21,18 +21,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_LMCBUILDER_H_
-#define PEMC_LMCTRAVERSER_LMCBUILDER_H_
-
-#include "pemc/lmc/lmc.h"
+#ifndef PEMC_MODELEXECUTOR_ICHOICERESOLVER_H_
+#define PEMC_MODELEXECUTOR_ICHOICERESOLVER_H_
 
 namespace pemc {
-  class LmcBuilder {
+  class IChoiceResolver {
   private:
   public:
-      LmcBuilder();
+      IChoiceResolver();
   };
 
 }
 
-#endif  // PEMC_LMCTRAVERSER_LMCBUILDER_H_
+#endif  // PEMC_MODELEXECUTOR_ICHOICERESOLVER_H_

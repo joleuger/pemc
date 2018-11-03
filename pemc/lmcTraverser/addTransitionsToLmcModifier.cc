@@ -21,18 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_LMCBUILDER_H_
-#define PEMC_LMCTRAVERSER_LMCBUILDER_H_
-
-#include "pemc/lmc/lmc.h"
+#include "pemc/lmcTraverser/addTransitionsToLmcModifier.h"
 
 namespace pemc {
-  class LmcBuilder {
-  private:
-  public:
-      LmcBuilder();
+
+  AddTransitionsToLmcModifier::AddTransitionsToLmcModifier(){
   };
-
 }
-
-#endif  // PEMC_LMCTRAVERSER_LMCBUILDER_H_

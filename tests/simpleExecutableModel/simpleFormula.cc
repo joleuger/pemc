@@ -21,18 +21,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_LMCBUILDER_H_
-#define PEMC_LMCTRAVERSER_LMCBUILDER_H_
+#include "tests/simpleExecutableModel/simpleFormula.h"
 
-#include "pemc/lmc/lmc.h"
+namespace pemc { namespace cpp {
 
-namespace pemc {
-  class LmcBuilder {
-  private:
-  public:
-      LmcBuilder();
-  };
+  SimpleFormula::SimpleFormula(const std::function<bool(SimpleModel*)>& _evaluator,
+    const std::string& _identifier)
+      : AdaptedFormula(_identifier), evaluator(_evaluator) {
+  }
 
-}
+  std::function<bool(SimpleModel*)> SimpleFormula::getEvaluator() {
+    return evaluator;
+  }
 
-#endif  // PEMC_LMCTRAVERSER_LMCBUILDER_H_
+} }

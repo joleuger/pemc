@@ -21,18 +21,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_LMCBUILDER_H_
-#define PEMC_LMCTRAVERSER_LMCBUILDER_H_
-
-#include "pemc/lmc/lmc.h"
+#include "pemc/pemc.h"
 
 namespace pemc {
-  class LmcBuilder {
-  private:
-  public:
-      LmcBuilder();
+  Pemc::Pemc(){
+    conf = Configuration();
   };
 
-}
+  Pemc::Pemc(const Configuration& _conf){
+    conf = _conf;
+  };
 
-#endif  // PEMC_LMCTRAVERSER_LMCBUILDER_H_
+
+  std::unique_ptr<Lmc> buildLmcFromExecutableModel(std::function<AbstractModel()> modelCreator, std::vector<Formula> formulas) {
+    
+
+  }
+
+  Probability calculateProbabilityToReachStateWithinBound(Lmc& lmc, Formula &formula, int32_t bound) {
+    return Probability(0.0);
+  }
+}
