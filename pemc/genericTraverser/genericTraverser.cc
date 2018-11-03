@@ -34,15 +34,16 @@ namespace {
   using namespace pemc;
 
   class Worker {
-  private:
+  public:
     std::unique_ptr<ITransitionsCalculator> transitionsCalculator;
     std::vector<std::unique_ptr<IPreStateStorageModifier>> preStateStorageModifiers;
     std::vector<std::unique_ptr<IPostStateStorageModifier>> postStateStorageModifiers;
     PathTracker pathTracker;
+    GenericTraverser& traverser;
 
-  public:
-    Worker(const Configuration& conf, GenericTraverser& traverser)
-      : pathTracker(PathTracker(conf.maximalSearchDepth))
+    Worker(const Configuration& conf, GenericTraverser& _traverser)
+      : pathTracker(PathTracker(conf.maximalSearchDepth)),
+        traverser(_traverser)
       {
       // currently only single core traversal implemented.
 
@@ -50,14 +51,6 @@ namespace {
       // the successor transitions of a given state (ModelExecutor is the most common
       // example of an ITransitionsCalculator).
       transitionsCalculator = traverser.transitionsCalculatorCreator();
-
-      // Now the state state storage is initialized with the stateVectorSize
-      auto modelStateVectorSize = transitionsCalculator->getStateVectorSize();
-      if (!traverser.stateStorage) {
-        // the first worker has to create the state storage.
-        // Note that the workers must not be created at the same time.
-        traverser.stateStorage = std::make_unique<StateStorage>(modelStateVectorSize, conf.modelCapacity->getMaximalStates());
-      }
 
       // create an instance of each IPreStateStorageModifier
       preStateStorageModifiers = std::vector<std::unique_ptr<IPreStateStorageModifier>>(traverser.preStateStorageModifierCreators.size());
@@ -76,17 +69,56 @@ namespace {
     }
 
     void handleTransitions(gsl::span<TraversalTransition> transitions) {
-      // traverse initial transitions
+      // handle transitions
+
+      // new states and transitions calculated during this method call
+      auto newCalculatedTransitionCount = 0;
+      auto newStatesCount = 0;
+
+      for (auto& modifier : preStateStorageModifiers) {
+      }
+
+      pathTracker.pushFrame();
       for (auto& transition : transitions) {
+
+        StateIndex targetStateIndex;
+        bool isNewState;
+
+        if (transition.flags & TraversalTransitionFlags::IsToStutteringState) {
+          isNewState = false;
+          targetStateIndex = traverser.stutteringStateIndex;
+        } else {
+          isNewState = traverser.stateStorage->addState(transition.targetState, targetStateIndex);
+        }
+
+        // Replace the targetState pointer with the unique indexes of the transition's target state.
+        transition.targetStateIndex = targetStateIndex;
+        transition.flags |= TraversalTransitionFlags::IsTargetStateTransformedToIndex;
+
+        if (isNewState) {
+          ++newStatesCount;
+          pathTracker.pushStateIndex(targetStateIndex);
+        }
+
+        ++newCalculatedTransitionCount;
+      }
+
+      for (auto& modifier : preStateStorageModifiers) {
       }
     }
 
     void traverse() {
-          // traverse initial transitions
+      // traverse initial transitions
       auto initialTransitions = transitionsCalculator->calculateInitialTransitions();
       handleTransitions(initialTransitions);
-    }
 
+      StateIndex stateIndexToTraverse;
+      while (pathTracker.tryGetStateIndex(stateIndexToTraverse) ) {
+        auto stateToTraverse = (*traverser.stateStorage)[stateIndexToTraverse];
+        //auto transitions = transitionsCalculator->calculateTransitionsOfState(stateToTraverse);
+        //handleTransitions(transitions);
+      }
+    }
   };
 }
 
@@ -102,10 +134,21 @@ namespace pemc {
   }
 
   void GenericTraverser::traverse() {
-    // currently only single core traversal implemented.
+    // currently only single core traversal implemented. Therefore, instantiate a single worker.
     auto worker = Worker(conf,*this);
-    worker.traverse();
 
+    // After the first worker has been initialized, it can be used to derive the stateVectorSize.
+    auto modelStateVectorSize = worker.transitionsCalculator->getStateVectorSize();
+    // Now the state state storage is initialized with the stateVectorSize
+    stateStorage = std::make_unique<StateStorage>(modelStateVectorSize, conf.modelCapacity->getMaximalStates());
+
+    // create a stuttering state if demanded.
+    if (createStutteringState) {
+      stutteringStateIndex = stateStorage->reserveStateIndex();
+    }
+
+    // conduct the actual traversal
+    worker.traverse();
   }
 
 }

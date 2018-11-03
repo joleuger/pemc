@@ -79,7 +79,7 @@ namespace pemc {
       // The unique_void_ptr keeps track of the memory to avoid leaks.
       // unique_ptr are not used, because they do not support void.
       unique_void_ptr stateMemory;
-      pbyte* pStateMemory;
+      gsl::byte* pStateMemory;
       std::unique_ptr<std::vector<std::atomic<StateIndex>>> indexMapper;
       // hashes in next line should be aligned for more speed
       std::unique_ptr<alignedStateIndexVector> hashes;
@@ -89,11 +89,11 @@ namespace pemc {
   public:
       StateStorage(int32_t _modelStateVectorSize, StateIndex _capacity);
 
-      gsl::span<pbyte> operator [](size_t idx);
+      gsl::span<gsl::byte> operator [](size_t idx);
 
       StateIndex getNumberOfSavedStates();
       StateIndex reserveStateIndex();
-      bool addState(pbyte* state, StateIndex& index);
+      bool addState(gsl::byte* state, StateIndex& index);
       void clear(int32_t _preStateStorageStateVectorSize);
   };
 

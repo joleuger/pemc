@@ -24,24 +24,50 @@
 #ifndef PEMC_GENERICTRAVERSER_TRAVERSALTRANSITION_H_
 #define PEMC_GENERICTRAVERSER_TRAVERSALTRANSITION_H_
 
-#include <vector>
-#include <gsl/span>
+#include <gsl/gsl_byte>
 #include <cstdint>
-#include <atomic>
-#include <stack>
-#include <limits>
 
 #include "pemc/basic/tscIndex.h"
 #include "pemc/basic/label.h"
-#include "pemc/basic/modelCapacity.h"
-#include "pemc/basic/rawMemory.h"
-#include "pemc/formula/formula.h"
 
 namespace pemc {
 
-  struct TraversalTransition {
+  enum TraversalTransitionFlags : uint32_t {
+		/// If set, the value of targetStateIndex is set and targetState is invalid.
+		/// If unset, the value of targetState is set and targetStateIndex is invalid.
+    IsTargetStateTransformedToIndex = 1,
 
+    /// If set, the transition is invalid and should be ignored
+    IsTransitionInvalid = 2,
+
+    /// If set, the transition leads to the stuttering state and the state in targetState
+    /// shall be ignored.
+    IsToStutteringState = 4
   };
+
+  struct TraversalTransition {
+    // 4 bytes / 8 bytes
+    union {
+      gsl::byte* targetState;  // is set prior to adding  the state to state storage
+      StateIndex targetStateIndex; // is set after having added the state to state storage
+    };
+
+    // 4 bytes
+    TraversalTransitionFlags flags;
+
+    // 4 bytes
+    Label label;
+  };
+
+
+  inline TraversalTransitionFlags operator|(TraversalTransitionFlags a, TraversalTransitionFlags b) {
+    return static_cast<TraversalTransitionFlags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
+  }
+
+  inline TraversalTransitionFlags operator|=(TraversalTransitionFlags a, const TraversalTransitionFlags b) {
+    a =  static_cast<TraversalTransitionFlags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
+    return a;
+  }
 
 }
 

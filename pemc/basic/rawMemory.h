@@ -28,8 +28,6 @@
 
 namespace pemc {
 
-  using pbyte = gsl::byte; // pemc byte, use until std::byte is included
-
   using deleter_t = std::function<void(void *)>;
 
   using unique_void_ptr = std::unique_ptr<void, deleter_t>;
@@ -44,7 +42,7 @@ namespace pemc {
   /// <param name="buffer1">The first buffer of memory to compare.</param>
   /// <param name="buffer2">The second buffer of memory to compare.</param>
   /// <param name="sizeInBytes">The size of the buffers in bytes.</param>
-  bool areBuffersEqual(pbyte* buffer1, pbyte* buffer2, size_t sizeInBytes);
+  bool areBuffersEqual(gsl::byte* buffer1, gsl::byte* buffer2, size_t sizeInBytes);
 
   /// <summary>
   ///   Copies <paramref name="sizeInBytes" />-many bytes from <paramref name="source" /> to <see cref="destination" />.
@@ -52,7 +50,7 @@ namespace pemc {
   /// <param name="source">The first buffer of memory to compare.</param>
   /// <param name="destination">The second buffer of memory to compare.</param>
   /// <param name="sizeInBytes">The size of the buffers in bytes.</param>
-  void copyBuffers(pbyte* source, pbyte* destination, size_t sizeInBytes);
+  void copyBuffers(gsl::byte* source, gsl::byte* destination, size_t sizeInBytes);
 
   /// <summary>
   ///   Hashes the <paramref name="buffer" />.
@@ -61,7 +59,7 @@ namespace pemc {
   /// <param name="sizeInBytes">The size of the buffer in bytes.</param>
   /// <param name="seed">The seed value for the hash.</param>
   /// <remarks>See also https://en.wikipedia.org/wiki/MurmurHash (MurmurHash3 implementation)</remarks>
-  uint32_t hashBuffer(pbyte* buffer, size_t sizeInBytes, int32_t seed);
+  uint32_t hashBuffer(gsl::byte* buffer, size_t sizeInBytes, int32_t seed);
 
 }
 

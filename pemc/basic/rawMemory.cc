@@ -48,7 +48,7 @@ namespace pemc {
     /// <param name="buffer1">The first buffer of memory to compare.</param>
     /// <param name="buffer2">The second buffer of memory to compare.</param>
     /// <param name="sizeInBytes">The size of the buffers in bytes.</param>
-    bool areBuffersEqual(pbyte* buffer1, pbyte* buffer2, size_t sizeInBytes) {
+    bool areBuffersEqual(gsl::byte* buffer1, gsl::byte* buffer2, size_t sizeInBytes) {
       if (buffer1 == buffer2)
         return true;
 
@@ -87,7 +87,7 @@ namespace pemc {
     /// <param name="source">The first buffer of memory to compare.</param>
     /// <param name="destination">The second buffer of memory to compare.</param>
     /// <param name="sizeInBytes">The size of the buffers in bytes.</param>
-    void copyBuffers(pbyte* source, pbyte* destination, size_t sizeInBytes) {
+    void copyBuffers(gsl::byte* source, gsl::byte* destination, size_t sizeInBytes) {
       for (auto i = sizeInBytes / 8; i > 0; --i) {
         * reinterpret_cast<int64_t*>(destination) = * reinterpret_cast<int64_t*>(source);
 
@@ -119,7 +119,7 @@ namespace pemc {
     /// <param name="sizeInBytes">The size of the buffer in bytes.</param>
     /// <param name="seed">The seed value for the hash.</param>
     /// <remarks>See also https://en.wikipedia.org/wiki/MurmurHash (MurmurHash3 implementation)</remarks>
-    uint32_t hashBuffer(pbyte* buffer, size_t sizeInBytes, int32_t seed) {
+    uint32_t hashBuffer(gsl::byte* buffer, size_t sizeInBytes, int32_t seed) {
       const uint32_t c1 = 0xcc9e2d51;
       const uint32_t c2 = 0x1b873593;
       const int32_t r1 = 15;

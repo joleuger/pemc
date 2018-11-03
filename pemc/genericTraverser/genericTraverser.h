@@ -48,6 +48,7 @@ namespace pemc {
   class GenericTraverser {
   private:
       const Configuration& conf;
+      bool createStutteringState = false;
 
   public:
       GenericTraverser(const Configuration& _conf);
@@ -69,6 +70,8 @@ namespace pemc {
 
       // stores all encoutered states and maps each state to a unique index.
       std::unique_ptr<StateStorage> stateStorage;
+
+      StateIndex stutteringStateIndex;
 
       StateIndex getNoOfStates();
 

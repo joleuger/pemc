@@ -53,22 +53,26 @@ namespace pemc {
 
       // The number of saved states
       std::atomic<StateIndex> savedStates = 0;
-  	  // The number of states that can be saved.
+  	  // The number of states that can be cached and the number of reserved states.
       StateIndex totalCapacity;
+      // The number of states that can be cached.
+  		StateIndex cachedStatesCapacity;
+      // The number of reserved states
+      StateIndex reservedStatesCapacity = 0;
 
       // The unique_void_ptr keeps track of the memory to avoid leaks.
       // unique_ptr are not used, because they do not support void.
       unique_void_ptr stateMemory;
-      pbyte* pStateMemory
+      gsl::byte* pStateMemory
 
       void resizeStateBuffer();
 
   public:
       TemporalStateStorage(int32_t _modelStateVectorSize, StateIndex _capacity);
 
-      gsl::span<pbyte> operator [](size_t idx);
+      gsl::span<gsl::byte> operator [](size_t idx);
 
-      pbyte* state addState(pbyte* state);
+      bool addState(gsl::byte* state, StateIndex& index);
       void clear(int32_t _traversalModifierStateVectorSize);
   };
 

@@ -41,17 +41,17 @@ TEST(genericTraverser_test, stateStorage_works_with_intSized_model) {
     stateStorage.clear(traversalModifierStateVectorSize);
 
     auto firstState = int32_t(55);
-    auto pFirstState = reinterpret_cast<pbyte*>(&firstState);
+    auto pFirstState = reinterpret_cast<gsl::byte*>(&firstState);
     StateIndex firstStateIndex = -1;
     auto firstAddSuccess = stateStorage.addState(pFirstState, firstStateIndex);
 
     auto secondState = int32_t(1337);
-    auto pSecondState = reinterpret_cast<pbyte*>(&secondState);
+    auto pSecondState = reinterpret_cast<gsl::byte*>(&secondState);
     StateIndex secondStateIndex = -1;
     auto secondAddSuccess = stateStorage.addState(pSecondState, secondStateIndex);
 
     auto firstStateAgain = int32_t(55);
-    auto pFirstStateAgain = reinterpret_cast<pbyte*>(&firstStateAgain);
+    auto pFirstStateAgain = reinterpret_cast<gsl::byte*>(&firstStateAgain);
     StateIndex firstStateAgainIndex = -1;
     auto firstStateAgainAddSuccess = stateStorage.addState(pFirstStateAgain, firstStateAgainIndex);
 

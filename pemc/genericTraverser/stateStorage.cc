@@ -51,9 +51,9 @@ namespace pemc {
   }
 
 
-  gsl::span<pbyte> StateStorage::operator [](size_t idx) {
+  gsl::span<gsl::byte> StateStorage::operator [](size_t idx) {
     throw_assert(idx >= 0 && idx < totalCapacity, "idx not in range");
-    return gsl::span<pbyte>(pStateMemory + idx * stateVectorSize, stateVectorSize);
+    return gsl::span<gsl::byte>(pStateMemory + idx * stateVectorSize, stateVectorSize);
   }
 
   StateIndex StateStorage::getNumberOfSavedStates() {
@@ -78,7 +78,7 @@ namespace pemc {
     return freshCompactIndex;
   }
 
-  bool StateStorage::addState(pbyte* state, StateIndex& index){
+  bool StateStorage::addState(gsl::byte* state, StateIndex& index){
 
 			// We don't have to do any out of bounds checks here
 			auto hash = hashBuffer(state, stateVectorSize, 0);
@@ -88,7 +88,7 @@ namespace pemc {
 				// 'empty' is represented by 0
 				// We ignore two most significant bits of the original hash, which has no influence on the
 				// correctness of the algorithm, but might result in more state comparisons
-				auto hashedIndex = hashBuffer(reinterpret_cast<pbyte*>(&hash), sizeof(StateIndex), i * 8345723) % cachedStatesCapacity;
+				auto hashedIndex = hashBuffer(reinterpret_cast<gsl::byte*>(&hash), sizeof(StateIndex), i * 8345723) % cachedStatesCapacity;
 				auto memoizedHash = hashedIndex & 0x3FFFFFFF;
 				auto cacheLineStart = (hashedIndex / BucketsPerCacheLine) * BucketsPerCacheLine;
 
@@ -144,7 +144,7 @@ namespace pemc {
   void StateStorage::resizeStateBuffer(){
     stateVectorSize = modelStateVectorSize + preStateStorageStateVectorSize;
     stateMemory = unique_void(::operator new(totalCapacity * stateVectorSize) );
-    pStateMemory = static_cast<pbyte*>(stateMemory.get());
+    pStateMemory = static_cast<gsl::byte*>(stateMemory.get());
   }
 
   void StateStorage::clear(int32_t _preStateStorageStateVectorSize){
