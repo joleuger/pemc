@@ -30,8 +30,9 @@
 namespace pemc {
   class AddTransitionsToLmcModifier : public IPostStateStorageModifier {
   private:
+    Lmc* lmc;
   public:
-      AddTransitionsToLmcModifier();
+      AddTransitionsToLmcModifier(Lmc* _lmc);
   };
 
 }

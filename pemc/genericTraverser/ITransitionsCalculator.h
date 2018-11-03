@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_GENERICTRAVERSER_ITRANSITIONSOFSTATECALCULATOR_H_
-#define PEMC_GENERICTRAVERSER_ITRANSITIONSOFSTATECALCULATOR_H_
+#ifndef PEMC_GENERICTRAVERSER_ITRANSITIONSCALCULATOR_H_
+#define PEMC_GENERICTRAVERSER_ITRANSITIONSCALCULATOR_H_
 
 #include <vector>
 #include <gsl/span>
@@ -39,13 +39,14 @@
 
 namespace pemc {
 
-  class ITransitionsOfStateCalculator {
-  private:
-
+  class ITransitionsCalculator {
   public:
-      ITransitionsOfStateCalculator();
+      ITransitionsCalculator();
+      virtual ~ITransitionsCalculator() = default;
+
+      virtual int32_t getStateVectorSize() = 0;
   };
 
 }
 
-#endif  // PEMC_GENERICTRAVERSER_ITRANSITIONSOFSTATECALCULATOR_H_
+#endif  // PEMC_GENERICTRAVERSER_ITRANSITIONSCALCULATOR_H_

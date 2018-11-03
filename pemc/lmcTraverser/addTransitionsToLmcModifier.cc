@@ -25,6 +25,7 @@
 
 namespace pemc {
 
-  AddTransitionsToLmcModifier::AddTransitionsToLmcModifier(){
+  AddTransitionsToLmcModifier::AddTransitionsToLmcModifier(Lmc* _lmc){
+    lmc = _lmc;
   };
 }

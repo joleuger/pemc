@@ -33,32 +33,46 @@
 #include <functional>
 
 #include "pemc/basic/tscIndex.h"
+#include "pemc/basic/configuration.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/modelCapacity.h"
 #include "pemc/basic/rawMemory.h"
 #include "pemc/formula/formula.h"
-#include "pemc/genericTraverser/ITransitionsOfStateCalculator.h"
+#include "pemc/genericTraverser/ITransitionsCalculator.h"
 #include "pemc/genericTraverser/IPreStateStorageModifier.h"
 #include "pemc/genericTraverser/IPostStateStorageModifier.h"
+#include "pemc/genericTraverser/stateStorage.h"
 
 namespace pemc {
 
   class GenericTraverser {
+  private:
+      const Configuration& conf;
+
   public:
-      // a transitionsOfStateCalculator calculates the successors of a given state.
-      std::function<ITransitionsOfStateCalculator()> transitionsOfStateCalculatorCreator;
+      GenericTraverser(const Configuration& _conf);
+
+      // a transitionsCalculator calculates the successors of a given state.
+      std::function<std::unique_ptr<ITransitionsCalculator>()> transitionsCalculatorCreator;
 
       // preStateStorageModifier can access and modify the transistions returned by
       // the transitionsOfStateCalculator before the corresponding states are added to the StateStorage.
       // The states in the array are given as byte vectors.
-      std::vector<std::function<IPreStateStorageModifier()>> preStateStorageModifierCreators;
+      // Note that order matters.
+      std::vector<std::function<std::unique_ptr<IPreStateStorageModifier>()>> preStateStorageModifierCreators;
 
       // postStateStorageModifier can access and modify the transistions returned by
       // the transitionsOfStateCalculator after the corresponding states are added to the StateStorage.
       // The states in the array are given as indexes into the stateStorage.
-      std::vector<std::function<IPostStateStorageModifier()>> postStateStorageModifierCreators;
-  public:
-      GenericTraverser();
+      // Note that order matters.
+      std::vector<std::function<std::unique_ptr<IPostStateStorageModifier>()>> postStateStorageModifierCreators;
+
+      // stores all encoutered states and maps each state to a unique index.
+      std::unique_ptr<StateStorage> stateStorage;
+
+      StateIndex getNoOfStates();
+
+      void traverse();
   };
 
 }

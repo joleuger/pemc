@@ -43,7 +43,7 @@ namespace pemc {
   private:
 
   public:
-      IPostStateStorageModifier();
+      IPostStateStorageModifier() = default;
   };
 
 }

@@ -27,6 +27,7 @@
 
 #include "pemc/basic/exceptions.h"
 #include "pemc/genericTraverser/genericTraverser.h"
+#include "pemc/genericTraverser/pathTracker.h"
 
 namespace {
   using namespace pemc;
@@ -38,7 +39,39 @@ namespace {
 
 namespace pemc {
 
-  GenericTraverser::GenericTraverser() {
+  GenericTraverser::GenericTraverser(const Configuration& _conf)
+    : conf(_conf){
+  }
+
+  StateIndex GenericTraverser::getNoOfStates() {
+    throw_assert(stateStorage, "traverse() has not been called, yet.");
+    return stateStorage->getNumberOfSavedStates();
+  }
+
+  void GenericTraverser::traverse() {
+    // currently only single core traversal implemented.
+
+    // instantiate an instance of ITransitionsCalculator, which can calculate
+    // the successor transitions of a given state (ModelExecutor is the most common
+    // example of an ITransitionsCalculator).
+    auto transitionsCalculator = transitionsCalculatorCreator();
+
+    // Now the state state storage is initialized with the stateVectorSize
+    auto modelStateVectorSize = transitionsCalculator->getStateVectorSize();
+    stateStorage = std::make_unique<StateStorage>(modelStateVectorSize, conf.modelCapacity->getMaximalStates());
+
+    // create an instance of each IPreStateStorageModifier
+    auto preStateStorageModifiers = std::vector<std::unique_ptr<IPreStateStorageModifier>>(preStateStorageModifierCreators.size());
+    std::transform(preStateStorageModifierCreators.begin(), preStateStorageModifierCreators.end(), std::back_inserter(preStateStorageModifiers),
+      [](std::function<std::unique_ptr<IPreStateStorageModifier>()> creator){ return creator();} );
+
+    // create an instance of each IPostStateStorageModifier
+    auto postStateStorageModifiers = std::vector<std::unique_ptr<IPostStateStorageModifier>>(postStateStorageModifierCreators.size());
+    std::transform(postStateStorageModifierCreators.begin(), postStateStorageModifierCreators.end(), std::back_inserter(postStateStorageModifiers),
+      [](std::function<std::unique_ptr<IPostStateStorageModifier>()> creator){ return creator();} );
+
+
+
   }
 
 }

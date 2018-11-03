@@ -38,7 +38,7 @@
 #include "pemc/basic/modelCapacity.h"
 #include "pemc/basic/rawMemory.h"
 #include "pemc/formula/formula.h"
-#include "pemc/genericTraverser/ITransitionsOfStateCalculator.h"
+#include "pemc/genericTraverser/ITransitionsCalculator.h"
 #include "pemc/genericTraverser/IPreStateStorageModifier.h"
 #include "pemc/genericTraverser/IPostStateStorageModifier.h"
 #include "pemc/executableModel/IChoiceResolver.h"
@@ -53,6 +53,8 @@ namespace pemc {
       void setChoiceResolver(IChoiceResolver* _choiceResolver);
       void serialize(gsl::byte* position);
       void deserialize(gsl::byte* position);
+
+      int32_t getStateVectorSize();
   };
 
 }

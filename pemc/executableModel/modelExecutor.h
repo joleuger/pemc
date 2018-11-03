@@ -37,7 +37,7 @@
 #include "pemc/basic/modelCapacity.h"
 #include "pemc/basic/rawMemory.h"
 #include "pemc/formula/formula.h"
-#include "pemc/genericTraverser/ITransitionsOfStateCalculator.h"
+#include "pemc/genericTraverser/ITransitionsCalculator.h"
 #include "pemc/genericTraverser/IPreStateStorageModifier.h"
 #include "pemc/genericTraverser/IPostStateStorageModifier.h"
 #include "pemc/executableModel/IChoiceResolver.h"
@@ -45,12 +45,16 @@
 
 namespace pemc {
 
-  class ModelExecutor : public ITransitionsOfStateCalculator {
+  class ModelExecutor : public ITransitionsCalculator {
   private:
       std::unique_ptr<IChoiceResolver> choiceResolver;
       std::unique_ptr<AbstractModel> model;
   public:
       ModelExecutor();
+
+      void setModel(std::unique_ptr<AbstractModel> _model);
+
+      virtual int32_t getStateVectorSize();
   };
 
 }

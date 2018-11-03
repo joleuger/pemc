@@ -38,38 +38,40 @@ namespace pemc {
   };
 
 
-  std::unique_ptr<Lmc> Pemc::buildLmcFromExecutableModel(std::function<AbstractModel()> modelCreator, std::vector<Formula> formulas) {
+  std::unique_ptr<Lmc> Pemc::buildLmcFromExecutableModel(std::function<AbstractModel()>& modelCreator, std::vector<Formula> formulas) {
     // initialize an empty Lmc, which will contain the resulting model.
     auto lmc = std::make_unique<Lmc>();
-    //lmc->initialize(capacity);
+    lmc->initialize(*conf.modelCapacity);
 
     // Set the labels of the Lmc.
-    auto labelIdentifier = std::vector<std::string> {"f1", "f2"};
-    //lmc.setLabelIdentifier(labelIdentifier);
+    auto labelIdentifier = std::vector<std::string>(formulas.size());
+    std::transform(formulas.begin(), formulas.end(), std::back_inserter(labelIdentifier),
+      [](Formula& formula){ return formula.getIdentifier();} );
+    lmc->setLabelIdentifier(labelIdentifier);
 
-    auto traverser = GenericTraverser();
+    auto traverser = GenericTraverser(conf);
 
     // Declare a creator for a ModelExecutor that has an instance of the model that should be executed.
-    auto transitionsOfStateCalculatorCreator = []() -> ITransitionsOfStateCalculator {
-      auto modelExecutor = ModelExecutor();
-      // modelExecutor.model = modelCreator();
+    auto transitionsCalculatorCreator = [&modelCreator]() -> std::unique_ptr<ModelExecutor> {
+      auto modelExecutor = std::make_unique<ModelExecutor>();
+      modelExecutor->setModel(std::make_unique<AbstractModel>(modelCreator()));
       return modelExecutor;
     };
-    traverser.transitionsOfStateCalculatorCreator = transitionsOfStateCalculatorCreator;
+    traverser.transitionsCalculatorCreator = transitionsCalculatorCreator;
 
     // Declare a creator for a modifier that adds states to the Lmc.
-    auto addTransitionsToLmcModifierCreator = []() -> IPostStateStorageModifier {
-      auto modifier = AddTransitionsToLmcModifier();
-      //modifier.lmc = lmc;
+    auto addTransitionsToLmcModifierCreator = [p_lmc = lmc.get()]() -> std::unique_ptr<IPostStateStorageModifier> {
+      auto modifier = std::make_unique<AddTransitionsToLmcModifier>(p_lmc);
       return modifier;
     };
     traverser.postStateStorageModifierCreators.push_back(addTransitionsToLmcModifierCreator);
 
     // Traverse the model.
-    //traverser.traverse();
+    traverser.traverse();
 
     // Finish the creation of the Lmc and return it.
-    //lmc.finishCreation(noOfStates);
+    auto getNoOfStates = traverser.getNoOfStates();
+    lmc->finishCreation(getNoOfStates);
     return lmc;
   }
 

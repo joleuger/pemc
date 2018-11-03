@@ -41,4 +41,11 @@ namespace pemc {
   ModelExecutor::ModelExecutor() {
   }
 
+  void ModelExecutor::setModel(std::unique_ptr<AbstractModel> _model) {
+    model = std::move(_model);
+  }
+
+  int32_t ModelExecutor::getStateVectorSize() {
+    return model->getStateVectorSize();
+  }
 }

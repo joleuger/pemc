@@ -33,6 +33,8 @@ namespace {
 }
 
 TEST(genericTraverser_test, genericTraverser_works) {
-    auto traverser = GenericTraverser();
+    auto configuration = Configuration();
+
+    auto traverser = GenericTraverser(configuration);
     ASSERT_EQ(1, 1) << "FAIL";
 }

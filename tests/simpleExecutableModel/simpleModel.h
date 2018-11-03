@@ -33,6 +33,8 @@ namespace pemc { namespace cpp {
   class SimpleModel : public AbstractModel {
   private:
     int32_t state;
+  public:
+    int32_t getState() {return state;}
   };
 
 } }
