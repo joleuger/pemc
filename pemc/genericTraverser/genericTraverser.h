@@ -44,19 +44,19 @@
 namespace pemc {
 
   class GenericTraverser {
-  protected:
+  public:
       // a transitionsOfStateCalculator calculates the successors of a given state.
-      std::function<ITransitionsOfStateCalculator()> transitionsOfStateCalculatorCreator();
+      std::function<ITransitionsOfStateCalculator()> transitionsOfStateCalculatorCreator;
 
       // preStateStorageModifier can access and modify the transistions returned by
       // the transitionsOfStateCalculator before the corresponding states are added to the StateStorage.
       // The states in the array are given as byte vectors.
-      std::vector<std::function<IPreStateStorageModifier()>> preStateStorageModifierCreators();
+      std::vector<std::function<IPreStateStorageModifier()>> preStateStorageModifierCreators;
 
       // postStateStorageModifier can access and modify the transistions returned by
       // the transitionsOfStateCalculator after the corresponding states are added to the StateStorage.
       // The states in the array are given as indexes into the stateStorage.
-      std::vector<std::function<IPostStateStorageModifier()>> postStateStorageModifierCreators();
+      std::vector<std::function<IPostStateStorageModifier()>> postStateStorageModifierCreators;
   public:
       GenericTraverser();
   };

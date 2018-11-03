@@ -49,7 +49,7 @@ namespace pemc {
       std::unique_ptr<Lmc> buildLmcFromExecutableModel(std::function<AbstractModel()> modelCreator, std::vector<Formula> formulas);
 
       // Lmc is a Labeled Markov chain. This method calculates the probability to reach
-      Probability calculateProbabilityToReachStateWithinBound(Lmc& lmc, Formula &formula, int32_t bound);
+      Probability calculateProbabilityToReachStateWithinBound(Lmc& lmc, std::shared_ptr<Formula> formula, int32_t bound);
   };
 
 }

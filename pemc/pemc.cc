@@ -22,6 +22,11 @@
 // THE SOFTWARE.
 
 #include "pemc/pemc.h"
+#include "pemc/formula/boundedUnaryFormula.h"
+#include "pemc/lmc/lmcModelChecker.h"
+#include "pemc/genericTraverser/genericTraverser.h"
+#include "pemc/executableModel/modelExecutor.h"
+#include "pemc/lmcTraverser/addTransitionsToLmcModifier.h"
 
 namespace pemc {
   Pemc::Pemc(){
@@ -33,12 +38,46 @@ namespace pemc {
   };
 
 
-  std::unique_ptr<Lmc> buildLmcFromExecutableModel(std::function<AbstractModel()> modelCreator, std::vector<Formula> formulas) {
-    
+  std::unique_ptr<Lmc> Pemc::buildLmcFromExecutableModel(std::function<AbstractModel()> modelCreator, std::vector<Formula> formulas) {
+    // initialize an empty Lmc, which will contain the resulting model.
+    auto lmc = std::make_unique<Lmc>();
+    //lmc->initialize(capacity);
 
+    // Set the labels of the Lmc.
+    auto labelIdentifier = std::vector<std::string> {"f1", "f2"};
+    //lmc.setLabelIdentifier(labelIdentifier);
+
+    auto traverser = GenericTraverser();
+
+    // Declare a creator for a ModelExecutor that has an instance of the model that should be executed.
+    auto transitionsOfStateCalculatorCreator = []() -> ITransitionsOfStateCalculator {
+      auto modelExecutor = ModelExecutor();
+      // modelExecutor.model = modelCreator();
+      return modelExecutor;
+    };
+    traverser.transitionsOfStateCalculatorCreator = transitionsOfStateCalculatorCreator;
+
+    // Declare a creator for a modifier that adds states to the Lmc.
+    auto addTransitionsToLmcModifierCreator = []() -> IPostStateStorageModifier {
+      auto modifier = AddTransitionsToLmcModifier();
+      //modifier.lmc = lmc;
+      return modifier;
+    };
+    traverser.postStateStorageModifierCreators.push_back(addTransitionsToLmcModifierCreator);
+
+    // Traverse the model.
+    //traverser.traverse();
+
+    // Finish the creation of the Lmc and return it.
+    //lmc.finishCreation(noOfStates);
+    return lmc;
   }
 
-  Probability calculateProbabilityToReachStateWithinBound(Lmc& lmc, Formula &formula, int32_t bound) {
-    return Probability(0.0);
+  Probability Pemc::calculateProbabilityToReachStateWithinBound(Lmc& lmc, std::shared_ptr<Formula> formula, int32_t bound) {
+    auto finally_formula = std::make_shared<BoundedUnaryFormula>(formula, UnaryOperator::Finally, bound);
+
+    auto mc = LmcModelChecker(lmc, conf);
+    auto probability = mc.calculateProbability(*finally_formula);
+    return probability;
   }
 }
