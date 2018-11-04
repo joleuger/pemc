@@ -29,8 +29,10 @@ namespace pemc {
     lmc = _lmc;
   };
 
-  void AddTransitionsToLmcModifier::applyOnTransitions(stde::optional<StateIndex> stateIndexOfSource,
-      gsl::span<TraversalTransition> transitions) {
+  void AddTransitionsToLmcModifier::applyOnTransitions(
+      stde::optional<StateIndex> stateIndexOfSource,
+      gsl::span<TraversalTransition> transitions,
+      void* customPayLoad) {
     auto p_transitions = transitions.data(); // for more speed
 
     TransitionIndex locationOfFirstEntry;

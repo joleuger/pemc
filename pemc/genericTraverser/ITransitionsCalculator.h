@@ -53,6 +53,8 @@ namespace pemc {
       virtual gsl::span<TraversalTransition> calculateInitialTransitions() = 0;
 
       virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state) = 0;
+
+      virtual void* getCustomPayloadOfLastCalculation() = 0;
   };
 
 }

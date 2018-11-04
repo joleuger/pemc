@@ -56,12 +56,4 @@ namespace pemc {
   int32_t ModelExecutor::getStateVectorSize() {
     return model->getStateVectorSize();
   }
-
-  gsl::span<TraversalTransition> ModelExecutor::calculateInitialTransitions() {
-    throw NotImplementedYetException();
-  }
-
-  gsl::span<TraversalTransition> ModelExecutor::calculateTransitionsOfState(gsl::span<gsl::byte> state) {
-    throw NotImplementedYetException();
-  }
 }

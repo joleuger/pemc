@@ -123,6 +123,10 @@ namespace {
         }
         return transitions;
       }
+
+      virtual void* getCustomPayloadOfLastCalculation() {
+        return nullptr;
+      }
   };
 }
 

@@ -21,25 +21,44 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_ADDTRANSITIONSTOLMCMODIFIER_H_
-#define PEMC_LMCTRAVERSER_ADDTRANSITIONSTOLMCMODIFIER_H_
+#ifndef PEMC_LMCTRAVERSER_LMCMODELEXECUTOR_H_
+#define PEMC_LMCTRAVERSER_LMCMODELEXECUTOR_H_
 
-#include "pemc/lmc/lmc.h"
+#include <vector>
+#include <gsl/span>
+#include <cstdint>
+#include <atomic>
+#include <stack>
+#include <limits>
+#include <functional>
+
+#include "pemc/basic/tscIndex.h"
+#include "pemc/basic/configuration.h"
+#include "pemc/basic/label.h"
+#include "pemc/basic/modelCapacity.h"
+#include "pemc/basic/rawMemory.h"
+#include "pemc/formula/formula.h"
+#include "pemc/genericTraverser/ITransitionsCalculator.h"
+#include "pemc/genericTraverser/IPreStateStorageModifier.h"
 #include "pemc/genericTraverser/IPostStateStorageModifier.h"
+#include "pemc/genericTraverser/temporaryStateStorage.h"
+#include "pemc/executableModel/IChoiceResolver.h"
+#include "pemc/executableModel/abstractModel.h"
+#include "pemc/executableModel/modelExecutor.h"
 
 namespace pemc {
-  class AddTransitionsToLmcModifier : public IPostStateStorageModifier {
-  private:
-    Lmc* lmc;
-  public:
-    AddTransitionsToLmcModifier(Lmc* _lmc);
 
-    virtual void applyOnTransitions(
-      stde::optional<StateIndex> stateIndexOfSource,
-      gsl::span<TraversalTransition> transitions,
-      void* customPayLoad);
+  class LmcModelExecutor : public ModelExecutor {
+  public:
+      LmcModelExecutor(const Configuration& conf);
+
+      virtual gsl::span<TraversalTransition> calculateInitialTransitions();
+
+      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state);
+
+      virtual void* getCustomPayloadOfLastCalculation();
   };
 
 }
 
-#endif  // PEMC_LMCTRAVERSER_ADDTRANSITIONSTOLMCMODIFIER_H_
+#endif  // PEMC_LMCTRAVERSER_LMCMODELEXECUTOR_H_

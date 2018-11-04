@@ -21,25 +21,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_LMCTRAVERSER_ADDTRANSITIONSTOLMCMODIFIER_H_
-#define PEMC_LMCTRAVERSER_ADDTRANSITIONSTOLMCMODIFIER_H_
+#include <limits>
+#include <algorithm>
+#include <ThrowAssert.hpp>
 
-#include "pemc/lmc/lmc.h"
-#include "pemc/genericTraverser/IPostStateStorageModifier.h"
+#include "pemc/basic/exceptions.h"
+#include "pemc/lmcTraverser/lmcModelExecutor.h"
 
-namespace pemc {
-  class AddTransitionsToLmcModifier : public IPostStateStorageModifier {
-  private:
-    Lmc* lmc;
-  public:
-    AddTransitionsToLmcModifier(Lmc* _lmc);
-
-    virtual void applyOnTransitions(
-      stde::optional<StateIndex> stateIndexOfSource,
-      gsl::span<TraversalTransition> transitions,
-      void* customPayLoad);
-  };
-
+namespace {
+  using namespace pemc;
 }
 
-#endif  // PEMC_LMCTRAVERSER_ADDTRANSITIONSTOLMCMODIFIER_H_
+namespace pemc {
+
+  LmcModelExecutor::LmcModelExecutor(const Configuration& conf)
+  : ModelExecutor(conf)
+  {
+  }
+
+  gsl::span<TraversalTransition> LmcModelExecutor::calculateInitialTransitions() {
+    throw NotImplementedYetException();
+  }
+
+  gsl::span<TraversalTransition> LmcModelExecutor::calculateTransitionsOfState(gsl::span<gsl::byte> state) {
+    throw NotImplementedYetException();
+  }
+
+  void* LmcModelExecutor::getCustomPayloadOfLastCalculation() {
+    throw NotImplementedYetException();
+  }
+}

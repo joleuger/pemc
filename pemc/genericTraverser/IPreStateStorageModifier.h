@@ -54,7 +54,10 @@ namespace pemc {
         return 0;
       }
 
-      virtual void applyOnTransitions(stde::optional<StateIndex> stateIndexOfSource, gsl::span<TraversalTransition> _transitions);
+      virtual void applyOnTransitions(
+        stde::optional<StateIndex> stateIndexOfSource,
+        gsl::span<TraversalTransition> transitions,
+        void* customPayLoad);
   };
 
 }

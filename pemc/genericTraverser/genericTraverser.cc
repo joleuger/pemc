@@ -90,9 +90,10 @@ namespace {
       // new states and transitions calculated during this method call
       auto newCalculatedTransitionCount = 0;
       auto newStatesCount = 0;
+      auto customPayloadOfLastCalculation = transitionsCalculator->getCustomPayloadOfLastCalculation();
 
       for (auto& modifier : preStateStorageModifiers) {
-        modifier->applyOnTransitions(stateIndexOfSource, transitions);
+        modifier->applyOnTransitions(stateIndexOfSource, transitions, customPayloadOfLastCalculation);
       }
 
       pathTracker.pushFrame();
@@ -121,7 +122,7 @@ namespace {
       }
 
       for (auto& modifier : postStateStorageModifiers) {
-        modifier->applyOnTransitions(stateIndexOfSource, transitions);
+        modifier->applyOnTransitions(stateIndexOfSource, transitions, customPayloadOfLastCalculation);
       }
     }
 

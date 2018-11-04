@@ -48,7 +48,7 @@
 namespace pemc {
 
   class ModelExecutor : public ITransitionsCalculator {
-  private:
+  protected:
       std::unique_ptr<IChoiceResolver> choiceResolver;
       std::unique_ptr<AbstractModel> model;
 
@@ -58,18 +58,20 @@ namespace pemc {
       std::vector<TraversalTransition> transitions;
 
       int32_t preStateStorageModifierStateVectorSize = 0;
-  public:
-      ModelExecutor(const Configuration& conf);
 
+      ModelExecutor(const Configuration& conf);
+  public:
       void setModel(std::unique_ptr<AbstractModel> _model);
 
       virtual int32_t getStateVectorSize();
 
       virtual void setPreStateStorageModifierStateVectorSize(int32_t _preStateStorageModifierStateVectorSize);
 
-      virtual gsl::span<TraversalTransition> calculateInitialTransitions();
+      virtual gsl::span<TraversalTransition> calculateInitialTransitions() = 0;
 
-      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state);
+      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state) = 0;
+
+      virtual void* getCustomPayloadOfLastCalculation() = 0;
   };
 
 }
