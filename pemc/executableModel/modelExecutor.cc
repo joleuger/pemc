@@ -30,19 +30,20 @@
 
 namespace {
   using namespace pemc;
-
-  class Worker {
-
-  };
 }
 
 namespace pemc {
 
-  ModelExecutor::ModelExecutor() {
+  ModelExecutor::ModelExecutor(const Configuration& conf)
+  : temporaryStateStorage(conf.successorCapacity)
+  {
   }
 
   void ModelExecutor::setModel(std::unique_ptr<AbstractModel> _model) {
     model = std::move(_model);
+    auto modelStateVectorSize = model->getStateVectorSize();
+    auto preStateStorageModifierStateVectorSize = 0;
+    temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
   }
 
   int32_t ModelExecutor::getStateVectorSize() {

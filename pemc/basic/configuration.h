@@ -42,7 +42,9 @@ namespace pemc {
 
     bool printGraphViz = false;
 
-    int32_t maximalSearchDepth = 1 << 21;
+    int32_t maximalSearchDepth = 1 << 20;
+
+    int32_t successorCapacity = 1 << 14;
 
     std::shared_ptr<ModelCapacity> modelCapacity = std::make_shared<ModelCapacityByModelSize>(ModelCapacityByModelSize::Small());
   };

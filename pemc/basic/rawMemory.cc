@@ -33,8 +33,14 @@ namespace pemc {
         ::operator delete(data);
     }
 
+    // The following method can be used to reserve some bulk memory.
+    // The unique_void_ptr keeps track of the memory to avoid leaks.
+    // unique_ptr are not used, because they do not support void.
+    // Example of usage:
+    // > unique_void_ptr stateMemory = unique_void(::operator new(amount of memory ) );
+    // > gsl::byte* p_stateMemory = static_cast<gsl::byte*>(stateMemory.get());
     // idea from
-    // https://stackoverflow.com/questions/39288891/why-is-shared-ptrvoid-legal-while-unique-ptrvoid-is-ill-formed
+    // > https://stackoverflow.com/questions/39288891/why-is-shared-ptrvoid-legal-while-unique-ptrvoid-is-ill-formed
     unique_void_ptr unique_void(void* ptr) {
         return unique_void_ptr(ptr, &deleter);
     }

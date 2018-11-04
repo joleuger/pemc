@@ -43,7 +43,8 @@ namespace pemc {
   ///   Therefore, we use state hashes and one level of indirection.
   ///   The hashes are stored in a separate array, using open addressing,
   ///   see Laarman, "Scalable Multi-Core Model Checking", Algorithm 2.3.
-  ///   Note: Must be cleared before used.
+  ///   The method addState can be used simultaneously by multiple threads.
+  ///   Note: Must be cleared with clear() before used.
   class StateStorage {
   private:
 
@@ -60,26 +61,25 @@ namespace pemc {
       using alignedStateIndexVector = std::vector<std::atomic<StateIndex>, boost::alignment::aligned_allocator<std::atomic<StateIndex>, CacheLineSize> >;
 
       // The length in bytes of a state vector required for the analysis model.
-      int32_t modelStateVectorSize;
+      int32_t modelStateVectorSize = 0;
       // Extra bytes in state vector for preStateStorage modifiers.
-      int32_t preStateStorageStateVectorSize;
+      int32_t preStateStorageModifierStateVectorSize = 0;
       // The length in bytes of the state vector of the analysis model with the extra bytes
 		  // required for the preStateStorage modifiers
-      int32_t stateVectorSize;
+      int32_t stateVectorSize = 0;
 
       // The number of saved states
-      std::atomic<StateIndex> savedStates = 0;
+      std::atomic<StateIndex> savedStates;
   	  // The number of states that can be cached and the number of reserved states.
       StateIndex totalCapacity;
       // The number of states that can be cached.
   		StateIndex cachedStatesCapacity;
       // The number of reserved states
-      StateIndex reservedStatesCapacity = 0;
+      StateIndex reservedStatesCapacity;
 
-      // The unique_void_ptr keeps track of the memory to avoid leaks.
-      // unique_ptr are not used, because they do not support void.
-      unique_void_ptr stateMemory;
-      gsl::byte* pStateMemory;
+      // the memory that contains the serialized states
+      std::vector<gsl::byte> stateMemory;
+      // maps the hashed based index to the index in the stateMemory and.
       std::unique_ptr<std::vector<std::atomic<StateIndex>>> indexMapper;
       // hashes in next line should be aligned for more speed
       std::unique_ptr<alignedStateIndexVector> hashes;
@@ -87,14 +87,19 @@ namespace pemc {
       void resizeStateBuffer();
 
   public:
-      StateStorage(int32_t _modelStateVectorSize, StateIndex _capacity);
+      StateStorage(StateIndex _capacity);
 
       gsl::span<gsl::byte> operator [](size_t idx);
 
       StateIndex getNumberOfSavedStates();
+
       StateIndex reserveStateIndex();
+
       bool addState(gsl::byte* state, StateIndex& index);
-      void clear(int32_t _preStateStorageStateVectorSize);
+
+      void setStateVectorSize(void setStateVectorSize(int32_t _modelStateVectorSize, int32_t _preStateStorageModifierStateVectorSize););
+
+      void clear();
   };
 
 }

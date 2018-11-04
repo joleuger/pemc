@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_GENERICTRAVERSER_TEMPORALSTATESTORAGE_H_
-#define PEMC_GENERICTRAVERSER_TEMPORALSTATESTORAGE_H_
+#ifndef PEMC_GENERICTRAVERSER_TEMPORARYSTATESTORAGE_H_
+#define PEMC_GENERICTRAVERSER_TEMPORARYSTATESTORAGE_H_
 
 #include <vector>
 #include <gsl/span>
@@ -40,42 +40,40 @@
 namespace pemc {
 
   ///   We store states in a contiguous array, indexed by a continuous variable.
-  class TemporalStateStorage {
+  ///   The TemporaryStateStorage is not thread safe.
+  class TemporaryStateStorage {
   private:
 
       // The length in bytes of a state vector required for the analysis model.
-      int32_t modelStateVectorSize;
-      // Extra bytes in state vector for traversal modifiers.
-      int32_t traversalModifierStateVectorSize;
+      int32_t modelStateVectorSize = 0;
+      // Extra bytes in state vector for preStateStorage modifiers.
+      int32_t preStateStorageModifierStateVectorSize = 0;
       // The length in bytes of the state vector of the analysis model with the extra bytes
-		  // required for the traversal
-      int32_t stateVectorSize;
+      // required for the preStateStorage modifiers
+      int32_t stateVectorSize = 0;
 
       // The number of saved states
-      std::atomic<StateIndex> savedStates = 0;
+      StateIndex savedStates = 0;
   	  // The number of states that can be cached and the number of reserved states.
       StateIndex totalCapacity;
-      // The number of states that can be cached.
-  		StateIndex cachedStatesCapacity;
-      // The number of reserved states
-      StateIndex reservedStatesCapacity = 0;
 
-      // The unique_void_ptr keeps track of the memory to avoid leaks.
-      // unique_ptr are not used, because they do not support void.
-      unique_void_ptr stateMemory;
-      gsl::byte* pStateMemory
+      // the memory that contains the serialized states
+      std::vector<gsl::byte> stateMemory;
 
       void resizeStateBuffer();
 
   public:
-      TemporalStateStorage(int32_t _modelStateVectorSize, StateIndex _capacity);
+      TemporaryStateStorage(StateIndex _capacity);
 
       gsl::span<gsl::byte> operator [](size_t idx);
 
-      bool addState(gsl::byte* state, StateIndex& index);
-      void clear(int32_t _traversalModifierStateVectorSize);
+      StateIndex getFreshStateIndex();
+
+      void setStateVectorSize(int32_t _modelStateVectorSize, int32_t _preStateStorageModifierStateVectorSize);
+
+      void clear();
   };
 
 }
 
-#endif  // PEMC_GENERICTRAVERSER_TEMPORALSTATESTORAGE_H_
+#endif  // PEMC_GENERICTRAVERSER_TEMPORARYSTATESTORAGE_H_

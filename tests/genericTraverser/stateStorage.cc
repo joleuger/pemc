@@ -34,11 +34,12 @@ namespace {
 
 TEST(genericTraverser_test, stateStorage_works_with_intSized_model) {
     auto stateVectorSize = sizeof(int32_t);
-    auto traversalModifierStateVectorSize = 0;
+    auto preStateStorageModifierStateVectorSize = 0;
     auto capacity = 10000;
 
     auto stateStorage = StateStorage(stateVectorSize, capacity);
-    stateStorage.clear(traversalModifierStateVectorSize);
+    stateStorage.setStateVectorSize(stateVectorSize, preStateStorageModifierStateVectorSize);
+    stateStorage.clear();
 
     auto firstState = int32_t(55);
     auto pFirstState = reinterpret_cast<gsl::byte*>(&firstState);

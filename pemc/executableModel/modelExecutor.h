@@ -33,6 +33,7 @@
 #include <functional>
 
 #include "pemc/basic/tscIndex.h"
+#include "pemc/basic/configuration.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/modelCapacity.h"
 #include "pemc/basic/rawMemory.h"
@@ -50,11 +51,12 @@ namespace pemc {
       std::unique_ptr<IChoiceResolver> choiceResolver;
       std::unique_ptr<AbstractModel> model;
 
-      // create a vector of transitions that can be reused for different calculations.
-      // this should prevent garbage.
+      // Create a storage for different state vectors and a vector of transitions
+      // that can be reused for different calculations. This should prevent garbage.
+      TemporaryStateStorage temporaryStateStorage;
       std::vector<TraversalTransition> transitions;
   public:
-      ModelExecutor();
+      ModelExecutor(const Configuration& conf);
 
       void setModel(std::unique_ptr<AbstractModel> _model);
 

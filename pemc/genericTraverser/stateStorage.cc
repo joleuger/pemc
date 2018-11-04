@@ -31,20 +31,13 @@
 
 namespace pemc {
 
-  StateStorage::StateStorage(int32_t _modelStateVectorSize, StateIndex _capacity) {
-    // auto x = ::operator new(sz);
+  StateStorage::StateStorage(StateIndex _capacity) {
     throw_assert(_capacity > 1024 && _capacity<=std::numeric_limits<StateIndex>::max(), "capacity invalid");
 
-		modelStateVectorSize = _modelStateVectorSize;
 	  totalCapacity = _capacity;
 
-    // capacity is reduced, because offset returned by this.add() may be up to
-    // BucketsPerCacheLine-1 positions bigger than cachedStatesCapacity
-		cachedStatesCapacity = totalCapacity - BucketsPerCacheLine;
-
-		resizeStateBuffer();
-
     indexMapper = std::make_unique<std::vector<std::atomic<StateIndex>>>(totalCapacity);
+
     hashes = std::make_unique<alignedStateIndexVector>(totalCapacity);
 
     throw_assert(sizeof(StateIndex)==4, "Used StateStorage not compatible with size of StateIndex");
@@ -53,7 +46,7 @@ namespace pemc {
 
   gsl::span<gsl::byte> StateStorage::operator [](size_t idx) {
     throw_assert(idx >= 0 && idx < totalCapacity, "idx not in range");
-    return gsl::span<gsl::byte>(pStateMemory + idx * stateVectorSize, stateVectorSize);
+    return gsl::span<gsl::byte>(stateMemory.data() + idx * stateVectorSize, stateVectorSize);
   }
 
   StateIndex StateStorage::getNumberOfSavedStates() {
@@ -142,14 +135,25 @@ namespace pemc {
 	}
 
   void StateStorage::resizeStateBuffer(){
-    stateVectorSize = modelStateVectorSize + preStateStorageStateVectorSize;
-    stateMemory = unique_void(::operator new(totalCapacity * stateVectorSize) );
-    pStateMemory = static_cast<gsl::byte*>(stateMemory.get());
+    stateVectorSize = modelStateVectorSize + preStateStorageModifierStateVectorSize;
+    stateMemory.resize(totalCapacity * stateVectorSize);
   }
 
-  void StateStorage::clear(int32_t _preStateStorageStateVectorSize){
-    preStateStorageStateVectorSize = _preStateStorageStateVectorSize;
+  void StateStorage::setStateVectorSize(void setStateVectorSize(int32_t _modelStateVectorSize, int32_t _preStateStorageModifierStateVectorSize);){
+    modelStateVectorSize = _modelStateVectorSize;
+    preStateStorageModifierStateVectorSize = _preStateStorageModifierStateVectorSize;
 		resizeStateBuffer();
+  }
+
+  void StateStorage::clear(){
+     savedStates = 0;
+
+     reservedStatesCapacity = 0;
+
+     // capacity is reduced, because offset returned by this.add() may be up to
+     // BucketsPerCacheLine-1 positions bigger than cachedStatesCapacity
+     cachedStatesCapacity = totalCapacity - BucketsPerCacheLine;
+
      //zeros memory of hashes
      for (auto& entry : *hashes) {
        entry.store(0);

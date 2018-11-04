@@ -29,6 +29,7 @@
 #include "pemc/genericTraverser/genericTraverser.h"
 #include "pemc/genericTraverser/pathTracker.h"
 #include "pemc/genericTraverser/traversalTransition.h"
+#include "pemc/genericTraverser/temporaryStateStorage.h"
 
 namespace {
   using namespace pemc;
@@ -115,8 +116,8 @@ namespace {
       StateIndex stateIndexToTraverse;
       while (pathTracker.tryGetStateIndex(stateIndexToTraverse) ) {
         auto stateToTraverse = (*traverser.stateStorage)[stateIndexToTraverse];
-        //auto transitions = transitionsCalculator->calculateTransitionsOfState(stateToTraverse);
-        //handleTransitions(transitions);
+        auto transitions = transitionsCalculator->calculateTransitionsOfState(stateToTraverse);
+        handleTransitions(transitions);
       }
     }
   };
@@ -137,10 +138,15 @@ namespace pemc {
     // currently only single core traversal implemented. Therefore, instantiate a single worker.
     auto worker = Worker(conf,*this);
 
-    // After the first worker has been initialized, it can be used to derive the stateVectorSize.
+    // After the first worker has been initialized, it can be used to derive the stateVectorSize
+    // and the traversalModifierStateVectorSize.
     auto modelStateVectorSize = worker.transitionsCalculator->getStateVectorSize();
+    auto preStateStorageModifierStateVectorSize = 0;
+
     // Now the state state storage is initialized with the stateVectorSize
-    stateStorage = std::make_unique<StateStorage>(modelStateVectorSize, conf.modelCapacity->getMaximalStates());
+    stateStorage = std::make_unique<StateStorage>(conf.modelCapacity->getMaximalStates());
+    stateStorage->setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
+    stateStorage->clear();
 
     // create a stuttering state if demanded.
     if (createStutteringState) {
