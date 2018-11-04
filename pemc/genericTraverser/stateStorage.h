@@ -97,7 +97,7 @@ namespace pemc {
 
       bool addState(gsl::byte* state, StateIndex& index);
 
-      void setStateVectorSize(void setStateVectorSize(int32_t _modelStateVectorSize, int32_t _preStateStorageModifierStateVectorSize););
+      void setStateVectorSize(int32_t _modelStateVectorSize, int32_t _preStateStorageModifierStateVectorSize);
 
       void clear();
   };

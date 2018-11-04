@@ -52,8 +52,8 @@ namespace pemc {
     auto traverser = GenericTraverser(conf);
 
     // Declare a creator for a ModelExecutor that has an instance of the model that should be executed.
-    auto transitionsCalculatorCreator = [&modelCreator]() -> std::unique_ptr<ModelExecutor> {
-      auto modelExecutor = std::make_unique<ModelExecutor>();
+    auto transitionsCalculatorCreator = [&modelCreator,&conf=this->conf]() -> std::unique_ptr<ModelExecutor> {
+      auto modelExecutor = std::make_unique<ModelExecutor>(conf);
       modelExecutor->setModel(std::make_unique<AbstractModel>(modelCreator()));
       return modelExecutor;
     };

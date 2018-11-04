@@ -44,6 +44,11 @@ namespace pemc {
 
   public:
       IPreStateStorageModifier() = default;
+      virtual ~IPreStateStorageModifier() = default;
+
+      virtual int32_t getModifierStateVectorSize() {
+        return 0;
+      }
   };
 
 }

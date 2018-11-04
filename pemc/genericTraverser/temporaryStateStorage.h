@@ -65,6 +65,8 @@ namespace pemc {
   public:
       TemporaryStateStorage(StateIndex _capacity);
 
+      StateIndex getNumberOfSavedStates();
+
       gsl::span<gsl::byte> operator [](size_t idx);
 
       StateIndex getFreshStateIndex();

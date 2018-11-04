@@ -41,6 +41,7 @@
 #include "pemc/genericTraverser/ITransitionsCalculator.h"
 #include "pemc/genericTraverser/IPreStateStorageModifier.h"
 #include "pemc/genericTraverser/IPostStateStorageModifier.h"
+#include "pemc/genericTraverser/temporaryStateStorage.h"
 #include "pemc/executableModel/IChoiceResolver.h"
 #include "pemc/executableModel/abstractModel.h"
 
@@ -55,12 +56,16 @@ namespace pemc {
       // that can be reused for different calculations. This should prevent garbage.
       TemporaryStateStorage temporaryStateStorage;
       std::vector<TraversalTransition> transitions;
+
+      int32_t preStateStorageModifierStateVectorSize = 0;
   public:
       ModelExecutor(const Configuration& conf);
 
       void setModel(std::unique_ptr<AbstractModel> _model);
 
       virtual int32_t getStateVectorSize();
+
+      virtual void setPreStateStorageModifierStateVectorSize(int32_t _preStateStorageModifierStateVectorSize);
 
       virtual gsl::span<TraversalTransition> calculateInitialTransitions();
 

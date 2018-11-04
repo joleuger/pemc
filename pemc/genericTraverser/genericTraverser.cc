@@ -60,6 +60,11 @@ namespace {
                      std::back_inserter(preStateStorageModifiers),
         [](std::function<std::unique_ptr<IPreStateStorageModifier>()> creator){ return creator();} );
 
+      // After all preStateStorage modifiers have been initialized, the transitionsCalculator can be
+      // aware the size all preStateStorage modifiers require.
+      auto preStateStorageModifierStateVectorSize = getPreStateStorageModifierStateVectorSize();
+      transitionsCalculator->setPreStateStorageModifierStateVectorSize(preStateStorageModifierStateVectorSize);
+
       // create an instance of each IPostStateStorageModifier
       postStateStorageModifiers = std::vector<std::unique_ptr<IPostStateStorageModifier>>(traverser.postStateStorageModifierCreators.size());
       std::transform(traverser.postStateStorageModifierCreators.begin(),
@@ -67,6 +72,13 @@ namespace {
                      std::back_inserter(postStateStorageModifiers),
         [](std::function<std::unique_ptr<IPostStateStorageModifier>()> creator){ return creator();} );
 
+    }
+
+    int32_t getPreStateStorageModifierStateVectorSize() {
+      auto stateVectorSize = 0;
+      for (auto& preStateStorageModifier : preStateStorageModifiers) {
+        stateVectorSize += preStateStorageModifier->getModifierStateVectorSize();
+      }
     }
 
     void handleTransitions(gsl::span<TraversalTransition> transitions) {
@@ -116,8 +128,8 @@ namespace {
       StateIndex stateIndexToTraverse;
       while (pathTracker.tryGetStateIndex(stateIndexToTraverse) ) {
         auto stateToTraverse = (*traverser.stateStorage)[stateIndexToTraverse];
-        auto transitions = transitionsCalculator->calculateTransitionsOfState(stateToTraverse);
-        handleTransitions(transitions);
+        //auto transitions = transitionsCalculator->calculateTransitionsOfState(stateToTraverse);
+        //handleTransitions(transitions);
       }
     }
   };
@@ -141,7 +153,7 @@ namespace pemc {
     // After the first worker has been initialized, it can be used to derive the stateVectorSize
     // and the traversalModifierStateVectorSize.
     auto modelStateVectorSize = worker.transitionsCalculator->getStateVectorSize();
-    auto preStateStorageModifierStateVectorSize = 0;
+    auto preStateStorageModifierStateVectorSize = worker.getPreStateStorageModifierStateVectorSize();
 
     // Now the state state storage is initialized with the stateVectorSize
     stateStorage = std::make_unique<StateStorage>(conf.modelCapacity->getMaximalStates());

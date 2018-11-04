@@ -37,7 +37,7 @@ TEST(genericTraverser_test, stateStorage_works_with_intSized_model) {
     auto preStateStorageModifierStateVectorSize = 0;
     auto capacity = 10000;
 
-    auto stateStorage = StateStorage(stateVectorSize, capacity);
+    auto stateStorage = StateStorage(capacity);
     stateStorage.setStateVectorSize(stateVectorSize, preStateStorageModifierStateVectorSize);
     stateStorage.clear();
 

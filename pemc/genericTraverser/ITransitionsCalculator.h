@@ -47,6 +47,8 @@ namespace pemc {
 
       virtual int32_t getStateVectorSize() = 0;
 
+      virtual void setPreStateStorageModifierStateVectorSize(int32_t _preStateStorageModifierStateVectorSize) = 0;
+
       virtual gsl::span<TraversalTransition> calculateInitialTransitions() = 0;
 
       virtual gsl::span<TraversalTransition> calculateTransitionsOfState(StateIndex state) = 0;

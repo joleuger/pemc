@@ -42,8 +42,15 @@ namespace pemc {
   void ModelExecutor::setModel(std::unique_ptr<AbstractModel> _model) {
     model = std::move(_model);
     auto modelStateVectorSize = model->getStateVectorSize();
-    auto preStateStorageModifierStateVectorSize = 0;
     temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
+  }
+
+  void ModelExecutor::setPreStateStorageModifierStateVectorSize(int32_t _preStateStorageModifierStateVectorSize){
+    preStateStorageModifierStateVectorSize = _preStateStorageModifierStateVectorSize;
+    if (model) {
+      auto modelStateVectorSize = model->getStateVectorSize();
+      temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
+    }
   }
 
   int32_t ModelExecutor::getStateVectorSize() {

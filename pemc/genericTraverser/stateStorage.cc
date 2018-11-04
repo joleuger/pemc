@@ -139,7 +139,7 @@ namespace pemc {
     stateMemory.resize(totalCapacity * stateVectorSize);
   }
 
-  void StateStorage::setStateVectorSize(void setStateVectorSize(int32_t _modelStateVectorSize, int32_t _preStateStorageModifierStateVectorSize);){
+  void StateStorage::setStateVectorSize(int32_t _modelStateVectorSize, int32_t _preStateStorageModifierStateVectorSize){
     modelStateVectorSize = _modelStateVectorSize;
     preStateStorageModifierStateVectorSize = _preStateStorageModifierStateVectorSize;
 		resizeStateBuffer();
