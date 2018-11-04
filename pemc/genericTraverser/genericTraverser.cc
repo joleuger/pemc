@@ -24,6 +24,7 @@
 #include <limits>
 #include <algorithm>
 #include <ThrowAssert.hpp>
+#include <experimental/optional>
 
 #include "pemc/basic/exceptions.h"
 #include "pemc/genericTraverser/genericTraverser.h"
@@ -33,6 +34,7 @@
 
 namespace {
   using namespace pemc;
+  namespace stde = std::experimental;
 
   class Worker {
   public:
@@ -82,7 +84,7 @@ namespace {
       return preStateStorageModifierStateVectorSize;
     }
 
-    void handleTransitions(gsl::span<TraversalTransition> transitions) {
+    void handleTransitions(stde::optional<StateIndex> stateIndexOfSource, gsl::span<TraversalTransition> transitions) {
       // handle transitions
 
       // new states and transitions calculated during this method call
@@ -90,6 +92,7 @@ namespace {
       auto newStatesCount = 0;
 
       for (auto& modifier : preStateStorageModifiers) {
+        modifier->applyOnTransitions(stateIndexOfSource, transitions);
       }
 
       pathTracker.pushFrame();
@@ -118,19 +121,20 @@ namespace {
       }
 
       for (auto& modifier : postStateStorageModifiers) {
+        modifier->applyOnTransitions(stateIndexOfSource, transitions);
       }
     }
 
     void traverse() {
       // traverse initial transitions
       auto initialTransitions = transitionsCalculator->calculateInitialTransitions();
-      handleTransitions(initialTransitions);
+      handleTransitions(stde::optional<StateIndex>(), initialTransitions);
 
       StateIndex stateIndexToTraverse;
       while (pathTracker.tryGetStateIndex(stateIndexToTraverse) ) {
         auto stateToTraverse = (*traverser.stateStorage)[stateIndexToTraverse];
         auto transitions = transitionsCalculator->calculateTransitionsOfState(stateToTraverse);
-        handleTransitions(transitions);
+        handleTransitions(stde::make_optional(stateIndexToTraverse), transitions);
       }
     }
   };

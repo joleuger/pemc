@@ -32,7 +32,9 @@ namespace pemc {
   private:
     Lmc* lmc;
   public:
-      AddTransitionsToLmcModifier(Lmc* _lmc);
+    AddTransitionsToLmcModifier(Lmc* _lmc);
+
+    virtual void applyOnTransitions(stde::optional<StateIndex> stateIndexOfSource, gsl::span<TraversalTransition> _transitions);
   };
 
 }

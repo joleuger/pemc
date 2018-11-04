@@ -25,7 +25,25 @@
 
 namespace pemc {
 
-  AddTransitionsToLmcModifier::AddTransitionsToLmcModifier(Lmc* _lmc){
+  AddTransitionsToLmcModifier::AddTransitionsToLmcModifier(Lmc* _lmc) {
     lmc = _lmc;
   };
+
+  void AddTransitionsToLmcModifier::applyOnTransitions(stde::optional<StateIndex> stateIndexOfSource,
+      gsl::span<TraversalTransition> transitions) {
+    auto p_transitions = transitions.data(); // for more speed
+
+    TransitionIndex locationOfFirstEntry;
+    auto transitionCount = transitions.size();
+
+    if (stateIndexOfSource==stde::nullopt) {
+      locationOfFirstEntry = lmc->getPlaceForNewInitialTransitionEntries(transitionCount);
+    } else {
+      locationOfFirstEntry = lmc->getPlaceForNewTransitionEntriesOfState(*stateIndexOfSource,transitionCount);
+    }
+    for (auto i = 0; i < transitionCount; i++) {
+      auto newEntry = LmcTransitionEntry(Probability::One(), p_transitions[i].label, p_transitions[i].targetStateIndex);
+      lmc->setLmcTransitionEntry(locationOfFirstEntry + i, newEntry);
+    }
+  }
 }

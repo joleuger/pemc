@@ -30,20 +30,26 @@
 #include <atomic>
 #include <stack>
 #include <limits>
+#include <experimental/optional>
 
 #include "pemc/basic/tscIndex.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/modelCapacity.h"
 #include "pemc/basic/rawMemory.h"
 #include "pemc/formula/formula.h"
+#include "pemc/genericTraverser/traversalTransition.h"
 
 namespace pemc {
+  namespace stde = std::experimental;
 
   class IPostStateStorageModifier {
   private:
 
   public:
       IPostStateStorageModifier() = default;
+      virtual ~IPostStateStorageModifier() = default;
+
+      virtual void applyOnTransitions(stde::optional<StateIndex> stateIndexOfSource, gsl::span<TraversalTransition> _transitions);
   };
 
 }

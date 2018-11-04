@@ -26,18 +26,22 @@
 
 #include <vector>
 #include <gsl/span>
+#include <gsl/gsl_byte>
 #include <cstdint>
 #include <atomic>
 #include <stack>
 #include <limits>
+#include <experimental/optional>
 
 #include "pemc/basic/tscIndex.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/modelCapacity.h"
 #include "pemc/basic/rawMemory.h"
 #include "pemc/formula/formula.h"
+#include "pemc/genericTraverser/traversalTransition.h"
 
 namespace pemc {
+  namespace stde = std::experimental;
 
   class IPreStateStorageModifier {
   private:
@@ -49,6 +53,8 @@ namespace pemc {
       virtual int32_t getModifierStateVectorSize() {
         return 0;
       }
+
+      virtual void applyOnTransitions(stde::optional<StateIndex> stateIndexOfSource, gsl::span<TraversalTransition> _transitions);
   };
 
 }
