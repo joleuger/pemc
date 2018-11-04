@@ -32,7 +32,7 @@
 namespace pemc {
 
     TemporaryStateStorage::TemporaryStateStorage(StateIndex _capacity) {
-      throw_assert(_capacity > 1024 && _capacity<=std::numeric_limits<StateIndex>::max(), "capacity invalid");
+      throw_assert(_capacity >= 1024 && _capacity<=std::numeric_limits<StateIndex>::max(), "capacity invalid");
 
   	  totalCapacity = _capacity;
 

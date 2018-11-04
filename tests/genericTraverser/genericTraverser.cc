@@ -21,7 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include<gtest/gtest.h>
+#include <gtest/gtest.h>
+#include <iostream>
 
 #include "pemc/basic/tscIndex.h"
 #include "pemc/basic/configuration.h"
@@ -76,6 +77,7 @@ namespace {
       HardCodedTransitionsCalculator(const Configuration& conf)
           : temporaryStateStorage(conf.successorCapacity) {
         temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
+        initializeSomeStates();
       }
 
       virtual int32_t getStateVectorSize() {
@@ -83,12 +85,16 @@ namespace {
       }
 
       virtual void setPreStateStorageModifierStateVectorSize(int32_t _preStateStorageModifierStateVectorSize) {
+        std::cout << "Resizing temporary state storage. "
+                  << "preStateStorageModifierStateVectorSize " << _preStateStorageModifierStateVectorSize << std::endl;
         preStateStorageModifierStateVectorSize = _preStateStorageModifierStateVectorSize;
         temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
       }
 
       virtual gsl::span<TraversalTransition> calculateInitialTransitions() {
         transitions.clear();
+        // set initial state "122"
+        std::cout << "Calculating initial transitions." << std::endl;
         auto transition0 = TraversalTransition(temporaryStateStorage[stateIndex0].data(), Label());
         transitions.push_back(transition0);
         return transitions;
@@ -97,17 +103,21 @@ namespace {
       virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state) {
         transitions.clear();
         auto currentState = *((int32_t*) state.data());
+        std::cout << "Calculating successors of state " << currentState << "." << std::endl;
         if (currentState == 112) {
+          // set successor states "1" and "5"
           auto transition0 = TraversalTransition(temporaryStateStorage[stateIndex1].data(), Label());
           transitions.push_back(transition0);
           auto transition1 = TraversalTransition(temporaryStateStorage[stateIndex2].data(), Label());
           transitions.push_back(transition1);
         } else if (currentState == 1) {
+          // set successor states "1"
           auto transition0 = TraversalTransition(temporaryStateStorage[stateIndex1].data(), Label());
           transitions.push_back(transition0);
           auto transition1 = TraversalTransition(temporaryStateStorage[stateIndex4].data(), Label());
           transitions.push_back(transition1);
         } else {
+          // set successor state "3"
           auto transition0 = TraversalTransition(temporaryStateStorage[stateIndex3].data(), Label());
           transitions.push_back(transition0);
         }
@@ -132,5 +142,5 @@ TEST(genericTraverser_test, genericTraverser_works) {
     // get the number of the states.
     auto getNoOfStates = traverser.getNoOfStates();
 
-    ASSERT_EQ(getNoOfStates, 5) << "FAIL";
+    ASSERT_EQ(getNoOfStates, 4) << "FAIL";
 }

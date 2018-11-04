@@ -75,10 +75,11 @@ namespace {
     }
 
     int32_t getPreStateStorageModifierStateVectorSize() {
-      auto stateVectorSize = 0;
+      auto preStateStorageModifierStateVectorSize = 0;
       for (auto& preStateStorageModifier : preStateStorageModifiers) {
-        stateVectorSize += preStateStorageModifier->getModifierStateVectorSize();
+        preStateStorageModifierStateVectorSize += preStateStorageModifier->getModifierStateVectorSize();
       }
+      return preStateStorageModifierStateVectorSize;
     }
 
     void handleTransitions(gsl::span<TraversalTransition> transitions) {
