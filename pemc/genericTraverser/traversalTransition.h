@@ -33,6 +33,8 @@
 namespace pemc {
 
   enum TraversalTransitionFlags : uint32_t {
+    NoFlag,
+
 		/// If set, the value of targetStateIndex is set and targetState is invalid.
 		/// If unset, the value of targetState is set and targetStateIndex is invalid.
     IsTargetStateTransformedToIndex = 1,
@@ -57,6 +59,14 @@ namespace pemc {
 
     // 4 bytes
     Label label;
+
+    TraversalTransition()
+      : targetState(nullptr), flags(TraversalTransitionFlags::NoFlag), label(Label()){
+    }
+
+    TraversalTransition(gsl::byte* _targetState, Label _label)
+      : targetState(_targetState), flags(TraversalTransitionFlags::NoFlag), label(_label) {
+    }
   };
 
 

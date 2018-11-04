@@ -23,18 +23,114 @@
 
 #include<gtest/gtest.h>
 
+#include "pemc/basic/tscIndex.h"
+#include "pemc/basic/configuration.h"
+#include "pemc/basic/label.h"
+#include "pemc/basic/modelCapacity.h"
+#include "pemc/basic/rawMemory.h"
+#include "pemc/formula/formula.h"
 #include "pemc/genericTraverser/genericTraverser.h"
+#include "pemc/genericTraverser/ITransitionsCalculator.h"
+#include "pemc/genericTraverser/temporaryStateStorage.h"
+#include "pemc/genericTraverser/traversalTransition.h"
 
 using namespace pemc;
 
 namespace {
   using namespace pemc;
 
+  class HardCodedTransitionsCalculator : public ITransitionsCalculator {
+  private:
+      size_t modelStateVectorSize = sizeof(int32_t);
+
+      TemporaryStateStorage temporaryStateStorage;
+
+      std::vector<TraversalTransition> transitions;
+
+      int32_t preStateStorageModifierStateVectorSize = 0;
+
+      StateIndex stateIndex0;
+      StateIndex stateIndex1;
+      StateIndex stateIndex2;
+      StateIndex stateIndex3;
+      StateIndex stateIndex4;
+
+      void initializeSomeStates() {
+        stateIndex0 = temporaryStateStorage.getFreshStateIndex();
+        *((int32_t*) temporaryStateStorage[stateIndex0].data()) = 112;
+
+        stateIndex1 = temporaryStateStorage.getFreshStateIndex();
+        *((int32_t*) temporaryStateStorage[stateIndex1].data()) = 1;
+
+        stateIndex2 = temporaryStateStorage.getFreshStateIndex();
+        *((int32_t*) temporaryStateStorage[stateIndex2].data()) = 5;
+
+        stateIndex3 = temporaryStateStorage.getFreshStateIndex();
+        *((int32_t*) temporaryStateStorage[stateIndex3].data()) = 3;
+
+        stateIndex4 = temporaryStateStorage.getFreshStateIndex();
+        *((int32_t*) temporaryStateStorage[stateIndex4].data()) = 1;
+      }
+  public:
+
+      HardCodedTransitionsCalculator(const Configuration& conf)
+          : temporaryStateStorage(conf.successorCapacity) {
+        temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
+      }
+
+      virtual int32_t getStateVectorSize() {
+        return modelStateVectorSize;
+      }
+
+      virtual void setPreStateStorageModifierStateVectorSize(int32_t _preStateStorageModifierStateVectorSize) {
+        preStateStorageModifierStateVectorSize = _preStateStorageModifierStateVectorSize;
+        temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
+      }
+
+      virtual gsl::span<TraversalTransition> calculateInitialTransitions() {
+        transitions.clear();
+        auto transition0 = TraversalTransition(temporaryStateStorage[stateIndex0].data(), Label());
+        transitions.push_back(transition0);
+        return transitions;
+      }
+
+      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state) {
+        transitions.clear();
+        auto currentState = *((int32_t*) state.data());
+        if (currentState == 112) {
+          auto transition0 = TraversalTransition(temporaryStateStorage[stateIndex1].data(), Label());
+          transitions.push_back(transition0);
+          auto transition1 = TraversalTransition(temporaryStateStorage[stateIndex2].data(), Label());
+          transitions.push_back(transition1);
+        } else if (currentState == 1) {
+          auto transition0 = TraversalTransition(temporaryStateStorage[stateIndex1].data(), Label());
+          transitions.push_back(transition0);
+          auto transition1 = TraversalTransition(temporaryStateStorage[stateIndex4].data(), Label());
+          transitions.push_back(transition1);
+        } else {
+          auto transition0 = TraversalTransition(temporaryStateStorage[stateIndex3].data(), Label());
+          transitions.push_back(transition0);
+        }
+        return transitions;
+      }
+  };
 }
 
 TEST(genericTraverser_test, genericTraverser_works) {
     auto configuration = Configuration();
-
     auto traverser = GenericTraverser(configuration);
-    ASSERT_EQ(1, 1) << "FAIL";
+
+    // Declare a creator for a ModelExecutor that has an instance of the model that should be executed.
+    auto transitionsCalculatorCreator = [&configuration]() -> std::unique_ptr<HardCodedTransitionsCalculator> {
+      return std::make_unique<HardCodedTransitionsCalculator>(configuration);
+    };
+    traverser.transitionsCalculatorCreator = transitionsCalculatorCreator;
+
+    // Traverse the model.
+    traverser.traverse();
+
+    // get the number of the states.
+    auto getNoOfStates = traverser.getNoOfStates();
+
+    ASSERT_EQ(getNoOfStates, 5) << "FAIL";
 }

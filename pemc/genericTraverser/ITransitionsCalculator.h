@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <gsl/span>
+#include <gsl/gsl_byte>
 #include <cstdint>
 #include <atomic>
 #include <stack>
@@ -42,7 +43,7 @@ namespace pemc {
 
   class ITransitionsCalculator {
   public:
-      ITransitionsCalculator();
+      ITransitionsCalculator() = default;
       virtual ~ITransitionsCalculator() = default;
 
       virtual int32_t getStateVectorSize() = 0;
@@ -51,7 +52,7 @@ namespace pemc {
 
       virtual gsl::span<TraversalTransition> calculateInitialTransitions() = 0;
 
-      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(StateIndex state) = 0;
+      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state) = 0;
   };
 
 }

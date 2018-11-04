@@ -69,7 +69,7 @@ namespace pemc {
 
       virtual gsl::span<TraversalTransition> calculateInitialTransitions();
 
-      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(StateIndex state);
+      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state);
   };
 
 }

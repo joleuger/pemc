@@ -116,7 +116,7 @@ namespace {
         ++newCalculatedTransitionCount;
       }
 
-      for (auto& modifier : preStateStorageModifiers) {
+      for (auto& modifier : postStateStorageModifiers) {
       }
     }
 
@@ -128,8 +128,8 @@ namespace {
       StateIndex stateIndexToTraverse;
       while (pathTracker.tryGetStateIndex(stateIndexToTraverse) ) {
         auto stateToTraverse = (*traverser.stateStorage)[stateIndexToTraverse];
-        //auto transitions = transitionsCalculator->calculateTransitionsOfState(stateToTraverse);
-        //handleTransitions(transitions);
+        auto transitions = transitionsCalculator->calculateTransitionsOfState(stateToTraverse);
+        handleTransitions(transitions);
       }
     }
   };

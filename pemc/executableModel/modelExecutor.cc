@@ -61,7 +61,7 @@ namespace pemc {
     throw NotImplementedYetException();
   }
 
-  gsl::span<TraversalTransition> ModelExecutor::calculateTransitionsOfState(StateIndex state) {
+  gsl::span<TraversalTransition> ModelExecutor::calculateTransitionsOfState(gsl::span<gsl::byte> state) {
     throw NotImplementedYetException();
   }
 }
