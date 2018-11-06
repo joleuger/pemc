@@ -56,7 +56,8 @@ namespace {
       transitionsCalculator = traverser.transitionsCalculatorCreator();
 
       // create an instance of each IPreStateStorageModifier
-      preStateStorageModifiers = std::vector<std::unique_ptr<IPreStateStorageModifier>>(traverser.preStateStorageModifierCreators.size());
+      preStateStorageModifiers = std::vector<std::unique_ptr<IPreStateStorageModifier>>();
+      preStateStorageModifiers.reserve(traverser.postStateStorageModifierCreators.size());
       std::transform(traverser.preStateStorageModifierCreators.begin(),
                      traverser.preStateStorageModifierCreators.end(),
                      std::back_inserter(preStateStorageModifiers),
@@ -68,7 +69,8 @@ namespace {
       transitionsCalculator->setPreStateStorageModifierStateVectorSize(preStateStorageModifierStateVectorSize);
 
       // create an instance of each IPostStateStorageModifier
-      postStateStorageModifiers = std::vector<std::unique_ptr<IPostStateStorageModifier>>(traverser.postStateStorageModifierCreators.size());
+      postStateStorageModifiers = std::vector<std::unique_ptr<IPostStateStorageModifier>>();
+      postStateStorageModifiers.reserve(traverser.postStateStorageModifierCreators.size());
       std::transform(traverser.postStateStorageModifierCreators.begin(),
                      traverser.postStateStorageModifierCreators.end(),
                      std::back_inserter(postStateStorageModifiers),

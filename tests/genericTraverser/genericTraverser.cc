@@ -56,6 +56,8 @@ namespace {
       StateIndex stateIndex3;
       StateIndex stateIndex4;
 
+      std::vector<int32_t> payloadData;
+
       void initializeSomeStates() {
         stateIndex0 = temporaryStateStorage.getFreshStateIndex();
         *((int32_t*) temporaryStateStorage[stateIndex0].data()) = 112;
@@ -101,6 +103,7 @@ namespace {
       }
 
       virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state) {
+
         transitions.clear();
         auto currentState = *((int32_t*) state.data());
         std::cout << "Calculating successors of state " << currentState << "." << std::endl;
@@ -121,12 +124,36 @@ namespace {
           auto transition0 = TraversalTransition(temporaryStateStorage[stateIndex3].data(), Label());
           transitions.push_back(transition0);
         }
+        payloadData.clear();
+        payloadData.push_back(1);
+
         return transitions;
       }
 
       virtual void* getCustomPayloadOfLastCalculation() {
-        return nullptr;
+        return static_cast<void*>(payloadData.data());
       }
+  };
+
+  class CountTranstitionsModifier : public IPostStateStorageModifier {
+  public:
+    CountTranstitionsModifier(int32_t& _transitionCount)
+      : transitionCount(_transitionCount){
+      transitionCount = 0;
+    }
+
+    int32_t& transitionCount;
+
+    virtual void applyOnTransitions(
+        stde::optional<StateIndex> stateIndexOfSource,
+        gsl::span<TraversalTransition> transitions,
+        void* customPayLoad){
+      auto payloadData = static_cast<int32_t*>(customPayLoad);
+
+      auto p_transitions = transitions.data(); // for more speed
+
+      transitionCount += transitions.size();
+    }
   };
 }
 
@@ -140,6 +167,13 @@ TEST(genericTraverser_test, genericTraverser_works) {
     };
     traverser.transitionsCalculatorCreator = transitionsCalculatorCreator;
 
+    int32_t transitionCount;
+    auto countTransitionsModifierCreator = [&transitionCount]() -> std::unique_ptr<IPostStateStorageModifier> {
+      auto modifier = std::make_unique<CountTranstitionsModifier>(transitionCount);
+      return modifier;
+    };
+    traverser.postStateStorageModifierCreators.push_back(countTransitionsModifierCreator);
+
     // Traverse the model.
     traverser.traverse();
 
@@ -147,4 +181,5 @@ TEST(genericTraverser_test, genericTraverser_works) {
     auto getNoOfStates = traverser.getNoOfStates();
 
     ASSERT_EQ(getNoOfStates, 4) << "FAIL";
+    ASSERT_EQ(transitionCount, 7) << "FAIL";
 }

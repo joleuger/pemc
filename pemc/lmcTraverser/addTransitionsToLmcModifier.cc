@@ -35,6 +35,8 @@ namespace pemc {
       void* customPayLoad) {
     auto p_transitions = transitions.data(); // for more speed
 
+    auto transitionProbabilities = reinterpret_cast<Probability*>(customPayLoad);
+
     TransitionIndex locationOfFirstEntry;
     auto transitionCount = transitions.size();
 
@@ -44,7 +46,7 @@ namespace pemc {
       locationOfFirstEntry = lmc->getPlaceForNewTransitionEntriesOfState(*stateIndexOfSource,transitionCount);
     }
     for (auto i = 0; i < transitionCount; i++) {
-      auto newEntry = LmcTransitionEntry(Probability::One(), p_transitions[i].label, p_transitions[i].targetStateIndex);
+      auto newEntry = LmcTransitionEntry(transitionProbabilities[i], p_transitions[i].label, p_transitions[i].targetStateIndex);
       lmc->setLmcTransitionEntry(locationOfFirstEntry + i, newEntry);
     }
   }
