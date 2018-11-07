@@ -70,6 +70,7 @@ LmcExample1::LmcExample1()
 
   auto noOfStates = 3;
   lmc.finishCreation(noOfStates);
+  lmc.validate();
 
 }
 
@@ -117,5 +118,6 @@ LmcExample2::LmcExample2()
 
   auto noOfStates = 3;
   lmc.finishCreation(noOfStates);
+  lmc.validate();
 
 }

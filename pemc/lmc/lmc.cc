@@ -194,15 +194,16 @@ namespace pemc {
         for (auto& transitionEntry : getTransitionsOfState(i)) {
           transitionSum += transitionEntry.probability.value;
         }
-        throw_assert(probabilityIsOne(transitionSum,0.00000001) , "Probability invalid");
+        throw_assert(probabilityIsOne(transitionSum,0.00000001) , "The sum of probabilities of the state "+std::to_string(i) +" is invalid");
 
       }
       transitionSum = 0.0;
       for (auto& transitionEntry : getInitialTransitions()) {
         throw_assert(transitionEntry.state >= 0 && transitionEntry.state < stateCount, "State invalid");
         throw_assert(probabilityIsValid(transitionEntry.probability), "Probability invalid");
+        transitionSum += transitionEntry.probability.value;
       }
-      throw_assert(probabilityIsOne(transitionSum,0.00000001) , "Probability invalid");
+      throw_assert(probabilityIsOne(transitionSum,0.00000001) , "The sum of probabilities of the initial transitions is invalid");
       #endif
   }
 }

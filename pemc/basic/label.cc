@@ -40,7 +40,7 @@ namespace pemc {
     value = 0;
   }
 
-  Label::Label(std::vector<bool>& values) {
+  Label::Label(const std::vector<bool>& values) {
       auto noOfValues = values.size();
       checkLabelCount(noOfValues);
       value = 0;

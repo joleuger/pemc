@@ -45,7 +45,8 @@ namespace pemc {
     lmc->initialize(*conf.modelCapacity);
 
     // Set the labels of the Lmc.
-    auto labelIdentifier = std::vector<std::string>(formulas.size());
+    auto labelIdentifier = std::vector<std::string>();
+    labelIdentifier.reserve(formulas.size());
     std::transform(formulas.begin(), formulas.end(), std::back_inserter(labelIdentifier),
       [](Formula& formula){ return formula.getIdentifier();} );
     lmc->setLabelIdentifier(labelIdentifier);

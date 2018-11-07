@@ -33,7 +33,7 @@ namespace pemc {
     int32_t value = 0;
 
     Label();
-    Label(std::vector<bool>& values);
+    Label(const std::vector<bool>& values);
 
     bool operator[](int32_t index);
   };
