@@ -29,6 +29,19 @@ namespace pemc {
   private:
   public:
       IChoiceResolver();
+      virtual ~IChoiceResolver() = default;
+
+      virtual void beginMacroStep();
+
+      virtual bool prepareNextPath();
+
+      virtual void beginMacroStepExecution();
+
+      virtual void endMacroStepExecution();
+
+      virtual void stepFinished();
+
+      virtual void* getCustomPayloadOfLastCalculation();
   };
 
 }

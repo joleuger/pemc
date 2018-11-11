@@ -45,6 +45,15 @@ namespace pemc {
     temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
   }
 
+  void ModelExecutor::setChoiceResolver(std::unique_ptr<IChoiceResolver> _choiceResolver) {
+    choiceResolver = std::move(_choiceResolver);
+    model->setChoiceResolver(choiceResolver.get());
+  }
+
+  int32_t ModelExecutor::getStateVectorSize() {
+    return model->getStateVectorSize();
+  }
+
   void ModelExecutor::setPreStateStorageModifierStateVectorSize(int32_t _preStateStorageModifierStateVectorSize){
     preStateStorageModifierStateVectorSize = _preStateStorageModifierStateVectorSize;
     if (model) {
@@ -53,7 +62,41 @@ namespace pemc {
     }
   }
 
-  int32_t ModelExecutor::getStateVectorSize() {
-    return model->getStateVectorSize();
+  gsl::span<TraversalTransition> ModelExecutor::calculateInitialTransitions() {
+    transitions.clear();
+		temporaryStateStorage.clear();
+
+    choiceResolver->beginMacroStepExecution();
+		choiceResolver->beginMacroStep();
+
+		while (choiceResolver->prepareNextPath()) {
+			model->resetToInitialState();
+			model->step();
+			choiceResolver->stepFinished();
+		}
+
+		choiceResolver->endMacroStepExecution();
+    return gsl::span<TraversalTransition>(transitions);
+  }
+
+  gsl::span<TraversalTransition> ModelExecutor::calculateTransitionsOfState(gsl::span<gsl::byte> state) {
+    transitions.clear();
+		temporaryStateStorage.clear();
+
+    choiceResolver->beginMacroStepExecution();
+		choiceResolver->beginMacroStep();
+
+		while (choiceResolver->prepareNextPath()) {
+			model->deserialize(state);
+			model->step();
+			choiceResolver->stepFinished();
+		}
+
+		choiceResolver->endMacroStepExecution();
+    return gsl::span<TraversalTransition>(transitions);
+  }
+
+  void* ModelExecutor::getCustomPayloadOfLastCalculation() {
+    return choiceResolver->getCustomPayloadOfLastCalculation();
   }
 }

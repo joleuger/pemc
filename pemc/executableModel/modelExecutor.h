@@ -41,7 +41,7 @@
 #include "pemc/genericTraverser/ITransitionsCalculator.h"
 #include "pemc/genericTraverser/IPreStateStorageModifier.h"
 #include "pemc/genericTraverser/IPostStateStorageModifier.h"
-#include "pemc/genericTraverser/temporaryStateStorage.h"
+#include "pemc/executableModel/temporaryStateStorage.h"
 #include "pemc/executableModel/IChoiceResolver.h"
 #include "pemc/executableModel/abstractModel.h"
 
@@ -58,20 +58,23 @@ namespace pemc {
       std::vector<TraversalTransition> transitions;
 
       int32_t preStateStorageModifierStateVectorSize = 0;
-
-      ModelExecutor(const Configuration& conf);
   public:
+      ModelExecutor(const Configuration& conf);
+
       void setModel(std::unique_ptr<AbstractModel> _model);
+
+      void setChoiceResolver(std::unique_ptr<IChoiceResolver> _choiceResolver);
 
       virtual int32_t getStateVectorSize();
 
       virtual void setPreStateStorageModifierStateVectorSize(int32_t _preStateStorageModifierStateVectorSize);
 
-      virtual gsl::span<TraversalTransition> calculateInitialTransitions() = 0;
+      virtual gsl::span<TraversalTransition> calculateInitialTransitions();
 
-      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state) = 0;
+      virtual gsl::span<TraversalTransition> calculateTransitionsOfState(gsl::span<gsl::byte> state);
 
-      virtual void* getCustomPayloadOfLastCalculation() = 0;
+      virtual void* getCustomPayloadOfLastCalculation();
+
   };
 
 }

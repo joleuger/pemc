@@ -32,7 +32,7 @@
 #include "pemc/formula/formula.h"
 #include "pemc/genericTraverser/genericTraverser.h"
 #include "pemc/genericTraverser/ITransitionsCalculator.h"
-#include "pemc/genericTraverser/temporaryStateStorage.h"
+#include "pemc/executableModel/temporaryStateStorage.h"
 #include "pemc/genericTraverser/traversalTransition.h"
 
 using namespace pemc;

@@ -30,7 +30,6 @@
 #include "pemc/genericTraverser/genericTraverser.h"
 #include "pemc/genericTraverser/pathTracker.h"
 #include "pemc/genericTraverser/traversalTransition.h"
-#include "pemc/genericTraverser/temporaryStateStorage.h"
 
 namespace {
   using namespace pemc;

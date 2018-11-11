@@ -26,5 +26,26 @@
 namespace pemc {
 
   LmcChoiceResolver::LmcChoiceResolver(){
-  };
+  }
+
+  void LmcChoiceResolver::beginMacroStep() {
+  }
+
+  bool LmcChoiceResolver::prepareNextPath() {
+  }
+
+  void LmcChoiceResolver::beginMacroStepExecution() {
+  }
+
+  void LmcChoiceResolver::endMacroStepExecution() {
+  }
+
+  void LmcChoiceResolver::stepFinished() {
+  }
+
+  void* LmcChoiceResolver::getCustomPayloadOfLastCalculation() {
+    return static_cast<void*>(probabilities.data());
+  }
+
+
 }

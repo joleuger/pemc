@@ -24,6 +24,9 @@
 #ifndef PEMC_LMCTRAVERSER_LMCCHOICERESOLVER_H_
 #define PEMC_LMCTRAVERSER_LMCCHOICERESOLVER_H_
 
+#include <vector>
+
+#include "pemc/basic/probability.h"
 #include "pemc/executableModel/IChoiceResolver.h"
 
 namespace pemc {
@@ -31,6 +34,21 @@ namespace pemc {
   private:
   public:
       LmcChoiceResolver();
+      virtual ~LmcChoiceResolver() = default;
+
+      std::vector<Probability> probabilities;
+
+      virtual void beginMacroStep();
+
+      virtual bool prepareNextPath();
+
+      virtual void beginMacroStepExecution();
+
+      virtual void endMacroStepExecution();
+
+      virtual void stepFinished();
+
+      virtual void* getCustomPayloadOfLastCalculation();
   };
 
 }

@@ -36,6 +36,7 @@
 #include "pemc/basic/tscIndex.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/modelCapacity.h"
+#include "pemc/basic/probability.h"
 #include "pemc/basic/rawMemory.h"
 #include "pemc/formula/formula.h"
 #include "pemc/genericTraverser/ITransitionsCalculator.h"
@@ -50,9 +51,28 @@ namespace pemc {
       IChoiceResolver* choiceResolver;
   public:
       AbstractModel();
+      virtual ~AbstractModel();
+
       void setChoiceResolver(IChoiceResolver* _choiceResolver);
-      void serialize(gsl::byte* position);
-      void deserialize(gsl::byte* position);
+
+      void serialize(gsl::span<gsl::byte> position);
+
+      void deserialize(gsl::span<gsl::byte> position);
+
+      template<typename T>
+      std::tuple<Probability,T> choose(std::initializer_list<std::tuple<Probability,T>> choices) {
+        // This is a Member template and the implementation must stay therefore in the header.
+      }
+
+      template<typename T>
+      T choose(std::initializer_list<T> choices) {
+        // This is a Member template and the implementation must stay therefore in the header.
+
+      }
+
+      virtual void resetToInitialState();
+
+      virtual void step();
 
       int32_t getStateVectorSize();
   };
