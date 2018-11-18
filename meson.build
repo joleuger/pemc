@@ -86,6 +86,7 @@ libpemctests = [
   'tests/lcmdp/lcmdp.cc',
   'tests/lcmdp/lcmdpModelChecker.cc',
   'tests/lmcTraverser/addTransitionsToLmcModifier.cc',
+  'tests/lmcTraverser/lmcChoiceResolver.cc',
   'tests/simpleExecutableModel/generateSlowSimpleFormulaEvaluator.cc',
   'tests/simpleExecutableModel/simpleFormula.cc'
 ]

@@ -27,6 +27,7 @@
 #include "pemc/genericTraverser/genericTraverser.h"
 #include "pemc/executableModel/modelExecutor.h"
 #include "pemc/lmcTraverser/addTransitionsToLmcModifier.h"
+#include "pemc/lmcTraverser/lmcChoiceResolver.h"
 
 namespace pemc {
   Pemc::Pemc(){
@@ -56,7 +57,7 @@ namespace pemc {
     auto transitionsCalculatorCreator = [&modelCreator,&conf=this->conf]() -> std::unique_ptr<ModelExecutor> {
       auto modelExecutor = std::make_unique<ModelExecutor>(conf);
       modelExecutor->setModel(std::make_unique<AbstractModel>(modelCreator()));
-      modelExecutor->setChoiceResolver(std::make_unique<IChoiceResolver>());
+      modelExecutor->setChoiceResolver(std::make_unique<LmcChoiceResolver>());
       return modelExecutor;
     };
     traverser.transitionsCalculatorCreator = transitionsCalculatorCreator;

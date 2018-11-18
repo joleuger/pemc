@@ -40,7 +40,9 @@ namespace pemc {
   private:
       std::vector<LmcChoiceStackEntry> choiceStack;
       bool firstExecutionOfMacroStep;
-      size_t choiceDepth = -1;
+      int32_t choiceDepth = -1;
+
+      Probability getPreviousProbability();
   public:
       LmcChoiceResolver();
       virtual ~LmcChoiceResolver() = default;

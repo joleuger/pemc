@@ -61,11 +61,16 @@ namespace pemc {
     return false;
   }
 
-  size_t LmcChoiceResolver::choose(const gsl::span<Probability>& choices) {
+  Probability LmcChoiceResolver::getPreviousProbability() {
     auto previousProbability = Probability::One();
-    if (choiceStack.size() > 0) {
+    if (choiceDepth >= 0 && choiceStack.size() >= choiceDepth + 1 ) {
       previousProbability = choiceStack[choiceDepth].probability;
     }
+    return previousProbability;
+  }
+
+  size_t LmcChoiceResolver::choose(const gsl::span<Probability>& choices) {
+    auto previousProbability = getPreviousProbability();
     choiceDepth++;
     if (choiceDepth < choiceStack.size()) {
       auto idx = choiceStack[choiceDepth].currentOption;
@@ -84,10 +89,7 @@ namespace pemc {
   }
 
   size_t LmcChoiceResolver::choose(size_t numberOfChoices) {
-    auto previousProbability = Probability::One();
-    if (choiceStack.size() > 0) {
-      previousProbability = choiceStack[choiceDepth].probability;
-    }
+    auto previousProbability = getPreviousProbability();
     choiceDepth++;
     if (choiceDepth < choiceStack.size()) {
       auto idx = choiceStack[choiceDepth].currentOption;
@@ -109,7 +111,7 @@ namespace pemc {
   void LmcChoiceResolver::stepFinished() {
     auto probability = Probability::One();
     if (choiceStack.size() > 0) {
-      probability = choiceStack[choiceDepth].probability;
+      probability = choiceStack.back().probability;
     }
 
     probabilities.push_back(probability);

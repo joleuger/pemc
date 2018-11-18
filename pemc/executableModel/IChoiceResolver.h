@@ -33,22 +33,22 @@ namespace pemc {
   class IChoiceResolver {
   private:
   public:
-      IChoiceResolver();
+      IChoiceResolver() = default;
       virtual ~IChoiceResolver() = default;
 
-      virtual void beginMacroStepExecution();
+      virtual void beginMacroStepExecution() {}
 
-      virtual bool prepareNextPath();
+      virtual bool prepareNextPath() {return false;}
 
-      virtual size_t choose(const gsl::span<Probability>& choices);
+      virtual size_t choose(const gsl::span<Probability>& choices) { return 0;}
 
-      virtual size_t choose(size_t numberOfChoices);
+      virtual size_t choose(size_t numberOfChoices) { return 0;}
 
-      virtual void stepFinished();
+      virtual void stepFinished() {}
 
-      virtual void endMacroStepExecution();
+      virtual void endMacroStepExecution() {}
 
-      virtual void* getCustomPayloadOfLastCalculation();
+      virtual void* getCustomPayloadOfLastCalculation() {return nullptr;}
   };
 
 }
