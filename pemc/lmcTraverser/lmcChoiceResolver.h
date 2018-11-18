@@ -30,23 +30,34 @@
 #include "pemc/executableModel/IChoiceResolver.h"
 
 namespace pemc {
+  struct LmcChoiceStackEntry {
+    Probability probability;
+    size_t currentOption;
+    size_t noOfOptions;
+  };
+
   class LmcChoiceResolver : public IChoiceResolver {
   private:
+      std::vector<LmcChoiceStackEntry> choiceStack;
+      bool firstExecutionOfMacroStep;
+      size_t choiceDepth = -1;
   public:
       LmcChoiceResolver();
       virtual ~LmcChoiceResolver() = default;
 
       std::vector<Probability> probabilities;
 
-      virtual void beginMacroStep();
+      virtual void beginMacroStepExecution();
 
       virtual bool prepareNextPath();
 
-      virtual void beginMacroStepExecution();
+      virtual size_t choose(const gsl::span<Probability>& choices);
 
-      virtual void endMacroStepExecution();
+      virtual size_t choose(size_t numberOfChoices);
 
       virtual void stepFinished();
+
+      virtual void endMacroStepExecution();
 
       virtual void* getCustomPayloadOfLastCalculation();
   };

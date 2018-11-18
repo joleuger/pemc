@@ -26,6 +26,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <functional>
 
 namespace pemc {
 
@@ -34,6 +35,7 @@ namespace pemc {
 
     Label();
     Label(const std::vector<bool>& values);
+    Label(const std::vector<std::function<bool()>>& formulaEvaluators);
 
     bool operator[](int32_t index);
   };

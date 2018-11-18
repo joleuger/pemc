@@ -35,6 +35,25 @@ namespace pemc { namespace cpp {
     int32_t state;
   public:
     int32_t getState() {return state;}
+
+    template<typename T>
+    std::tuple<Probability,T> choose(std::initializer_list<std::tuple<Probability,T>> choices) {
+      // This is a Member template and the implementation must stay therefore in the header.
+      auto probabilities = std::vector<Probability>();
+      probabilities.reserve(choices.size());
+      std::transform(choices.begin(), choices.end(), std::back_inserter(probabilities),
+        [](auto& choice){ return std::get<0>(choice);} );
+      auto chosenIdx = choiceResolver->choose(probabilities);
+      return choices.begin()[chosenIdx];
+    }
+
+    template<typename T>
+    T choose(std::initializer_list<T> choices) {
+      // This is a Member template and the implementation must stay therefore in the header.
+      auto chosenIdx = choiceResolver->choose(choices.size());
+      return choices.begin()[chosenIdx];
+    }
+
   };
 
 } }

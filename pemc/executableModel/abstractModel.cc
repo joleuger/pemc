@@ -25,7 +25,6 @@
 #include <algorithm>
 #include <ThrowAssert.hpp>
 
-#include "pemc/basic/exceptions.h"
 #include "pemc/executableModel/abstractModel.h"
 
 namespace {
@@ -39,4 +38,15 @@ namespace pemc {
     choiceResolver = _choiceResolver;
   };
 
+  Label AbstractModel::calculateLabel() {
+    return Label(formulaEvaluators);
+  };
+
+  size_t AbstractModel::choose(const gsl::span<Probability>& choices) {
+    return choiceResolver->choose(choices);
+  }
+
+  size_t AbstractModel::choose(size_t numberOfChoices) {
+    return choiceResolver->choose(numberOfChoices);
+  }
 }

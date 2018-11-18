@@ -24,6 +24,11 @@
 #ifndef PEMC_EXECUTABLEMODEL_ICHOICERESOLVER_H_
 #define PEMC_EXECUTABLEMODEL_ICHOICERESOLVER_H_
 
+#include <gsl/span>
+
+#include "pemc/basic/probability.h"
+
+
 namespace pemc {
   class IChoiceResolver {
   private:
@@ -31,15 +36,17 @@ namespace pemc {
       IChoiceResolver();
       virtual ~IChoiceResolver() = default;
 
-      virtual void beginMacroStep();
+      virtual void beginMacroStepExecution();
 
       virtual bool prepareNextPath();
 
-      virtual void beginMacroStepExecution();
+      virtual size_t choose(const gsl::span<Probability>& choices);
 
-      virtual void endMacroStepExecution();
+      virtual size_t choose(size_t numberOfChoices);
 
       virtual void stepFinished();
+
+      virtual void endMacroStepExecution();
 
       virtual void* getCustomPayloadOfLastCalculation();
   };

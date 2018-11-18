@@ -62,17 +62,26 @@ namespace pemc {
     }
   }
 
+  void ModelExecutor::addTransition() {
+    auto tempStateIndex = temporaryStateStorage.getFreshStateIndex();
+    auto tempStateSpan = temporaryStateStorage[tempStateIndex];
+    model->serialize(tempStateSpan);
+    auto label = model->calculateLabel();
+    auto newTransition = TraversalTransition(tempStateSpan.data(), label);
+    transitions.push_back(newTransition);
+  }
+
   gsl::span<TraversalTransition> ModelExecutor::calculateInitialTransitions() {
     transitions.clear();
 		temporaryStateStorage.clear();
 
     choiceResolver->beginMacroStepExecution();
-		choiceResolver->beginMacroStep();
 
 		while (choiceResolver->prepareNextPath()) {
 			model->resetToInitialState();
 			model->step();
 			choiceResolver->stepFinished();
+      addTransition();
 		}
 
 		choiceResolver->endMacroStepExecution();
@@ -84,12 +93,12 @@ namespace pemc {
 		temporaryStateStorage.clear();
 
     choiceResolver->beginMacroStepExecution();
-		choiceResolver->beginMacroStep();
 
 		while (choiceResolver->prepareNextPath()) {
 			model->deserialize(state);
 			model->step();
 			choiceResolver->stepFinished();
+      addTransition();
 		}
 
 		choiceResolver->endMacroStepExecution();

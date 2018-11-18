@@ -47,8 +47,9 @@
 namespace pemc {
 
   class AbstractModel {
-  private:
-      IChoiceResolver* choiceResolver;
+  protected:
+      IChoiceResolver* choiceResolver = nullptr;
+      std::vector<std::function<bool()>> formulaEvaluators;
   public:
       AbstractModel();
       virtual ~AbstractModel();
@@ -59,16 +60,13 @@ namespace pemc {
 
       void deserialize(gsl::span<gsl::byte> position);
 
-      template<typename T>
-      std::tuple<Probability,T> choose(std::initializer_list<std::tuple<Probability,T>> choices) {
-        // This is a Member template and the implementation must stay therefore in the header.
-      }
+      void setFormulasForLabel(const std::vector<std::shared_ptr<Formula>>& _formulas);
 
-      template<typename T>
-      T choose(std::initializer_list<T> choices) {
-        // This is a Member template and the implementation must stay therefore in the header.
+      Label calculateLabel();
 
-      }
+      size_t choose(const gsl::span<Probability>& choices);
+
+      size_t choose(size_t numberOfChoices);
 
       virtual void resetToInitialState();
 

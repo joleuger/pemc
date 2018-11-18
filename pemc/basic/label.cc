@@ -49,6 +49,15 @@ namespace pemc {
         value |= values[i] ? 1 << i : 0;
   }
 
+  Label::Label(const std::vector<std::function<bool()>>& formulaEvaluators) {
+      auto noOfValues = formulaEvaluators.size();
+      checkLabelCount(noOfValues);
+      value = 0;
+
+      for (auto i = 0; i < noOfValues; ++i)
+        value |= formulaEvaluators[i]() ? 1 << i : 0;
+  }
+
   bool Label::operator[](int32_t index)
   {
     return (value & (1 << index)) != 0;

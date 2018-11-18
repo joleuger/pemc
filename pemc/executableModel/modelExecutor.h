@@ -58,6 +58,8 @@ namespace pemc {
       std::vector<TraversalTransition> transitions;
 
       int32_t preStateStorageModifierStateVectorSize = 0;
+
+      void addTransition();
   public:
       ModelExecutor(const Configuration& conf);
 
