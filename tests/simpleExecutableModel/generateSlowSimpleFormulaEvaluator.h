@@ -30,7 +30,7 @@
 
 #include "tests/simpleExecutableModel/simpleModel.h"
 
-namespace pemc { namespace cpp {
+namespace pemc { namespace simple {
   using namespace pemc;
 
   std::function<bool()> generateSlowSimpleFormulaEvaluator(SimpleModel* model, Formula* formula);

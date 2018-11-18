@@ -51,16 +51,18 @@ namespace pemc {
       IChoiceResolver* choiceResolver = nullptr;
       std::vector<std::function<bool()>> formulaEvaluators;
   public:
-      AbstractModel();
-      virtual ~AbstractModel();
+      AbstractModel() {}
+      virtual ~AbstractModel() {}
+
+      //AbstractModel(const AbstractModel&) = delete;
 
       void setChoiceResolver(IChoiceResolver* _choiceResolver);
 
-      void serialize(gsl::span<gsl::byte> position);
+      virtual void serialize(gsl::span<gsl::byte> position) {}
 
-      void deserialize(gsl::span<gsl::byte> position);
+      virtual void deserialize(gsl::span<gsl::byte> position) {}
 
-      void setFormulasForLabel(const std::vector<std::shared_ptr<Formula>>& _formulas);
+      virtual void setFormulasForLabel(const std::vector<std::shared_ptr<Formula>>& _formulas) {}
 
       Label calculateLabel();
 
@@ -68,11 +70,11 @@ namespace pemc {
 
       size_t choose(size_t numberOfChoices);
 
-      virtual void resetToInitialState();
+      virtual void resetToInitialState() {}
 
-      virtual void step();
+      virtual void step() {}
 
-      int32_t getStateVectorSize();
+      virtual int32_t getStateVectorSize() {return 0;}
   };
 
 }

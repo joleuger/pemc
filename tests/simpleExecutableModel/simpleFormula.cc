@@ -23,7 +23,7 @@
 
 #include "tests/simpleExecutableModel/simpleFormula.h"
 
-namespace pemc { namespace cpp {
+namespace pemc { namespace simple {
 
   SimpleFormula::SimpleFormula(const std::function<bool(SimpleModel*)>& _evaluator,
     const std::string& _identifier)

@@ -56,7 +56,7 @@ namespace pemc {
     // Declare a creator for a ModelExecutor that has an instance of the model that should be executed.
     auto transitionsCalculatorCreator = [&modelCreator,&conf=this->conf]() -> std::unique_ptr<ModelExecutor> {
       auto modelExecutor = std::make_unique<ModelExecutor>(conf);
-      modelExecutor->setModel(std::make_unique<AbstractModel>(modelCreator()));
+      modelExecutor->setModel(std::make_unique<AbstractModel>(modelCreator())); // calls copy constructor... TODO: Make better...
       modelExecutor->setChoiceResolver(std::make_unique<LmcChoiceResolver>());
       return modelExecutor;
     };

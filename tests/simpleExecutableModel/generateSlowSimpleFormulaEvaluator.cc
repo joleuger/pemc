@@ -36,7 +36,7 @@
 
 namespace {
   using namespace pemc;
-  using namespace pemc::cpp;
+  using namespace pemc::simple;
 
   #include <string>
   #include <sstream>
@@ -156,7 +156,7 @@ namespace {
     throw_assert(false, error);
   }
 }
-namespace pemc { namespace cpp {
+namespace pemc { namespace simple {
   std::function<bool()> generateSlowSimpleFormulaEvaluator(SimpleModel* model, Formula& formula) {
       auto compiler = SlowFormulaCompilationVisitor(model);
       formula.visit(&compiler);

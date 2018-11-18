@@ -21,30 +21,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFORMULA_H_
-#define PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFORMULA_H_
+#include <gtest/gtest.h>
+#include <iostream>
 
-#include <functional>
-
-#include <pemc/formula/adaptedFormula.h>
+#include "pemc/executableModel/modelExecutor.h"
+#include "pemc/lmcTraverser/lmcChoiceResolver.h"
 
 #include "tests/simpleExecutableModel/simpleModel.h"
 
-namespace pemc { namespace simple {
+using namespace pemc;
+using namespace pemc::simple;
 
+namespace {
   using namespace pemc;
 
-  // such formulas should be static in the model classes
-  class SimpleFormula : public AdaptedFormula {
-  private:
-    std::function<bool(SimpleModel*)> evaluator;
-  public:
-    SimpleFormula(const std::function<bool(SimpleModel*)>& _evaluator,
-      const std::string& _identifier = "");
-    virtual ~SimpleFormula() = default;
+}
 
-    std::function<bool(SimpleModel*)> getEvaluator();
-  };
+TEST(modelExecutor_test, modelExecutor_test) {
+    auto configuration = Configuration();
 
-} }
-#endif  // PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFORMULA_H_
+    auto modelExecutor = std::make_unique<ModelExecutor>(configuration);
+    modelExecutor->setModel(std::make_unique<SimpleModel>());
+    modelExecutor->setChoiceResolver(std::make_unique<LmcChoiceResolver>());
+
+    // assert
+    ASSERT_EQ(true, true) << "FAIL";
+}

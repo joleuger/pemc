@@ -21,30 +21,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFORMULA_H_
-#define PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFORMULA_H_
-
-#include <functional>
-
-#include <pemc/formula/adaptedFormula.h>
-
 #include "tests/simpleExecutableModel/simpleModel.h"
+#include "tests/simpleExecutableModel/generateSlowSimpleFormulaEvaluator.h"
 
 namespace pemc { namespace simple {
-
   using namespace pemc;
 
-  // such formulas should be static in the model classes
-  class SimpleFormula : public AdaptedFormula {
-  private:
-    std::function<bool(SimpleModel*)> evaluator;
-  public:
-    SimpleFormula(const std::function<bool(SimpleModel*)>& _evaluator,
-      const std::string& _identifier = "");
-    virtual ~SimpleFormula() = default;
+  int32_t SimpleModel::getState() {
+    return state;
+  }
 
-    std::function<bool(SimpleModel*)> getEvaluator();
-  };
+  void SimpleModel::serialize(gsl::span<gsl::byte> position) {
+    auto ptrToState = reinterpret_cast<int32_t*>(position.data());
+    *ptrToState = state;
+  }
+
+  void SimpleModel::deserialize(gsl::span<gsl::byte> position) {
+    auto ptrToState = reinterpret_cast<int32_t*>(position.data());
+    state = *ptrToState;
+  }
+
+  void SimpleModel::setFormulasForLabel(const std::vector<std::shared_ptr<Formula>>& _formulas) {
+    formulaEvaluators.clear();
+    formulaEvaluators.reserve(_formulas.size());
+    //std::transform(_formulas.begin(), _formulas.end(), std::back_inserter(formulaEvaluators),
+    //  [this](auto& formula){ return generateSlowSimpleFormulaEvaluator(this,formula.get()) ;} );
+  }
+
+  void SimpleModel::resetToInitialState() {
+    state = 0;
+  }
+
+  void SimpleModel::step() {
+  }
+
+  int32_t SimpleModel::getStateVectorSize() {
+    return sizeof(int32_t);
+  }
 
 } }
-#endif  // PEMC_SIMPLEEXECUTABLEMODEL_SIMPLEFORMULA_H_
