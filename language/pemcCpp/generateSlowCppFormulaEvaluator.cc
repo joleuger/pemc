@@ -157,9 +157,9 @@ namespace {
   }
 }
 namespace pemc { namespace cpp {
-  std::function<bool()> generateSlowCppFormulaEvaluator(CppModel* model, Formula& formula) {
+  std::function<bool()> generateSlowCppFormulaEvaluator(CppModel* model, Formula* formula) {
       auto compiler = SlowFormulaCompilationVisitor(model);
-      formula.visit(&compiler);
+      formula->visit(&compiler);
       return std::move(compiler.result);
   }
 

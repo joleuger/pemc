@@ -31,10 +31,19 @@ namespace pemc { namespace cpp {
   using namespace pemc;
 
   class CppModel : public AbstractModel {
-  private:
-    int32_t state;
   public:
-    int32_t getState() {return state;}
+
+    virtual void serialize(gsl::span<gsl::byte> position) { }
+
+    virtual void deserialize(gsl::span<gsl::byte> position) { }
+
+    virtual void setFormulasForLabel(const std::vector<std::shared_ptr<Formula>>& _formulas);
+
+    virtual void resetToInitialState() { }
+
+    virtual void step() { }
+
+    virtual int32_t getStateVectorSize() { return 0; }
 
     template<typename T>
     std::tuple<Probability,T> choose(std::initializer_list<std::tuple<Probability,T>> choices) {

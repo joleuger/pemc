@@ -58,12 +58,14 @@ libpemcCpp_include = include_directories('language')
 
 libpemcCpp =  static_library('pemcCpp',
   'language/pemcCpp/cppFormula.cc',
+  'language/pemcCpp/cppModel.cc',
   'language/pemcCpp/generateSlowCppFormulaEvaluator.cc',
   include_directories : [ libpemc_include, libpemcCpp_include ] )
 
 libpemcCpp_dep = declare_dependency(
   link_with: [ libpemc, libpemcCpp ],
-  include_directories: [ libpemc_include, libpemcCpp_include ])
+  include_directories: [ libpemc_include, libpemcCpp_include ],
+  dependencies: boostdep)
 
 
 # TEST
