@@ -39,7 +39,7 @@ namespace pemc {
   };
 
 
-  std::unique_ptr<Lmc> Pemc::buildLmcFromExecutableModel(std::function<AbstractModel()>& modelCreator, std::vector<Formula> formulas) {
+  std::unique_ptr<Lmc> Pemc::buildLmcFromExecutableModel(const std::function<std::unique_ptr<AbstractModel>()>& modelCreator, std::vector<std::shared_ptr<Formula>> formulas) {
     // initialize an empty Lmc, which will contain the resulting model.
     auto lmc = std::make_unique<Lmc>();
     lmc->initialize(*conf.modelCapacity);
@@ -48,15 +48,17 @@ namespace pemc {
     auto labelIdentifier = std::vector<std::string>();
     labelIdentifier.reserve(formulas.size());
     std::transform(formulas.begin(), formulas.end(), std::back_inserter(labelIdentifier),
-      [](Formula& formula){ return formula.getIdentifier();} );
+      [](std::shared_ptr<Formula>& formula){ return formula->getIdentifier();} );
     lmc->setLabelIdentifier(labelIdentifier);
 
     auto traverser = GenericTraverser(conf);
 
     // Declare a creator for a ModelExecutor that has an instance of the model that should be executed.
-    auto transitionsCalculatorCreator = [&modelCreator,&conf=this->conf]() -> std::unique_ptr<ModelExecutor> {
+    auto transitionsCalculatorCreator = [&modelCreator,&conf=this->conf,&formulas]() -> std::unique_ptr<ModelExecutor> {
       auto modelExecutor = std::make_unique<ModelExecutor>(conf);
-      modelExecutor->setModel(std::make_unique<AbstractModel>(modelCreator())); // calls copy constructor... TODO: Make better...
+      auto model = modelCreator();
+      model->setFormulasForLabel(formulas);
+      modelExecutor->setModel(std::move(model));
       modelExecutor->setChoiceResolver(std::make_unique<LmcChoiceResolver>());
       return modelExecutor;
     };
