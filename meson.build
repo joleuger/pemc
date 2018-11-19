@@ -110,3 +110,8 @@ if meson.get_cross_property('build-tests', 'yes') == 'yes'
       dependencies : [gtest_dep, libpemcCpp_dep])
    test('gtest test', pemcCppExe)
 endif
+
+
+if meson.get_cross_property('build-examples', 'yes') == 'yes'
+   executable('example_dice', 'language/pemcCppExamples/dice.cc', dependencies : [libpemcCpp_dep])
+endif
