@@ -21,46 +21,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <gtest/gtest.h>
+#include <iostream>
+#include <vector>
+
+#include "pemc/basic/label.h"
+#include "pemc/formula/adaptedFormula.h"
+#include "pemc/formula/binaryFormula.h"
+
+#include "tests/simpleExecutableModel/simpleFormula.h"
 #include "tests/simpleExecutableModel/simpleModel.h"
 #include "tests/simpleExecutableModel/generateSlowSimpleFormulaEvaluator.h"
 
-namespace pemc { namespace simple {
-  using namespace pemc;
+using namespace pemc;
+using namespace pemc::simple;
 
-  int32_t SimpleModel::getState() {
-    return state;
-  }
+namespace {
 
-  void SimpleModel::setState(int32_t _state) {
-    state = _state;
-  }
+  auto model = SimpleModel();
 
-  void SimpleModel::serialize(gsl::span<gsl::byte> position) {
-    auto ptrToState = reinterpret_cast<int32_t*>(position.data());
-    *ptrToState = state;
-  }
+  auto f1 = std::make_shared<SimpleFormula>([](SimpleModel* model) { return model->getState() >= 0; }, "f1" );
+  auto f2 = std::make_shared<SimpleFormula>([](SimpleModel* model) { return model->getState() == 1; }, "f2" );
 
-  void SimpleModel::deserialize(gsl::span<gsl::byte> position) {
-    auto ptrToState = reinterpret_cast<int32_t*>(position.data());
-    state = *ptrToState;
-  }
+  auto f1_and_f2 = std::make_shared<BinaryFormula>(f1,BinaryOperator::And,f2);
 
-  void SimpleModel::setFormulasForLabel(const std::vector<std::shared_ptr<Formula>>& _formulas) {
-    formulaEvaluators.clear();
-    formulaEvaluators.reserve(_formulas.size());
-    std::transform(_formulas.begin(), _formulas.end(), std::back_inserter(formulaEvaluators),
-      [this](auto& formula){ return generateSlowSimpleFormulaEvaluator(this,formula.get()) ;} );
-  }
+  auto labelIdentifier = std::vector<std::string> {"f1", "f2"};
+}
 
-  void SimpleModel::resetToInitialState() {
-    state = 0;
-  }
+TEST(formula_test, labelBasedFormulaEvaluatorOfBinaryFormula_SimpleModel) {
 
-  void SimpleModel::step() {
-  }
+    auto modelEvaluator = generateSlowSimpleFormulaEvaluator(&model, f1_and_f2.get());
 
-  int32_t SimpleModel::getStateVectorSize() {
-    return sizeof(int32_t);
-  }
+    auto result1 = modelEvaluator();
+    model.setState(1);
+    auto result2 = modelEvaluator();
+    model.setState(2);
+    auto result3 = modelEvaluator();
+    model.setState(0);
+    auto result4 = modelEvaluator();
 
-} }
+    ASSERT_EQ(result1, false) << "FAIL";
+    ASSERT_EQ(result2, true) << "FAIL";
+    ASSERT_EQ(result3, false) << "FAIL";
+    ASSERT_EQ(result4, false) << "FAIL";
+}

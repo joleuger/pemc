@@ -90,7 +90,8 @@ libpemctests = [
   'tests/executableModel/modelExecutor.cc',
   'tests/simpleExecutableModel/generateSlowSimpleFormulaEvaluator.cc',
   'tests/simpleExecutableModel/simpleFormula.cc',
-  'tests/simpleExecutableModel/simpleModel.cc'
+  'tests/simpleExecutableModel/simpleModel.cc',
+  'tests/simpleExecutableModel/slowSimpleFormulaEvaluator.cc'
 ]
 
 libpemcCpptests = [

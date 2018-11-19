@@ -49,6 +49,8 @@ namespace pemc { namespace simple {
 
     int32_t getState();
 
+    void setState(int32_t _state);
+
     template<typename T>
     std::tuple<Probability,T> choose(std::initializer_list<std::tuple<Probability,T>> choices) {
       // This is a Member template and the implementation must stay therefore in the header.

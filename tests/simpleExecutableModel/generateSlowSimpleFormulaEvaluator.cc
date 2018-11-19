@@ -63,7 +63,7 @@ namespace {
 
   void SlowFormulaCompilationVisitor::visitAdaptedFormula(AdaptedFormula* formula) {
     auto simpleFormula = dynamic_cast<SimpleFormula*>(formula);
-    throw_assert(simpleFormula!=nullptr, "Could not cast AdaptedFormula into a CppFormula");
+    throw_assert(simpleFormula!=nullptr, "Could not cast AdaptedFormula into a SimpleFormula");
     result = std::bind(simpleFormula->getEvaluator(), model);
   }
 
@@ -157,9 +157,9 @@ namespace {
   }
 }
 namespace pemc { namespace simple {
-  std::function<bool()> generateSlowSimpleFormulaEvaluator(SimpleModel* model, Formula& formula) {
+  std::function<bool()> generateSlowSimpleFormulaEvaluator(pemc::simple::SimpleModel* model, pemc::Formula* formula) {
       auto compiler = SlowFormulaCompilationVisitor(model);
-      formula.visit(&compiler);
+      formula->visit(&compiler);
       return std::move(compiler.result);
   }
 
