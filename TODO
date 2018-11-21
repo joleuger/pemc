@@ -1,0 +1,10 @@
+List of features that have not been implemented, yet
+* LCMDP support (lcmdpTraverser/*, lcmdp/lcmdp.cc, lcmdp/lcmdpModelChecker.cc)
+* Python binding
+* Webassembly/JS support
+* Java binding
+* Multi core support (genericTraverser/genericTraverser.cc must be extended)
+* Support for Once formulas
+* Qualitative invariant checking
+* Fault-aware Support
+* Generation of Bayesian networks
