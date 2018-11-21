@@ -3,6 +3,7 @@ List of features that have not been implemented, yet
 * Python binding
 * Webassembly/JS support
 * Java binding
+* Unbounded Model checking until fixed point
 * Multi core support (genericTraverser/genericTraverser.cc must be extended)
 * Support for Once formulas
 * Qualitative invariant checking
