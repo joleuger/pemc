@@ -4,7 +4,7 @@ List of features that have not been implemented, yet
 * Webassembly/JS support
 * Java binding
 * Unbounded Model checking until fixed point
-* Multi core support (genericTraverser/genericTraverser.cc must be extended)
+* Multi core support (genericTraverser/genericTraverser.cc must be extended; check memory tearing in statestorage)
 * Support for Once formulas
 * Qualitative invariant checking
 * Fault-aware Support
