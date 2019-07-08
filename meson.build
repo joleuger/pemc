@@ -12,14 +12,20 @@ if get_option('buildtype').startswith('debug')
 endif
 
 # external dependencies
-#boostdep = dependency('boost', modules : ['thread', 'system', 'timer'])
-boostdep = dependency('boost', modules : ['system', 'timer', 'align'], version : '>=1.6.8')
+#boost_dep = dependency('boost', modules : ['thread', 'system', 'timer'])
+boost_dep = dependency('boost', modules : ['system', 'timer', 'align'], version : '>=1.6.8')
+
+microsoft_gsl_dep = dependency('microsoft_gsl', fallback : ['microsoft-gsl', 'microsoft_gsl_dep'])
+
+fmt_dep = dependency('fmt', fallback : ['fmt', 'fmt_dep'])
+
+spdlog_include = include_directories('subprojects/spdlog-1.3.1/include',)
+spdlog_dep = declare_dependency(include_directories : spdlog_include, compile_args:'-DSPDLOG_FMT_EXTERNAL', dependencies : [fmt_dep])
+
 
 # libpemc_include = include_directories('src')
 libpemc_include = include_directories('.',
-  'external/GSL/include',
-  'external/ThrowAssert',
-#  'external/range/include'
+  'subprojects/ThrowAssert'
 )
 
 libpemc =  static_library('pemc',
@@ -50,8 +56,12 @@ libpemc =  static_library('pemc',
   'pemc/executable_model/model_executor.cc',
   'pemc/executable_model/temporary_state_storage.cc',
   'pemc/pemc.cc',
-  include_directories : libpemc_include)
-libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpemc_include, dependencies: boostdep)
+  include_directories : libpemc_include,
+  dependencies: [microsoft_gsl_dep, boost_dep, fmt_dep, spdlog_dep])
+
+libpemc_dep = declare_dependency(link_with: libpemc,
+  include_directories: libpemc_include,
+  dependencies: [microsoft_gsl_dep, boost_dep, fmt_dep, spdlog_dep] )
 
 
 libpemcCpp_include = include_directories('language')
@@ -60,19 +70,17 @@ libpemcCpp =  static_library('pemcCpp',
   'language/pemc_cpp/cpp_formula.cc',
   'language/pemc_cpp/cpp_model.cc',
   'language/pemc_cpp/generate_slow_cpp_formula_evaluator.cc',
-  include_directories : [ libpemc_include, libpemcCpp_include ] )
+  include_directories : [ libpemc_include, libpemcCpp_include ],
+  dependencies: [microsoft_gsl_dep] )
 
 libpemcCpp_dep = declare_dependency(
   link_with: [ libpemc, libpemcCpp ],
   include_directories: [ libpemc_include, libpemcCpp_include ],
-  dependencies: boostdep)
+  dependencies: [microsoft_gsl_dep, boost_dep])
 
 
 # TEST
-gtest_include = include_directories('external/googletest/googletest/include')
-
-gtest_build_include= include_directories('external/googletest/googletest','external/googletest/googletest/include')
-gtest_dep = declare_dependency(sources : ['external/googletest/googletest/src/gtest-all.cc','external/googletest/googletest/src/gtest_main.cc'], include_directories : gtest_build_include)
+gtest_main_dep = dependency('googletest', fallback : ['googletest', 'gtest_main_dep'])
 
 libpemctests = [
   'tests/test.cc',
@@ -103,11 +111,11 @@ libpemcCpptests = [
 
 if meson.get_cross_property('build-tests', 'yes') == 'yes'
    pemcExe = executable('testpemc', libpemctests,
-      dependencies : [gtest_dep, libpemc_dep])
+      dependencies : [gtest_main_dep, libpemc_dep])
    test('gtest test', pemcExe)
 
    pemcCppExe = executable('testpemcCpp', libpemcCpptests,
-      dependencies : [gtest_dep, libpemcCpp_dep])
+      dependencies : [gtest_main_dep, libpemcCpp_dep])
    test('gtest test', pemcCppExe)
 endif
 
