@@ -21,8 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_CPP_CPPMODEL_H_
-#define PEMC_CPP_CPPMODEL_H_
+#ifndef PEMC_CPP_CPP_MODEL_H_
+#define PEMC_CPP_CPP_MODEL_H_
 
 #include "pemc/executable_model/abstract_model.h"
 
@@ -66,4 +66,4 @@ namespace pemc { namespace cpp {
   };
 
 } }
-#endif  // PEMC_CPP_CPPMODEL_H_
+#endif  // PEMC_CPP_CPP_MODEL_H_

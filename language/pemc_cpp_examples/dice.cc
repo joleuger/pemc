@@ -27,9 +27,9 @@
 #include "pemc/lmc_traverser/lmc_choice_resolver.h"
 #include "pemc/pemc.h"
 
-#include "pemcCpp/cppFormula.h"
-#include "pemcCpp/cppModel.h"
-#include "pemcCpp/generateSlowCppFormulaEvaluator.h"
+#include "pemc_cpp/cpp_formula.h"
+#include "pemc_cpp/cpp_model.h"
+#include "pemc_cpp/generate_slow_cpp_formula_evaluator.h"
 
 using namespace pemc;
 using namespace pemc::cpp;

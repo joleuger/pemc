@@ -57,9 +57,9 @@ libpemc_dep = declare_dependency(link_with: libpemc, include_directories: libpem
 libpemcCpp_include = include_directories('language')
 
 libpemcCpp =  static_library('pemcCpp',
-  'language/pemcCpp/cppFormula.cc',
-  'language/pemcCpp/cppModel.cc',
-  'language/pemcCpp/generateSlowCppFormulaEvaluator.cc',
+  'language/pemc_cpp/cpp_formula.cc',
+  'language/pemc_cpp/cpp_model.cc',
+  'language/pemc_cpp/generate_slow_cpp_formula_evaluator.cc',
   include_directories : [ libpemc_include, libpemcCpp_include ] )
 
 libpemcCpp_dep = declare_dependency(
@@ -98,7 +98,7 @@ libpemctests = [
 ]
 
 libpemcCpptests = [
-  'language/pemcCppTests/test.cc'
+  'language/pemc_cpp_tests/test.cc'
 ]
 
 if meson.get_cross_property('build-tests', 'yes') == 'yes'
@@ -113,5 +113,5 @@ endif
 
 
 if meson.get_cross_property('build-examples', 'yes') == 'yes'
-   executable('example_dice', 'language/pemcCppExamples/dice.cc', dependencies : [libpemcCpp_dep])
+   executable('example_dice', 'language/pemc_cpp_examples/dice.cc', dependencies : [libpemcCpp_dep])
 endif

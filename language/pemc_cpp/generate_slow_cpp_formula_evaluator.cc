@@ -31,8 +31,8 @@
 #include "pemc/formula/bounded_unary_formula.h"
 #include "pemc/formula/bounded_binary_formula.h"
 
-#include "pemcCpp/cppFormula.h"
-#include "pemcCpp/generateSlowCppFormulaEvaluator.h"
+#include "pemc_cpp/cpp_formula.h"
+#include "pemc_cpp/generate_slow_cpp_formula_evaluator.h"
 
 namespace {
   using namespace pemc;

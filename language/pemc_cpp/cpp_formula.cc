@@ -21,19 +21,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_CPP_GENERATESLOWCPPFORMULAEVALUATOR_H_
-#define PEMC_CPP_GENERATESLOWCPPFORMULAEVALUATOR_H_
-
-#include <functional>
-
-#include "pemc/formula/formula_visitor.h"
-
-#include "pemcCpp/cppModel.h"
+#include "pemc_cpp/cpp_formula.h"
 
 namespace pemc { namespace cpp {
-  using namespace pemc;
 
-  std::function<bool()> generateSlowCppFormulaEvaluator(CppModel* model, Formula* formula);
+  CppFormula::CppFormula(const std::function<bool(CppModel*)>& _evaluator,
+    const std::string& _identifier)
+      : AdaptedFormula(_identifier), evaluator(_evaluator) {
+  }
+
+  std::function<bool(CppModel*)> CppFormula::getEvaluator() {
+    return evaluator;
+  }
 
 } }
-#endif  // PEMC_CPP_GENERATESLOWCPPFORMULAEVALUATOR_H_

@@ -21,18 +21,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "pemcCpp/cppFormula.h"
-#include "pemcCpp/cppModel.h"
-#include "pemcCpp/generateSlowCppFormulaEvaluator.h"
+#ifndef PEMC_CPP_CPP_FORMULA_H_
+#define PEMC_CPP_CPP_FORMULA_H_
+
+#include <functional>
+
+#include <pemc/formula/adapted_formula.h>
+
+#include "pemc_cpp/cpp_model.h"
 
 namespace pemc { namespace cpp {
+
   using namespace pemc;
 
-  void CppModel::setFormulasForLabel(const std::vector<std::shared_ptr<Formula>>& _formulas) {
-    formulaEvaluators.clear();
-    formulaEvaluators.reserve(_formulas.size());
-    std::transform(_formulas.begin(), _formulas.end(), std::back_inserter(formulaEvaluators),
-      [this](auto& formula){ return generateSlowCppFormulaEvaluator(this,formula.get()) ;} );
-  }
+  // such formulas should be static in the model classes
+  class CppFormula : public AdaptedFormula {
+  private:
+    std::function<bool(CppModel*)> evaluator;
+  public:
+    CppFormula(const std::function<bool(CppModel*)>& _evaluator,
+      const std::string& _identifier = "");
+    virtual ~CppFormula() = default;
+
+    std::function<bool(CppModel*)> getEvaluator();
+  };
 
 } }
+#endif  // PEMC_CPP_CPP_FORMULA_H_
