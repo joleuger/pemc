@@ -39,8 +39,7 @@ namespace {
 
 }
 
-LmcExample1::LmcExample1()
-  : lmc(Lmc()){
+LmcExample1::LmcExample1() {
     // 0----> 1 ----> 2⟲ f2
 
   f1 = std::make_shared<AdaptedFormula>("f1");
@@ -75,8 +74,7 @@ LmcExample1::LmcExample1()
 }
 
 
-LmcExample2::LmcExample2()
-  : lmc(Lmc()){
+LmcExample2::LmcExample2() {
   // 0---->
   //  -f1-> 1⟲
   //           ----> 2⟲

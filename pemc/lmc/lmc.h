@@ -51,7 +51,7 @@ namespace pemc {
   class Lmc {
   private:
       TransitionIndex maxNumberOfTransitions = 0;
-      std::atomic<TransitionIndex> transitionCount = 0;
+      std::atomic<TransitionIndex> transitionCount{0};
       std::vector<LmcTransitionEntry> transitions;
       TransitionIndex initialTransitionFrom = -1; //is uninitialized at first, but may be something else than 0
       int32_t initialTransitionElements = 0;

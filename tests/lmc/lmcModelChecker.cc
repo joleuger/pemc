@@ -33,7 +33,7 @@ using namespace pemc;
 
 
 TEST(lmcModelChecker_test, check_simple_formula_1) {
-    auto example = LmcExample1();
+    LmcExample1 example{};
     auto& lmc = example.lmc;
 
     auto finally_f2 = std::make_shared<BoundedUnaryFormula>(example.f2,UnaryOperator::Finally,15);
@@ -49,7 +49,7 @@ TEST(lmcModelChecker_test, check_simple_formula_1) {
 
 
 TEST(lmcModelChecker_test, check_simple_formula_2) {
-    auto example = LmcExample2();
+    LmcExample2 example{};
     auto& lmc = example.lmc;
 
     auto configuration = Configuration();

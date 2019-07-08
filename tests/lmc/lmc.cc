@@ -42,7 +42,7 @@ TEST(lmc_test, lmc_is_constructed) {
 }
 
 TEST(lmc_test, lmc_createLabelBasedFormulaEvaluator_works) {
-    auto example = LmcExample1();
+    LmcExample1 example{};
     auto& lmc = example.lmc;
 
     auto f1_and_f2 = std::make_shared<BinaryFormula>(example.f1,BinaryOperator::And,example.f2);
