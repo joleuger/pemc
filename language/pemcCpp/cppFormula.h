@@ -26,7 +26,7 @@
 
 #include <functional>
 
-#include <pemc/formula/adaptedFormula.h>
+#include <pemc/formula/adapted_formula.h>
 
 #include "pemcCpp/cppModel.h"
 

@@ -24,7 +24,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include "pemc/lmcTraverser/lmcChoiceResolver.h"
+#include "pemc/lmc_traverser/lmc_choice_resolver.h"
 
 using namespace pemc;
 

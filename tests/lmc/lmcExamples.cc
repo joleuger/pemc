@@ -22,8 +22,8 @@
 // THE SOFTWARE.
 
 
-#include "pemc/formula/adaptedFormula.h"
-#include "pemc/formula/binaryFormula.h"
+#include "pemc/formula/adapted_formula.h"
+#include "pemc/formula/binary_formula.h"
 
 #include "tests/lmc/lmcExamples.h"
 

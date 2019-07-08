@@ -23,8 +23,8 @@
 
 #include <iostream>
 
-#include "pemc/executableModel/modelExecutor.h"
-#include "pemc/lmcTraverser/lmcChoiceResolver.h"
+#include "pemc/executable_model/model_executor.h"
+#include "pemc/lmc_traverser/lmc_choice_resolver.h"
 #include "pemc/pemc.h"
 
 #include "pemcCpp/cppFormula.h"

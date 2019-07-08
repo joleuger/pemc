@@ -22,12 +22,12 @@
 // THE SOFTWARE.
 
 #include "pemc/pemc.h"
-#include "pemc/formula/boundedUnaryFormula.h"
-#include "pemc/lmc/lmcModelChecker.h"
-#include "pemc/genericTraverser/genericTraverser.h"
-#include "pemc/executableModel/modelExecutor.h"
-#include "pemc/lmcTraverser/addTransitionsToLmcModifier.h"
-#include "pemc/lmcTraverser/lmcChoiceResolver.h"
+#include "pemc/formula/bounded_unary_formula.h"
+#include "pemc/lmc/lmc_model_checker.h"
+#include "pemc/generic_traverser/generic_traverser.h"
+#include "pemc/executable_model/model_executor.h"
+#include "pemc/lmc_traverser/add_transitions_to_lmc_modifier.h"
+#include "pemc/lmc_traverser/lmc_choice_resolver.h"
 
 namespace pemc {
   Pemc::Pemc(){

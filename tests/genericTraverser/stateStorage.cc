@@ -23,7 +23,7 @@
 
 #include<gtest/gtest.h>
 
-#include "pemc/genericTraverser/stateStorage.h"
+#include "pemc/generic_traverser/state_storage.h"
 
 using namespace pemc;
 

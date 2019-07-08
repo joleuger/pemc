@@ -24,9 +24,9 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include "pemc/formula/adaptedFormula.h"
-#include "pemc/formula/binaryFormula.h"
-#include "pemc/formula/formulaUtils.h"
+#include "pemc/formula/adapted_formula.h"
+#include "pemc/formula/binary_formula.h"
+#include "pemc/formula/formula_utils.h"
 
 using namespace pemc;
 

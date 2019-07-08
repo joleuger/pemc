@@ -26,7 +26,7 @@
 
 #include <functional>
 
-#include "pemc/formula/formulaVisitor.h"
+#include "pemc/formula/formula_visitor.h"
 
 #include "pemcCpp/cppModel.h"
 

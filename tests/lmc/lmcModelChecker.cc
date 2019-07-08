@@ -23,9 +23,9 @@
 
 #include<gtest/gtest.h>
 
-#include "pemc/formula/binaryFormula.h"
-#include "pemc/formula/boundedUnaryFormula.h"
-#include "pemc/lmc/lmcModelChecker.h"
+#include "pemc/formula/binary_formula.h"
+#include "pemc/formula/bounded_unary_formula.h"
+#include "pemc/lmc/lmc_model_checker.h"
 
 #include "tests/lmc/lmcExamples.h"
 

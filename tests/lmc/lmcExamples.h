@@ -26,8 +26,8 @@
 
 #include "pemc/lmc/lmc.h"
 #include "pemc/basic/label.h"
-#include "pemc/formula/adaptedFormula.h"
-#include "pemc/formula/binaryFormula.h"
+#include "pemc/formula/adapted_formula.h"
+#include "pemc/formula/binary_formula.h"
 
 using namespace pemc;
 

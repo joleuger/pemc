@@ -24,12 +24,12 @@
 #include <ThrowAssert.hpp>
 
 #include "pemc/formula/formula.h"
-#include "pemc/formula/formulaToStringVisitor.h"
-#include "pemc/formula/adaptedFormula.h"
-#include "pemc/formula/unaryFormula.h"
-#include "pemc/formula/binaryFormula.h"
-#include "pemc/formula/boundedUnaryFormula.h"
-#include "pemc/formula/boundedBinaryFormula.h"
+#include "pemc/formula/formula_to_string_visitor.h"
+#include "pemc/formula/adapted_formula.h"
+#include "pemc/formula/unary_formula.h"
+#include "pemc/formula/binary_formula.h"
+#include "pemc/formula/bounded_unary_formula.h"
+#include "pemc/formula/bounded_binary_formula.h"
 
 #include "pemcCpp/cppFormula.h"
 #include "pemcCpp/generateSlowCppFormulaEvaluator.h"

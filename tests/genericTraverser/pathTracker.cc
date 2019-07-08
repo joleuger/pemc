@@ -23,7 +23,7 @@
 
 #include<gtest/gtest.h>
 
-#include "pemc/genericTraverser/pathTracker.h"
+#include "pemc/generic_traverser/path_tracker.h"
 
 using namespace pemc;
 

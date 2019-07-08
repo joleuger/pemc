@@ -24,7 +24,7 @@
 #ifndef PEMC_CPP_CPPMODEL_H_
 #define PEMC_CPP_CPPMODEL_H_
 
-#include "pemc/executableModel/abstractModel.h"
+#include "pemc/executable_model/abstract_model.h"
 
 namespace pemc { namespace cpp {
 

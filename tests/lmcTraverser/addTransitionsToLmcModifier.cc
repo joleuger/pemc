@@ -24,18 +24,18 @@
 #include <gtest/gtest.h>
 #include <iostream>
 
-#include "pemc/basic/tscIndex.h"
+#include "pemc/basic/tsc_index.h"
 #include "pemc/basic/configuration.h"
 #include "pemc/basic/label.h"
-#include "pemc/basic/modelCapacity.h"
-#include "pemc/basic/rawMemory.h"
+#include "pemc/basic/model_capacity.h"
+#include "pemc/basic/raw_memory.h"
 #include "pemc/formula/formula.h"
 #include "pemc/lmc/lmc.h"
-#include "pemc/genericTraverser/genericTraverser.h"
-#include "pemc/genericTraverser/ITransitionsCalculator.h"
-#include "pemc/executableModel/temporaryStateStorage.h"
-#include "pemc/genericTraverser/traversalTransition.h"
-#include "pemc/lmcTraverser/addTransitionsToLmcModifier.h"
+#include "pemc/generic_traverser/generic_traverser.h"
+#include "pemc/generic_traverser/i_transitions_calculator.h"
+#include "pemc/executable_model/temporary_state_storage.h"
+#include "pemc/generic_traverser/traversal_transition.h"
+#include "pemc/lmc_traverser/add_transitions_to_lmc_modifier.h"
 
 using namespace pemc;
 

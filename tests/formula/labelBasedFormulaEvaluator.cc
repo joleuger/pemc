@@ -26,9 +26,9 @@
 #include <vector>
 
 #include "pemc/basic/label.h"
-#include "pemc/formula/adaptedFormula.h"
-#include "pemc/formula/binaryFormula.h"
-#include "pemc/formula/generateLabelBasedFormulaEvaluator.h"
+#include "pemc/formula/adapted_formula.h"
+#include "pemc/formula/binary_formula.h"
+#include "pemc/formula/generate_label_based_formula_evaluator.h"
 
 namespace {
   using namespace pemc;

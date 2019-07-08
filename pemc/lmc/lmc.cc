@@ -1,7 +1,8 @@
+// SPDX-License-Identifier: MIT
 // The MIT License (MIT)
 //
 // Copyright (c) 2014-2018, Institute for Software & Systems Engineering
-// Copyright (c) 2018, Johannes Leupolz
+// Copyright (c) 2018-2019, Johannes Leupolz
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +27,7 @@
 #include <ThrowAssert.hpp>
 
 #include "pemc/basic/exceptions.h"
-#include "pemc/formula/generateLabelBasedFormulaEvaluator.h"
+#include "pemc/formula/generate_label_based_formula_evaluator.h"
 #include "pemc/lmc/lmc.h"
 
 namespace pemc {
