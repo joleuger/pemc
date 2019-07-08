@@ -1,0 +1,39 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "create ninja files with meson",
+            "type": "shell",
+            "command": "meson build"
+        },
+        {
+            "label": "ninja pemc build",
+            "type": "shell",
+            "command": "ninja",
+            "options": {
+                "cwd": "${workspaceFolder}/build",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "ninja pemc test",
+            "type": "shell",
+            "command": "ninja",
+            "options": {
+                "cwd": "${workspaceFolder}/build",
+            },
+            "args": [
+                "test"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        }
+    ]
+}
