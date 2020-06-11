@@ -25,22 +25,22 @@
 #ifndef PEMC_LMC_TRAVERSER_ADD_TRANSITIONS_TO_LMC_MODIFIER_H_
 #define PEMC_LMC_TRAVERSER_ADD_TRANSITIONS_TO_LMC_MODIFIER_H_
 
-#include "pemc/lmc/lmc.h"
 #include "pemc/generic_traverser/i_post_state_storage_modifier.h"
+#include "pemc/lmc/lmc.h"
 
 namespace pemc {
-  class AddTransitionsToLmcModifier : public IPostStateStorageModifier {
-  private:
-    Lmc* lmc;
-  public:
-    AddTransitionsToLmcModifier(Lmc* _lmc);
+class AddTransitionsToLmcModifier : public IPostStateStorageModifier {
+ private:
+  Lmc* lmc;
 
-    virtual void applyOnTransitions(
-      stde::optional<StateIndex> stateIndexOfSource,
-      gsl::span<TraversalTransition> transitions,
-      void* customPayLoad);
-  };
+ public:
+  AddTransitionsToLmcModifier(Lmc* _lmc);
 
-}
+  virtual void applyOnTransitions(std::optional<StateIndex> stateIndexOfSource,
+                                  gsl::span<TraversalTransition> transitions,
+                                  void* customPayLoad);
+};
+
+}  // namespace pemc
 
 #endif  // PEMC_LMC_TRAVERSER_ADD_TRANSITIONS_TO_LMC_MODIFIER_H_

@@ -22,91 +22,96 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <limits>
-#include <algorithm>
-#include <ThrowAssert.hpp>
-
-#include "pemc/basic/exceptions.h"
 #include "pemc/executable_model/model_executor.h"
 
+#include <algorithm>
+#include <limits>
+
+#include "pemc/basic/ThrowAssert.hpp"
+#include "pemc/basic/exceptions.h"
+
 namespace {
-  using namespace pemc;
+using namespace pemc;
 }
 
 namespace pemc {
 
-  ModelExecutor::ModelExecutor(const Configuration& conf)
-  : temporaryStateStorage(conf.successorCapacity)
-  {
-  }
+ModelExecutor::ModelExecutor(const Configuration& conf)
+    : temporaryStateStorage(conf.successorCapacity) {}
 
-  void ModelExecutor::setModel(std::unique_ptr<AbstractModel> _model) {
-    model = std::move(_model);
+void ModelExecutor::setModel(std::unique_ptr<AbstractModel> _model) {
+  model = std::move(_model);
+  auto modelStateVectorSize = model->getStateVectorSize();
+  temporaryStateStorage.setStateVectorSize(
+      modelStateVectorSize, preStateStorageModifierStateVectorSize);
+}
+
+void ModelExecutor::setChoiceResolver(
+    std::unique_ptr<IChoiceResolver> _choiceResolver) {
+  choiceResolver = std::move(_choiceResolver);
+  model->setChoiceResolver(choiceResolver.get());
+}
+
+int32_t ModelExecutor::getStateVectorSize() {
+  return model->getStateVectorSize();
+}
+
+void ModelExecutor::setPreStateStorageModifierStateVectorSize(
+    int32_t _preStateStorageModifierStateVectorSize) {
+  preStateStorageModifierStateVectorSize =
+      _preStateStorageModifierStateVectorSize;
+  if (model) {
     auto modelStateVectorSize = model->getStateVectorSize();
-    temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
-  }
-
-  void ModelExecutor::setChoiceResolver(std::unique_ptr<IChoiceResolver> _choiceResolver) {
-    choiceResolver = std::move(_choiceResolver);
-    model->setChoiceResolver(choiceResolver.get());
-  }
-
-  int32_t ModelExecutor::getStateVectorSize() {
-    return model->getStateVectorSize();
-  }
-
-  void ModelExecutor::setPreStateStorageModifierStateVectorSize(int32_t _preStateStorageModifierStateVectorSize){
-    preStateStorageModifierStateVectorSize = _preStateStorageModifierStateVectorSize;
-    if (model) {
-      auto modelStateVectorSize = model->getStateVectorSize();
-      temporaryStateStorage.setStateVectorSize(modelStateVectorSize, preStateStorageModifierStateVectorSize);
-    }
-  }
-
-  void ModelExecutor::addTransition() {
-    auto tempStateIndex = temporaryStateStorage.getFreshStateIndex();
-    auto tempStateSpan = temporaryStateStorage[tempStateIndex];
-    model->serialize(tempStateSpan);
-    auto label = model->calculateLabel();
-    auto newTransition = TraversalTransition(tempStateSpan.data(), label);
-    transitions.push_back(newTransition);
-  }
-
-  gsl::span<TraversalTransition> ModelExecutor::calculateInitialTransitions() {
-    transitions.clear();
-		temporaryStateStorage.clear();
-
-    choiceResolver->beginMacroStepExecution();
-
-		while (choiceResolver->prepareNextPath()) {
-			model->resetToInitialState();
-			model->step();
-			choiceResolver->stepFinished();
-      addTransition();
-		}
-
-		choiceResolver->endMacroStepExecution();
-    return gsl::span<TraversalTransition>(transitions);
-  }
-
-  gsl::span<TraversalTransition> ModelExecutor::calculateTransitionsOfState(gsl::span<gsl::byte> state) {
-    transitions.clear();
-		temporaryStateStorage.clear();
-
-    choiceResolver->beginMacroStepExecution();
-
-		while (choiceResolver->prepareNextPath()) {
-			model->deserialize(state);
-			model->step();
-			choiceResolver->stepFinished();
-      addTransition();
-		}
-
-		choiceResolver->endMacroStepExecution();
-    return gsl::span<TraversalTransition>(transitions);
-  }
-
-  void* ModelExecutor::getCustomPayloadOfLastCalculation() {
-    return choiceResolver->getCustomPayloadOfLastCalculation();
+    temporaryStateStorage.setStateVectorSize(
+        modelStateVectorSize, preStateStorageModifierStateVectorSize);
   }
 }
+
+void ModelExecutor::addTransition() {
+  auto tempStateIndex = temporaryStateStorage.getFreshStateIndex();
+  auto tempStateSpan = temporaryStateStorage[tempStateIndex];
+  model->serialize(tempStateSpan);
+  auto label = model->calculateLabel();
+  auto newTransition = TraversalTransition(tempStateSpan.data(), label);
+  transitions.push_back(newTransition);
+}
+
+gsl::span<TraversalTransition> ModelExecutor::calculateInitialTransitions() {
+  transitions.clear();
+  temporaryStateStorage.clear();
+
+  choiceResolver->beginMacroStepExecution();
+
+  while (choiceResolver->prepareNextPath()) {
+    model->resetToInitialState();
+    model->step();
+    choiceResolver->stepFinished();
+    addTransition();
+  }
+
+  choiceResolver->endMacroStepExecution();
+  return gsl::span<TraversalTransition>(transitions);
+}
+
+gsl::span<TraversalTransition> ModelExecutor::calculateTransitionsOfState(
+    gsl::span<gsl::byte> state) {
+  transitions.clear();
+  temporaryStateStorage.clear();
+
+  choiceResolver->beginMacroStepExecution();
+
+  while (choiceResolver->prepareNextPath()) {
+    model->deserialize(state);
+    model->step();
+    choiceResolver->stepFinished();
+    addTransition();
+  }
+
+  choiceResolver->endMacroStepExecution();
+  return gsl::span<TraversalTransition>(transitions);
+}
+
+void* ModelExecutor::getCustomPayloadOfLastCalculation() {
+  return choiceResolver->getCustomPayloadOfLastCalculation();
+}
+}  // namespace pemc

@@ -22,79 +22,86 @@
 // THE SOFTWARE.
 
 #include <gtest/gtest.h>
+
 #include <iostream>
 
-#include "pemc/basic/tsc_index.h"
 #include "pemc/basic/configuration.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/model_capacity.h"
 #include "pemc/basic/raw_memory.h"
+#include "pemc/basic/tsc_index.h"
+#include "pemc/executable_model/temporary_state_storage.h"
 #include "pemc/formula/formula.h"
-#include "pemc/lmc/lmc.h"
 #include "pemc/generic_traverser/generic_traverser.h"
 #include "pemc/generic_traverser/i_transitions_calculator.h"
-#include "pemc/executable_model/temporary_state_storage.h"
 #include "pemc/generic_traverser/traversal_transition.h"
+#include "pemc/lmc/lmc.h"
 #include "pemc/lmc_traverser/add_transitions_to_lmc_modifier.h"
 
 using namespace pemc;
 
 namespace {
-  using namespace pemc;
+using namespace pemc;
 
 }
 
 TEST(lmcTraverser_test, lmcTraverser_works) {
-    auto configuration = Configuration();
-    auto traverser = GenericTraverser(configuration);
+  auto configuration = Configuration();
+  auto traverser = GenericTraverser(configuration);
 
-    auto lmc = std::make_unique<Lmc>();
-    lmc->initialize(*configuration.modelCapacity);
+  auto lmc = std::make_unique<Lmc>();
+  lmc->initialize(*configuration.modelCapacity);
 
-    // Set the labels of the Lmc.
-    auto labelIdentifier = std::vector<std::string> {"f1", "f2"};
-    lmc->setLabelIdentifier(labelIdentifier);
+  // Set the labels of the Lmc.
+  auto labelIdentifier = std::vector<std::string>{"f1", "f2"};
+  lmc->setLabelIdentifier(labelIdentifier);
 
-    auto modifier = std::make_unique<AddTransitionsToLmcModifier>(lmc.get());
+  auto modifier = std::make_unique<AddTransitionsToLmcModifier>(lmc.get());
 
-    auto noState = stde::optional<StateIndex>();
-    auto state0 = stde::make_optional(0);
-    auto state1 = stde::make_optional(1);
-    auto transitions = std::vector<TraversalTransition>();
-    auto transitionProbabilities = std::vector<Probability>();
+  auto noState = std::optional<StateIndex>();
+  auto state0 = std::make_optional(0);
+  auto state1 = std::make_optional(1);
+  auto transitions = std::vector<TraversalTransition>();
+  auto transitionProbabilities = std::vector<Probability>();
 
-    //act
-    // add initial transitions
-    transitions.clear();
-    transitionProbabilities.clear();
-    auto transition = TraversalTransition();
-    transition.label = Label(std::vector<bool> { false, true });
-    transition.targetStateIndex=0;
-    transitions.push_back(transition);
-    transitionProbabilities.push_back(Probability::One());
-    modifier->applyOnTransitions(noState, gsl::span<TraversalTransition>(transitions),static_cast<void*>(transitionProbabilities.data()));
-    // add transitions of state 0
-    transitions.clear();
-    transitionProbabilities.clear();
-    transition.targetStateIndex=0;
-    transitions.push_back(transition);
-    transitionProbabilities.push_back(Probability(0.4));
-    transition.targetStateIndex=1;
-    transitions.push_back(transition);
-    transitionProbabilities.push_back(Probability(0.6));
-    modifier->applyOnTransitions(state0, gsl::span<TraversalTransition>(transitions),static_cast<void*>(transitionProbabilities.data()));
-    // add transitions of state 1
-    transitions.clear();
-    transitionProbabilities.clear();
-    transition.targetStateIndex=1;
-    transitions.push_back(transition);
-    transitionProbabilities.push_back(Probability::One());
-    modifier->applyOnTransitions(state1, gsl::span<TraversalTransition>(transitions),static_cast<void*>(transitionProbabilities.data()));
-    // finish
-    lmc->finishCreation(2);
+  // act
+  // add initial transitions
+  transitions.clear();
+  transitionProbabilities.clear();
+  auto transition = TraversalTransition();
+  transition.label = Label(std::vector<bool>{false, true});
+  transition.targetStateIndex = 0;
+  transitions.push_back(transition);
+  transitionProbabilities.push_back(Probability::One());
+  modifier->applyOnTransitions(
+      noState, gsl::span<TraversalTransition>(transitions),
+      static_cast<void*>(transitionProbabilities.data()));
+  // add transitions of state 0
+  transitions.clear();
+  transitionProbabilities.clear();
+  transition.targetStateIndex = 0;
+  transitions.push_back(transition);
+  transitionProbabilities.push_back(Probability(0.4));
+  transition.targetStateIndex = 1;
+  transitions.push_back(transition);
+  transitionProbabilities.push_back(Probability(0.6));
+  modifier->applyOnTransitions(
+      state0, gsl::span<TraversalTransition>(transitions),
+      static_cast<void*>(transitionProbabilities.data()));
+  // add transitions of state 1
+  transitions.clear();
+  transitionProbabilities.clear();
+  transition.targetStateIndex = 1;
+  transitions.push_back(transition);
+  transitionProbabilities.push_back(Probability::One());
+  modifier->applyOnTransitions(
+      state1, gsl::span<TraversalTransition>(transitions),
+      static_cast<void*>(transitionProbabilities.data()));
+  // finish
+  lmc->finishCreation(2);
 
-    // assert
-    lmc->validate();
-    ASSERT_EQ(lmc->getTransitions().size(), 4) << "FAIL";
-    ASSERT_EQ(lmc->getInitialTransitions().size(), 1) << "FAIL";
+  // assert
+  lmc->validate();
+  ASSERT_EQ(lmc->getTransitions().size(), 4) << "FAIL";
+  ASSERT_EQ(lmc->getInitialTransitions().size(), 1) << "FAIL";
 }

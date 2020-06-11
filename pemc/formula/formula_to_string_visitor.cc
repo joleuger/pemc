@@ -22,9 +22,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <ThrowAssert.hpp>
 
 #include "pemc/formula/formula_to_string_visitor.h"
+
+#include "pemc/basic/ThrowAssert.hpp"
 #include "pemc/formula/formula.h"
 #include "pemc/formula/adapted_formula.h"
 #include "pemc/formula/unary_formula.h"

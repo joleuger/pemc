@@ -22,32 +22,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <limits>
-#include <algorithm>
-#include <ThrowAssert.hpp>
-
 #include "pemc/executable_model/abstract_model.h"
 
+#include <algorithm>
+#include <limits>
+
+#include "pemc/basic/ThrowAssert.hpp"
+
 namespace {
-  using namespace pemc;
+using namespace pemc;
 
 }
 
 namespace pemc {
 
-  void AbstractModel::setChoiceResolver(IChoiceResolver* _choiceResolver) {
-    choiceResolver = _choiceResolver;
-  };
+void AbstractModel::setChoiceResolver(IChoiceResolver* _choiceResolver) {
+  choiceResolver = _choiceResolver;
+};
 
-  Label AbstractModel::calculateLabel() {
-    return Label(formulaEvaluators);
-  };
+Label AbstractModel::calculateLabel() {
+  return Label(formulaEvaluators);
+};
 
-  size_t AbstractModel::choose(const gsl::span<Probability>& choices) {
-    return choiceResolver->choose(choices);
-  }
-
-  size_t AbstractModel::choose(size_t numberOfChoices) {
-    return choiceResolver->choose(numberOfChoices);
-  }
+size_t AbstractModel::choose(const gsl::span<Probability>& choices) {
+  return choiceResolver->choose(choices);
 }
+
+size_t AbstractModel::choose(size_t numberOfChoices) {
+  return choiceResolver->choose(numberOfChoices);
+}
+}  // namespace pemc

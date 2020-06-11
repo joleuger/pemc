@@ -1,5 +1,5 @@
 project('pemc', 'cpp',
-  default_options : ['cpp_std=c++14'])
+  default_options : ['cpp_std=c++17'])
 
 # if get_option('buildtype')=='release'
 if not get_option('buildtype').startswith('debug')
@@ -24,9 +24,7 @@ spdlog_dep = declare_dependency(include_directories : spdlog_include, compile_ar
 
 
 # libpemc_include = include_directories('src')
-libpemc_include = include_directories('.',
-  'subprojects/ThrowAssert'
-)
+libpemc_include = include_directories('.')
 
 libpemc =  static_library('pemc',
   'pemc/basic/label.cc',

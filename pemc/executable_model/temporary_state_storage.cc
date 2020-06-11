@@ -22,52 +22,60 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <limits>
-#include <algorithm>
-#include <ThrowAssert.hpp>
-
-#include "pemc/basic/exceptions.h"
 #include "pemc/executable_model/temporary_state_storage.h"
 
+#include <algorithm>
+#include <limits>
+
+#include "pemc/basic/ThrowAssert.hpp"
+#include "pemc/basic/exceptions.h"
 
 namespace pemc {
 
-    TemporaryStateStorage::TemporaryStateStorage(StateIndex _capacity) {
-      throw_assert(_capacity >= 1024 && _capacity<=std::numeric_limits<StateIndex>::max(), "capacity invalid");
+TemporaryStateStorage::TemporaryStateStorage(StateIndex _capacity) {
+  throw_assert(
+      _capacity >= 1024 && _capacity <= std::numeric_limits<StateIndex>::max(),
+      "capacity invalid");
 
-  	  totalCapacity = _capacity;
+  totalCapacity = _capacity;
 
-      throw_assert(sizeof(StateIndex)==4, "Used StateStorage not compatible with size of StateIndex");
-    }
-
-    gsl::span<gsl::byte> TemporaryStateStorage::operator [](size_t idx) {
-      throw_assert(idx >= 0 && idx < totalCapacity, "idx not in range");
-      return gsl::span<gsl::byte>(stateMemory.data() + idx * stateVectorSize, stateVectorSize);
-    }
-
-    StateIndex TemporaryStateStorage::getNumberOfSavedStates() {
-      return savedStates;
-    }
-
-    StateIndex TemporaryStateStorage::getFreshStateIndex(){
-      auto stateIndex = savedStates;
-      savedStates++;
-      return stateIndex;
-    }
-
-    void TemporaryStateStorage::resizeStateBuffer(){
-      stateVectorSize = modelStateVectorSize + preStateStorageModifierStateVectorSize;
-      stateMemory.resize(totalCapacity * stateVectorSize);
-    }
-
-    void TemporaryStateStorage::setStateVectorSize(int32_t _modelStateVectorSize, int32_t _preStateStorageModifierStateVectorSize){
-      modelStateVectorSize = _modelStateVectorSize;
-      preStateStorageModifierStateVectorSize = _preStateStorageModifierStateVectorSize;
-  		resizeStateBuffer();
-    }
-
-    void TemporaryStateStorage::clear(){
-      savedStates = 0;
-    }
-
+  throw_assert(sizeof(StateIndex) == 4,
+               "Used StateStorage not compatible with size of StateIndex");
 }
+
+gsl::span<gsl::byte> TemporaryStateStorage::operator[](size_t idx) {
+  throw_assert(idx >= 0 && idx < totalCapacity, "idx not in range");
+  return gsl::span<gsl::byte>(stateMemory.data() + idx * stateVectorSize,
+                              stateVectorSize);
+}
+
+StateIndex TemporaryStateStorage::getNumberOfSavedStates() {
+  return savedStates;
+}
+
+StateIndex TemporaryStateStorage::getFreshStateIndex() {
+  auto stateIndex = savedStates;
+  savedStates++;
+  return stateIndex;
+}
+
+void TemporaryStateStorage::resizeStateBuffer() {
+  stateVectorSize =
+      modelStateVectorSize + preStateStorageModifierStateVectorSize;
+  stateMemory.resize(totalCapacity * stateVectorSize);
+}
+
+void TemporaryStateStorage::setStateVectorSize(
+    int32_t _modelStateVectorSize,
+    int32_t _preStateStorageModifierStateVectorSize) {
+  modelStateVectorSize = _modelStateVectorSize;
+  preStateStorageModifierStateVectorSize =
+      _preStateStorageModifierStateVectorSize;
+  resizeStateBuffer();
+}
+
+void TemporaryStateStorage::clear() {
+  savedStates = 0;
+}
+
+}  // namespace pemc

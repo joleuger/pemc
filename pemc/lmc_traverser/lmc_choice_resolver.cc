@@ -22,108 +22,107 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <ThrowAssert.hpp>
-
-#include "pemc/basic/exceptions.h"
 #include "pemc/lmc_traverser/lmc_choice_resolver.h"
+
+#include "pemc/basic/ThrowAssert.hpp"
+#include "pemc/basic/exceptions.h"
 
 // For the description, see chapter 7.3 of the thesis "Safety Analysis of
 // Executable Models".
 
 namespace pemc {
 
-  LmcChoiceResolver::LmcChoiceResolver(){
+LmcChoiceResolver::LmcChoiceResolver() {}
+
+void LmcChoiceResolver::beginMacroStepExecution() {
+  firstExecutionOfMacroStep = true;
+  probabilities.clear();
+}
+
+bool LmcChoiceResolver::prepareNextPath() {
+  throw_assert(choiceDepth == choiceStack.size() - 1,
+               "Something strange occured somewhere");
+
+  choiceDepth = -1;
+
+  if (firstExecutionOfMacroStep) {
+    firstExecutionOfMacroStep = false;
+    return true;
   }
 
-  void LmcChoiceResolver::beginMacroStepExecution() {
-    firstExecutionOfMacroStep = true;
-    probabilities.clear();
-  }
-
-  bool LmcChoiceResolver::prepareNextPath() {
-    throw_assert(choiceDepth == choiceStack.size() -1, "Something strange occured somewhere");
-
-    choiceDepth = -1;
-
-    if (firstExecutionOfMacroStep) {
-      firstExecutionOfMacroStep = false;
+  while (choiceStack.size() > 0) {
+    auto lastEntry = choiceStack.back();
+    choiceStack.pop_back();
+    if (lastEntry.noOfOptions > lastEntry.currentOption + 1) {
+      lastEntry.currentOption++;
+      choiceStack.push_back(lastEntry);
       return true;
     }
-
-    while (choiceStack.size() > 0) {
-      auto lastEntry = choiceStack.back();
-      choiceStack.pop_back();
-      if (lastEntry.noOfOptions > lastEntry.currentOption + 1) {
-        lastEntry.currentOption++;
-        choiceStack.push_back(lastEntry);
-        return true;
-      }
-    }
-    return false;
   }
-
-  Probability LmcChoiceResolver::getPreviousProbability() {
-    auto previousProbability = Probability::One();
-    if (choiceDepth >= 0 && choiceStack.size() >= choiceDepth + 1 ) {
-      previousProbability = choiceStack[choiceDepth].probability;
-    }
-    return previousProbability;
-  }
-
-  size_t LmcChoiceResolver::choose(const gsl::span<Probability>& choices) {
-    auto previousProbability = getPreviousProbability();
-    choiceDepth++;
-    if (choiceDepth < choiceStack.size()) {
-      auto idx = choiceStack[choiceDepth].currentOption;
-      if (choiceDepth == choiceStack.size()-1) {
-        choiceStack[choiceDepth].probability = choices[idx] * previousProbability;
-      }
-      return idx;
-    }
-    auto valueCount = choices.size();
-    auto newChoiceEntry = LmcChoiceStackEntry();
-    newChoiceEntry.probability = choices[0] * previousProbability;
-    newChoiceEntry.currentOption = 0;
-    newChoiceEntry.noOfOptions = valueCount;
-    choiceStack.push_back(newChoiceEntry);
-    return 0;
-  }
-
-  size_t LmcChoiceResolver::choose(size_t numberOfChoices) {
-    auto previousProbability = getPreviousProbability();
-    choiceDepth++;
-    if (choiceDepth < choiceStack.size()) {
-      auto idx = choiceStack[choiceDepth].currentOption;
-      if (choiceDepth == choiceStack.size()-1) {
-        choiceStack[choiceDepth].probability = Probability(1.0/numberOfChoices) * previousProbability;
-      }
-      return idx;
-    }
-    auto valueCount = numberOfChoices;
-    auto newChoiceEntry = LmcChoiceStackEntry();
-    newChoiceEntry.probability = Probability(1.0/numberOfChoices) * previousProbability;
-    newChoiceEntry.currentOption = 0;
-    newChoiceEntry.noOfOptions = valueCount;
-    choiceStack.push_back(newChoiceEntry);
-    return 0;
-
-  }
-
-  void LmcChoiceResolver::stepFinished() {
-    auto probability = Probability::One();
-    if (choiceStack.size() > 0) {
-      probability = choiceStack.back().probability;
-    }
-
-    probabilities.push_back(probability);
-  }
-
-  void LmcChoiceResolver::endMacroStepExecution() {
-  }
-
-  void* LmcChoiceResolver::getCustomPayloadOfLastCalculation() {
-    return static_cast<void*>(probabilities.data());
-  }
-
-
+  return false;
 }
+
+Probability LmcChoiceResolver::getPreviousProbability() {
+  auto previousProbability = Probability::One();
+  if (choiceDepth >= 0 && choiceStack.size() >= choiceDepth + 1) {
+    previousProbability = choiceStack[choiceDepth].probability;
+  }
+  return previousProbability;
+}
+
+size_t LmcChoiceResolver::choose(const gsl::span<Probability>& choices) {
+  auto previousProbability = getPreviousProbability();
+  choiceDepth++;
+  if (choiceDepth < choiceStack.size()) {
+    auto idx = choiceStack[choiceDepth].currentOption;
+    if (choiceDepth == choiceStack.size() - 1) {
+      choiceStack[choiceDepth].probability = choices[idx] * previousProbability;
+    }
+    return idx;
+  }
+  auto valueCount = choices.size();
+  auto newChoiceEntry = LmcChoiceStackEntry();
+  newChoiceEntry.probability = choices[0] * previousProbability;
+  newChoiceEntry.currentOption = 0;
+  newChoiceEntry.noOfOptions = valueCount;
+  choiceStack.push_back(newChoiceEntry);
+  return 0;
+}
+
+size_t LmcChoiceResolver::choose(size_t numberOfChoices) {
+  auto previousProbability = getPreviousProbability();
+  choiceDepth++;
+  if (choiceDepth < choiceStack.size()) {
+    auto idx = choiceStack[choiceDepth].currentOption;
+    if (choiceDepth == choiceStack.size() - 1) {
+      choiceStack[choiceDepth].probability =
+          Probability(1.0 / numberOfChoices) * previousProbability;
+    }
+    return idx;
+  }
+  auto valueCount = numberOfChoices;
+  auto newChoiceEntry = LmcChoiceStackEntry();
+  newChoiceEntry.probability =
+      Probability(1.0 / numberOfChoices) * previousProbability;
+  newChoiceEntry.currentOption = 0;
+  newChoiceEntry.noOfOptions = valueCount;
+  choiceStack.push_back(newChoiceEntry);
+  return 0;
+}
+
+void LmcChoiceResolver::stepFinished() {
+  auto probability = Probability::One();
+  if (choiceStack.size() > 0) {
+    probability = choiceStack.back().probability;
+  }
+
+  probabilities.push_back(probability);
+}
+
+void LmcChoiceResolver::endMacroStepExecution() {}
+
+void* LmcChoiceResolver::getCustomPayloadOfLastCalculation() {
+  return static_cast<void*>(probabilities.data());
+}
+
+}  // namespace pemc

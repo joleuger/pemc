@@ -25,42 +25,37 @@
 #ifndef PEMC_GENERIC_TRAVERSER_I_PRE_STATE_STORAGE_MODIFIER_H_
 #define PEMC_GENERIC_TRAVERSER_I_PRE_STATE_STORAGE_MODIFIER_H_
 
-#include <vector>
-#include <gsl/span>
-#include <gsl/gsl_byte>
-#include <cstdint>
 #include <atomic>
-#include <stack>
+#include <cstdint>
+#include <gsl/gsl_byte>
+#include <gsl/span>
 #include <limits>
-#include <experimental/optional>
+#include <optional>
+#include <stack>
+#include <vector>
 
-#include "pemc/basic/tsc_index.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/model_capacity.h"
 #include "pemc/basic/raw_memory.h"
+#include "pemc/basic/tsc_index.h"
 #include "pemc/formula/formula.h"
 #include "pemc/generic_traverser/traversal_transition.h"
 
 namespace pemc {
-  namespace stde = std::experimental;
 
-  class IPreStateStorageModifier {
-  private:
+class IPreStateStorageModifier {
+ private:
+ public:
+  IPreStateStorageModifier() = default;
+  virtual ~IPreStateStorageModifier() = default;
 
-  public:
-      IPreStateStorageModifier() = default;
-      virtual ~IPreStateStorageModifier() = default;
+  virtual int32_t getModifierStateVectorSize() { return 0; }
 
-      virtual int32_t getModifierStateVectorSize() {
-        return 0;
-      }
+  virtual void applyOnTransitions(std::optional<StateIndex> stateIndexOfSource,
+                                  gsl::span<TraversalTransition> transitions,
+                                  void* customPayLoad);
+};
 
-      virtual void applyOnTransitions(
-        stde::optional<StateIndex> stateIndexOfSource,
-        gsl::span<TraversalTransition> transitions,
-        void* customPayLoad);
-  };
-
-}
+}  // namespace pemc
 
 #endif  // PEMC_GENERIC_TRAVERSER_I_PRE_STATE_STORAGE_MODIFIER_H_

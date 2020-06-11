@@ -23,10 +23,9 @@
 // THE SOFTWARE.
 
 
-#include <ThrowAssert.hpp>
-
 #include "pemc/basic/label.h"
 
+#include "pemc/basic/ThrowAssert.hpp"
 
 namespace {
 

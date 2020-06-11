@@ -1,5 +1,0 @@
-# has no meson.build-file, yet.
-[wrap-git]
-directory = ThrowAssert
-url = https://github.com/Softwariness/ThrowAssert.git
-revision = b6147600e3e4409e96191b8e58960de73e69e714

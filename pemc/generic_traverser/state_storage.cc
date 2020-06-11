@@ -22,12 +22,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include "pemc/generic_traverser/state_storage.h"
+
 #include <limits>
 #include <algorithm>
-#include <ThrowAssert.hpp>
 
 #include "pemc/basic/exceptions.h"
-#include "pemc/generic_traverser/state_storage.h"
+#include "pemc/basic/ThrowAssert.hpp"
 
 
 namespace pemc {

@@ -22,8 +22,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <ThrowAssert.hpp>
+#include "pemc/formula/generate_label_based_formula_evaluator.h"
 
+#include "pemc/basic/ThrowAssert.hpp"
 #include "pemc/formula/formula.h"
 #include "pemc/formula/formula_visitor.h"
 #include "pemc/formula/adapted_formula.h"
@@ -31,7 +32,6 @@
 #include "pemc/formula/binary_formula.h"
 #include "pemc/formula/bounded_unary_formula.h"
 #include "pemc/formula/bounded_binary_formula.h"
-#include "pemc/formula/generate_label_based_formula_evaluator.h"
 
 namespace {
   using namespace pemc;

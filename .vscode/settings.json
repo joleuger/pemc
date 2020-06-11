@@ -85,7 +85,8 @@
         "__hash_table": "cpp",
         "unordered_map": "cpp",
         "__errc": "cpp",
-        "__node_handle": "cpp"
+        "__node_handle": "cpp",
+        "bit": "cpp"
     },
     "editor.formatOnSave": true,
     "C_Cpp.clang_format_fallbackStyle": "Chromium"

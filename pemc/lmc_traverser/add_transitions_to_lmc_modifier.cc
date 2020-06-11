@@ -26,29 +26,33 @@
 
 namespace pemc {
 
-  AddTransitionsToLmcModifier::AddTransitionsToLmcModifier(Lmc* _lmc) {
-    lmc = _lmc;
-  };
+AddTransitionsToLmcModifier::AddTransitionsToLmcModifier(Lmc* _lmc) {
+  lmc = _lmc;
+};
 
-  void AddTransitionsToLmcModifier::applyOnTransitions(
-      stde::optional<StateIndex> stateIndexOfSource,
-      gsl::span<TraversalTransition> transitions,
-      void* customPayLoad) {
-    auto p_transitions = transitions.data(); // for more speed
+void AddTransitionsToLmcModifier::applyOnTransitions(
+    std::optional<StateIndex> stateIndexOfSource,
+    gsl::span<TraversalTransition> transitions,
+    void* customPayLoad) {
+  auto p_transitions = transitions.data();  // for more speed
 
-    auto transitionProbabilities = reinterpret_cast<Probability*>(customPayLoad);
+  auto transitionProbabilities = reinterpret_cast<Probability*>(customPayLoad);
 
-    TransitionIndex locationOfFirstEntry;
-    auto transitionCount = transitions.size();
+  TransitionIndex locationOfFirstEntry;
+  auto transitionCount = transitions.size();
 
-    if (stateIndexOfSource==stde::nullopt) {
-      locationOfFirstEntry = lmc->getPlaceForNewInitialTransitionEntries(transitionCount);
-    } else {
-      locationOfFirstEntry = lmc->getPlaceForNewTransitionEntriesOfState(*stateIndexOfSource,transitionCount);
-    }
-    for (auto i = 0; i < transitionCount; i++) {
-      auto newEntry = LmcTransitionEntry(transitionProbabilities[i], p_transitions[i].label, p_transitions[i].targetStateIndex);
-      lmc->setLmcTransitionEntry(locationOfFirstEntry + i, newEntry);
-    }
+  if (stateIndexOfSource == std::nullopt) {
+    locationOfFirstEntry =
+        lmc->getPlaceForNewInitialTransitionEntries(transitionCount);
+  } else {
+    locationOfFirstEntry = lmc->getPlaceForNewTransitionEntriesOfState(
+        *stateIndexOfSource, transitionCount);
+  }
+  for (auto i = 0; i < transitionCount; i++) {
+    auto newEntry =
+        LmcTransitionEntry(transitionProbabilities[i], p_transitions[i].label,
+                           p_transitions[i].targetStateIndex);
+    lmc->setLmcTransitionEntry(locationOfFirstEntry + i, newEntry);
   }
 }
+}  // namespace pemc

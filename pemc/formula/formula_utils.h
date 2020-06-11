@@ -31,11 +31,10 @@
 
 namespace pemc {
 
-    namespace stde = std;
+std::optional<std::tuple<Formula*, Formula*, std::optional<int>>>
+tryExtractPhiUntilPsiWithBound(Formula& formula);
 
-    stde::optional<std::tuple<Formula*,Formula*,stde::optional<int>>> tryExtractPhiUntilPsiWithBound(Formula& formula);
+std::string formulaToString(Formula& formula);
 
-    std::string formulaToString(Formula& formula);
-
-}
+}  // namespace pemc
 #endif  // PEMC_FORMULA_FORMULA_UTILS_H_
