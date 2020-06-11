@@ -27,6 +27,8 @@
 
 #include "pemc/formula/formula.h"
 
+#include <memory>
+
 namespace pemc {
 
   enum UnaryOperator {

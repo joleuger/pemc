@@ -25,6 +25,7 @@
 #ifndef PEMC_BASIC_RAW_MEMORY_H_
 #define PEMC_BASIC_RAW_MEMORY_H_
 
+#include <memory>
 #include <gsl/gsl_byte>
 
 namespace pemc {

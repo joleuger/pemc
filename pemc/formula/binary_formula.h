@@ -26,6 +26,8 @@
 
 #include "pemc/formula/formula.h"
 
+#include <memory>
+
 namespace pemc {
 
   enum BinaryOperator {

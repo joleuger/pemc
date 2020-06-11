@@ -25,6 +25,8 @@
 #ifndef PEMC_BASIC_PROBABILITY_H_
 #define PEMC_BASIC_PROBABILITY_H_
 
+#include <string>
+
 namespace pemc {
 
   struct Probability {

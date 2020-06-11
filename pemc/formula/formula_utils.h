@@ -25,13 +25,13 @@
 #ifndef PEMC_FORMULA_FORMULA_UTILS_H_
 #define PEMC_FORMULA_FORMULA_UTILS_H_
 
-#include <experimental/optional>
+#include <optional>
 
 #include "pemc/formula/formula.h"
 
 namespace pemc {
 
-    namespace stde = std::experimental;
+    namespace stde = std;
 
     stde::optional<std::tuple<Formula*,Formula*,stde::optional<int>>> tryExtractPhiUntilPsiWithBound(Formula& formula);
 
