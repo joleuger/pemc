@@ -25,6 +25,7 @@
 #ifndef PEMC_LMC_LMC_H_
 #define PEMC_LMC_LMC_H_
 
+#include <atomic>
 #include <string>
 #include <vector>
 #include <functional>

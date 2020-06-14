@@ -13,7 +13,7 @@ endif
 
 # external dependencies
 #boost_dep = dependency('boost', modules : ['thread', 'system', 'timer'])
-boost_dep = dependency('boost', modules : ['system', 'timer', 'align'], version : '>=1.6.8')
+boost_dep = dependency('boost', modules : ['system', 'timer'], version : '>=1.6.8')
 
 microsoft_gsl_dep = dependency('microsoft_gsl', fallback : ['microsoft-gsl', 'microsoft_gsl_dep'])
 
@@ -22,6 +22,26 @@ fmt_dep = dependency('fmt', fallback : ['fmt', 'fmt_dep'])
 spdlog_include = include_directories('subprojects/spdlog-1.3.1/include',)
 spdlog_dep = declare_dependency(include_directories : spdlog_include, compile_args:'-DSPDLOG_FMT_EXTERNAL', dependencies : [fmt_dep])
 
+
+# platform specific dependencies
+if target_machine.system() == 'windows'
+  message('Target machine is Windows')
+  # Idea from https://github.com/radareorg/radare2/blob/master/meson.build
+  cc = meson.get_compiler('cpp')
+  bcrypt_dep = cc.find_library('bcrypt')
+  platform_specific_dep = declare_dependency(
+    link_with: [],
+    dependencies: [bcrypt_dep],
+    include_directories: []
+  )
+else
+  message('Target machine is not Windows.')
+  platform_specific_dep = declare_dependency(
+    link_with: [],
+    dependencies: [],
+    include_directories: []
+  )
+endif
 
 # libpemc_include = include_directories('src')
 libpemc_include = include_directories('.')
@@ -55,7 +75,7 @@ libpemc =  static_library('pemc',
   'pemc/executable_model/temporary_state_storage.cc',
   'pemc/pemc.cc',
   include_directories : libpemc_include,
-  dependencies: [microsoft_gsl_dep, boost_dep, fmt_dep, spdlog_dep])
+  dependencies: [microsoft_gsl_dep, boost_dep, fmt_dep, spdlog_dep, platform_specific_dep])
 
 libpemc_dep = declare_dependency(link_with: libpemc,
   include_directories: libpemc_include,
