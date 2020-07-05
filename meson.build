@@ -109,7 +109,7 @@ if py_installation.found()
 
   # Python module does not need to be linked against the Library, because it opens the library during runtime
   # as a plugin. But: Dependencies must be installed with the module.
-  libpypemc =  py_installation.extension_module('pypemc',
+  libpypemc =  py_installation.extension_module('pemc',
     'language/pemc_python/pemcmodule.c',
     include_directories : [ libpemc_include, libpypemc_include ],
     dependencies: [python_dep] )

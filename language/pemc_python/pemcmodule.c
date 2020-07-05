@@ -25,3 +25,33 @@
 #include <Python.h>
 
 // see https://docs.python.org/3/extending/extending.html
+
+static PyObject* pemc_check_lmc(PyObject* self, PyObject* args) {
+  const char* command;
+  int sts;
+
+  if (!PyArg_ParseTuple(args, "s", &command))
+    return NULL;
+
+  // calculate
+  sts = 1234;
+
+  return PyLong_FromLong(sts);
+}
+
+static PyMethodDef PemcMethods[] = {
+    {"check_lmc", pemc_check_lmc, METH_VARARGS,
+     "Check the data structure using a labeled Markov chain."},
+    {NULL, NULL, 0, NULL} /* Sentinel */
+};
+
+static struct PyModuleDef pemcmodule = {
+    PyModuleDef_HEAD_INIT, "pemc", /* name of module */
+    NULL,                          /* module documentation, may be NULL */
+    -1, /* size of per-interpreter state of the module,
+           or -1 if the module keeps state in global variables. */
+    PemcMethods};
+
+PyMODINIT_FUNC PyInit_pemc(void) {
+  return PyModule_Create(&pemcmodule);
+}
