@@ -1,7 +1,7 @@
 // The MIT License (MIT)
 //
 // Copyright (c) 2014-2018, Institute for Software & Systems Engineering
-// Copyright (c) 2018, Johannes Leupolz
+// Copyright (c) 2018-2020, Johannes Leupolz
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,43 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef PEMC_PEMC_H_
-#define PEMC_PEMC_H_
+#include <gtest/gtest.h>
 
-#include <functional>
+namespace {}  // namespace
 
-#include "pemc/basic/configuration.h"
-#include "pemc/basic/probability.h"
-#include "pemc/executable_model/abstract_model.h"
-#include "pemc/formula/formula.h"
-#include "pemc/lmc/lmc.h"
-
-namespace pemc {
-
-// Pemc is the facade, which facilitates calculating probabilities of formulas
-// in executable models.
-class Pemc {
- private:
-  Configuration conf;
-
- public:
-  Pemc();
-  Pemc(const Configuration& _conf);
-
-  // The modelCreator creates an instance of an executable model.
-  // The formulas are the formulas to include as labels.
-  std::unique_ptr<Lmc> buildLmcFromExecutableModel(
-      const std::function<std::unique_ptr<AbstractModel>()>& modelCreator,
-      std::vector<std::shared_ptr<Formula>> formulas);
-
-  // Lmc is a Labeled Markov chain. This method calculates the probability to
-  // reach
-  Probability calculateProbabilityToReachStateWithinBound(
-      Lmc& lmc,
-      std::shared_ptr<Formula> formula,
-      int32_t bound);
-};
-
-}  // namespace pemc
-
-#endif  // PEMC_PEMC_H_
+TEST(pemcC_test, pemcC_test) {
+  ASSERT_EQ(2, 2) << "FAIL";
+}

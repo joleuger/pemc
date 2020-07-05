@@ -16,6 +16,8 @@ ninja
 ninja test
 ```
 
+For a release build use `meson --buildtype release buildrelease` instead of `meson build`.
+
 After compiling, the Knuth dice example can be executed by `./example_dice`. The executable is located in the `build`-directory. Its code is located in the directory `language/pemc_cpp_examples/dice.cc`.
 
 

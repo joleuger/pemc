@@ -71,6 +71,8 @@ ninja
 ninja test
 ```
 
+For a release build use `meson --buildtype release buildrelease` instead of `meson build`.
+
 
 # Additional Notes
 

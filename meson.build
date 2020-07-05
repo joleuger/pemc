@@ -1,9 +1,9 @@
-project('pemc', 'cpp',
-  default_options : ['cpp_std=c++17'])
+project('pemc', 'c', 'cpp',
+        default_options : ['c_std=c11', 'cpp_std=c++17'])
 
 # if get_option('buildtype')=='release'
 if not get_option('buildtype').startswith('debug')
-  print('Deactivating Ensures and Expects of GSL')
+  message('Deactivating Ensures and Expects of GSL')
   add_global_arguments('-DGSL_UNENFORCED_ON_CONTRACT_VIOLATION', language : 'cpp')
 endif
 
@@ -74,6 +74,7 @@ libpemc =  static_library('pemc',
   'pemc/executable_model/model_executor.cc',
   'pemc/executable_model/temporary_state_storage.cc',
   'pemc/pemc.cc',
+  'pemc/c_api/c_api.cc',
   include_directories : libpemc_include,
   dependencies: [microsoft_gsl_dep, boost_dep, fmt_dep, spdlog_dep, platform_specific_dep])
 
@@ -95,6 +96,25 @@ libpemcCpp_dep = declare_dependency(
   link_with: [ libpemc, libpemcCpp ],
   include_directories: [ libpemc_include, libpemcCpp_include ],
   dependencies: [microsoft_gsl_dep, boost_dep])
+
+# Build Python modules
+pymod=import('python')
+py_installation = pymod.find_installation('python3', required:false, disabler:true)
+
+if py_installation.found()
+  message('Python found')
+  python_dep = py_installation.dependency()
+
+  libpypemc_include = include_directories('language')
+
+  # Python module does not need to be linked against the Library, because it opens the library during runtime
+  # as a plugin. But: Dependencies must be installed with the module.
+  libpypemc =  py_installation.extension_module('pypemc',
+    'language/pemc_python/pemcmodule.c',
+    include_directories : [ libpemc_include, libpypemc_include ],
+    dependencies: [python_dep] )
+
+endif
 
 
 # TEST

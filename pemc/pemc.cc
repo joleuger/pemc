@@ -22,69 +22,83 @@
 // THE SOFTWARE.
 
 #include "pemc/pemc.h"
-#include "pemc/formula/bounded_unary_formula.h"
-#include "pemc/lmc/lmc_model_checker.h"
-#include "pemc/generic_traverser/generic_traverser.h"
+
 #include "pemc/executable_model/model_executor.h"
+#include "pemc/formula/bounded_unary_formula.h"
+#include "pemc/generic_traverser/generic_traverser.h"
+#include "pemc/lmc/lmc_model_checker.h"
 #include "pemc/lmc_traverser/add_transitions_to_lmc_modifier.h"
 #include "pemc/lmc_traverser/lmc_choice_resolver.h"
 
 namespace pemc {
-  Pemc::Pemc(){
-    conf = Configuration();
+Pemc::Pemc() {
+  conf = Configuration();
+};
+
+Pemc::Pemc(const Configuration& _conf) {
+  conf = _conf;
+};
+
+std::unique_ptr<Lmc> Pemc::buildLmcFromExecutableModel(
+    const std::function<std::unique_ptr<AbstractModel>()>& modelCreator,
+    std::vector<std::shared_ptr<Formula>> formulas) {
+  // initialize an empty Lmc, which will contain the resulting model.
+  auto lmc = std::make_unique<Lmc>();
+  lmc->initialize(*conf.modelCapacity);
+
+  // Set the labels of the Lmc.
+  auto labelIdentifier = std::vector<std::string>();
+  labelIdentifier.reserve(formulas.size());
+  std::transform(formulas.begin(), formulas.end(),
+                 std::back_inserter(labelIdentifier),
+                 [](std::shared_ptr<Formula>& formula) {
+                   return formula->getIdentifier();
+                 });
+  lmc->setLabelIdentifier(labelIdentifier);
+
+  auto traverser = GenericTraverser(conf);
+
+  // Declare a creator for a ModelExecutor that has an instance of the model
+  // that should be executed.
+  auto transitionsCalculatorCreator =
+      [&modelCreator, &conf = this->conf,
+       &formulas]() -> std::unique_ptr<ModelExecutor> {
+    auto modelExecutor = std::make_unique<ModelExecutor>(conf);
+    auto model = modelCreator();
+    model->setFormulasForLabel(formulas);
+    modelExecutor->setModel(std::move(model));
+    modelExecutor->setChoiceResolver(std::make_unique<LmcChoiceResolver>());
+    return modelExecutor;
   };
+  traverser.transitionsCalculatorCreator = transitionsCalculatorCreator;
 
-  Pemc::Pemc(const Configuration& _conf){
-    conf = _conf;
+  // Declare a creator for a modifier that adds states to the Lmc.
+  auto addTransitionsToLmcModifierCreator =
+      [p_lmc = lmc.get()]() -> std::unique_ptr<IPostStateStorageModifier> {
+    auto modifier = std::make_unique<AddTransitionsToLmcModifier>(p_lmc);
+    return modifier;
   };
+  traverser.postStateStorageModifierCreators.push_back(
+      addTransitionsToLmcModifierCreator);
 
+  // Traverse the model.
+  traverser.traverse();
 
-  std::unique_ptr<Lmc> Pemc::buildLmcFromExecutableModel(const std::function<std::unique_ptr<AbstractModel>()>& modelCreator, std::vector<std::shared_ptr<Formula>> formulas) {
-    // initialize an empty Lmc, which will contain the resulting model.
-    auto lmc = std::make_unique<Lmc>();
-    lmc->initialize(*conf.modelCapacity);
-
-    // Set the labels of the Lmc.
-    auto labelIdentifier = std::vector<std::string>();
-    labelIdentifier.reserve(formulas.size());
-    std::transform(formulas.begin(), formulas.end(), std::back_inserter(labelIdentifier),
-      [](std::shared_ptr<Formula>& formula){ return formula->getIdentifier();} );
-    lmc->setLabelIdentifier(labelIdentifier);
-
-    auto traverser = GenericTraverser(conf);
-
-    // Declare a creator for a ModelExecutor that has an instance of the model that should be executed.
-    auto transitionsCalculatorCreator = [&modelCreator,&conf=this->conf,&formulas]() -> std::unique_ptr<ModelExecutor> {
-      auto modelExecutor = std::make_unique<ModelExecutor>(conf);
-      auto model = modelCreator();
-      model->setFormulasForLabel(formulas);
-      modelExecutor->setModel(std::move(model));
-      modelExecutor->setChoiceResolver(std::make_unique<LmcChoiceResolver>());
-      return modelExecutor;
-    };
-    traverser.transitionsCalculatorCreator = transitionsCalculatorCreator;
-
-    // Declare a creator for a modifier that adds states to the Lmc.
-    auto addTransitionsToLmcModifierCreator = [p_lmc = lmc.get()]() -> std::unique_ptr<IPostStateStorageModifier> {
-      auto modifier = std::make_unique<AddTransitionsToLmcModifier>(p_lmc);
-      return modifier;
-    };
-    traverser.postStateStorageModifierCreators.push_back(addTransitionsToLmcModifierCreator);
-
-    // Traverse the model.
-    traverser.traverse();
-
-    // Finish the creation of the Lmc and return it.
-    auto getNoOfStates = traverser.getNoOfStates();
-    lmc->finishCreation(getNoOfStates);
-    return lmc;
-  }
-
-  Probability Pemc::calculateProbabilityToReachStateWithinBound(Lmc& lmc, std::shared_ptr<Formula> formula, int32_t bound) {
-    auto finally_formula = std::make_shared<BoundedUnaryFormula>(formula, UnaryOperator::Finally, bound);
-
-    auto mc = LmcModelChecker(lmc, conf);
-    auto probability = mc.calculateProbability(*finally_formula);
-    return probability;
-  }
+  // Finish the creation of the Lmc and return it.
+  auto getNoOfStates = traverser.getNoOfStates();
+  lmc->finishCreation(getNoOfStates);
+  return lmc;
 }
+
+Probability Pemc::calculateProbabilityToReachStateWithinBound(
+    Lmc& lmc,
+    std::shared_ptr<Formula> formula,
+    int32_t bound) {
+  auto finally_formula = std::make_shared<BoundedUnaryFormula>(
+      formula, UnaryOperator::Finally, bound);
+
+  auto mc = LmcModelChecker(lmc, conf);
+  auto probability = mc.calculateProbability(*finally_formula);
+  return probability;
+}
+}  // namespace pemc
