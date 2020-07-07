@@ -29,97 +29,87 @@
 #include <iostream>
 #include <tuple>
 
-#include "pemc/basic/tsc_index.h"
 #include "pemc/basic/label.h"
+#include "pemc/basic/tsc_index.h"
 
 namespace pemc {
 
-  class ModelCapacity {
-  private:
-    std::size_t stateSize = sizeof(StateIndex);
-    std::size_t targetSize = sizeof(Label) + sizeof(StateIndex);
-    std::size_t choiceSize = 0;
-  public:
-    virtual ~ModelCapacity() = default;
+class ModelCapacity {
+ private:
+  std::size_t stateSize = sizeof(StateIndex);
+  std::size_t targetSize = sizeof(Label) + sizeof(StateIndex);
+  std::size_t choiceSize = 0;
 
-    void setStateSize(std::size_t _stateSize) {
-      stateSize = _stateSize;
-    }
+ public:
+  virtual ~ModelCapacity() = default;
 
-    void setTargetSize(std::size_t _targetSize) {
-      targetSize = _targetSize;
-    }
+  void setStateSize(std::size_t _stateSize) { stateSize = _stateSize; }
 
-    void setChoiceSize(std::size_t _choiceSize) {
-      choiceSize = _choiceSize;
-    }
+  void setTargetSize(std::size_t _targetSize) { targetSize = _targetSize; }
 
-    virtual StateIndex getMaximalStates() = 0;
+  void setChoiceSize(std::size_t _choiceSize) { choiceSize = _choiceSize; }
 
-    virtual TargetIndex getMaximalTargets() = 0;
+  virtual StateIndex getMaximalStates() = 0;
 
-    virtual ChoiceIndex getMaximalChoices () = 0;
+  virtual TargetIndex getMaximalTargets() = 0;
+
+  virtual ChoiceIndex getMaximalChoices() = 0;
+};
+
+class ModelCapacityByModelSize : public ModelCapacity {
+ private:
+  StateIndex maximalStates = 0;
+  TargetIndex maximalTargets = 0;
+  ChoiceIndex maximalChoices = 0;
+
+ public:
+  virtual ~ModelCapacityByModelSize() = default;
+
+  void setMaximalStates(StateIndex _maximalStates) {
+    maximalStates = _maximalStates;
+  }
+
+  void setMaximalTargets(TargetIndex _maximalTargets) {
+    maximalTargets = _maximalTargets;
+  }
+
+  void setMaximalChoices(ChoiceIndex _maximalChoices) {
+    maximalChoices = _maximalChoices;
+  }
+
+  virtual StateIndex getMaximalStates() { return maximalStates; };
+
+  virtual TargetIndex getMaximalTargets() {
+    // Remind: Transition = Target + Probability
+    return maximalTargets;
   };
 
-  class ModelCapacityByModelSize : public ModelCapacity {
-  private:
-      StateIndex maximalStates = 0;
-      TargetIndex maximalTargets = 0;
-      ChoiceIndex maximalChoices = 0;
+  virtual ChoiceIndex getMaximalChoices() { return maximalChoices; };
 
-  public:
-    virtual ~ModelCapacityByModelSize() = default;
+  static ModelCapacityByModelSize Small() {
+    auto modelCapacity = ModelCapacityByModelSize();
+    modelCapacity.setMaximalStates(1024);
+    modelCapacity.setMaximalTargets(1024 << 2);
+    modelCapacity.setMaximalChoices(1024 << 4);
+    return modelCapacity;
+  }
 
-    void setMaximalStates(StateIndex _maximalStates) {
-      maximalStates = _maximalStates;
-    }
+  static ModelCapacityByModelSize Normal() {
+    auto modelCapacity = ModelCapacityByModelSize();
+    modelCapacity.setMaximalStates(1 << 21);
+    modelCapacity.setMaximalTargets(1 << 23);
+    modelCapacity.setMaximalChoices(1 << 25);
+    return modelCapacity;
+  }
 
-    void setMaximalTargets(TargetIndex _maximalTargets) {
-      maximalTargets = _maximalTargets;
-    }
+  static ModelCapacityByModelSize Large() {
+    auto modelCapacity = ModelCapacityByModelSize();
+    modelCapacity.setMaximalStates(1 << 26);
+    modelCapacity.setMaximalTargets(1 << 28);
+    modelCapacity.setMaximalChoices(1 << 30);
+    return modelCapacity;
+  }
+};
 
-    void setMaximalChoices(ChoiceIndex _maximalChoices) {
-      maximalChoices = _maximalChoices;
-    }
-
-    virtual StateIndex getMaximalStates() {
-      return maximalStates;
-    };
-
-    virtual TargetIndex getMaximalTargets() {
-      // Remind: Transition = Target + Probability
-      return maximalTargets;
-    };
-
-    virtual ChoiceIndex getMaximalChoices () {
-      return maximalChoices;
-    };
-
-    static ModelCapacityByModelSize Small() {
-      auto modelCapacity = ModelCapacityByModelSize();
-      modelCapacity.setMaximalStates(1024);
-      modelCapacity.setMaximalTargets(1024 << 2);
-      modelCapacity.setMaximalChoices(1024 << 4);
-      return modelCapacity;
-    }
-
-    static ModelCapacityByModelSize Normal() {
-      auto modelCapacity = ModelCapacityByModelSize();
-      modelCapacity.setMaximalStates(1 << 21);
-      modelCapacity.setMaximalTargets(1 << 23);
-      modelCapacity.setMaximalChoices(1 << 25);
-      return modelCapacity;
-    }
-
-    static ModelCapacityByModelSize Large() {
-      auto modelCapacity = ModelCapacityByModelSize();
-      modelCapacity.setMaximalStates(1 << 26);
-      modelCapacity.setMaximalTargets(1 << 28);
-      modelCapacity.setMaximalChoices(1 << 30);
-      return modelCapacity;
-    }
-  };
-
-
-}
+}  // namespace pemc
 #endif  // PEMC_BASIC_MODEL_CAPACITY_H_

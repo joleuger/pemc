@@ -24,4 +24,36 @@
 #ifndef PEMC_C_PEMC_C_H_
 #define PEMC_C_PEMC_C_H_
 
+#include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef void (*pemc_serialize_function_type)(unsigned char*,  // position
+                                             size_t);         // size
+
+typedef void (*pemc_deserialize_function_type)(unsigned char*,  // position
+                                               size_t);         // size
+
+typedef void (*pemc_reset_to_initial_state_function_type)(void);
+
+typedef void (*pemc_step_function_type)(void);
+
+typedef int32_t (*pemc_get_state_vector_size_function_type)(void);
+
+typedef struct {
+  pemc_serialize_function_type serialize;
+  pemc_deserialize_function_type deserialize;
+  pemc_reset_to_initial_state_function_type reset_to_initial_state;
+  pemc_step_function_type step;
+  pemc_get_state_vector_size_function_type get_state_vector_size;
+} pemc_functions;
+
+int32_t assign_pemc_functions_from_dll(pemc_functions* target);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

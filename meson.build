@@ -29,6 +29,7 @@ if target_machine.system() == 'windows'
   # Idea from https://github.com/radareorg/radare2/blob/master/meson.build
   cc = meson.get_compiler('cpp')
   bcrypt_dep = cc.find_library('bcrypt')
+  #ucrt_dep = cc.find_library('ucrt')
   platform_specific_dep = declare_dependency(
     link_with: [],
     dependencies: [bcrypt_dep],
@@ -42,6 +43,7 @@ else
     include_directories: []
   )
 endif
+
 
 # libpemc_include = include_directories('src')
 libpemc_include = include_directories('.')
@@ -74,14 +76,34 @@ libpemc =  static_library('pemc',
   'pemc/executable_model/model_executor.cc',
   'pemc/executable_model/temporary_state_storage.cc',
   'pemc/pemc.cc',
-  'pemc/c_api/c_api.cc',
   include_directories : libpemc_include,
   dependencies: [microsoft_gsl_dep, boost_dep, fmt_dep, spdlog_dep, platform_specific_dep])
+  
 
 libpemc_dep = declare_dependency(link_with: libpemc,
   include_directories: libpemc_include,
   dependencies: [microsoft_gsl_dep, boost_dep, fmt_dep, spdlog_dep] )
 
+# If lib_pemc gets build as a shared library, then define PEMC_DLL of
+# the file pemc/basic/dll_defines.h.
+# TODO: Switch libpemc from shared_library to library and set global flag depending on
+# the option default_library on https://mesonbuild.com/Builtin-options.html, which decides
+# whether library means shared_library or static_library.
+#add_project_arguments('-DPEMC_DLL', language : 'c')
+#add_project_arguments('-DPEMC_DLL', language : 'cpp')
+
+
+libpemc_shared = shared_library('pemc_shared',
+    'pemc/c_api/c_api.cc',
+  include_directories : libpemc_include,
+  dependencies: [libpemc_dep, microsoft_gsl_dep, boost_dep, fmt_dep, spdlog_dep, platform_specific_dep],
+  c_args : ['-DPEMC_DLL', '-DPEMC_DLL_EXPORTS'],
+  cpp_args : ['-DPEMC_DLL', '-DPEMC_DLL_EXPORTS']
+)
+
+libpemc_shared_dep = declare_dependency(link_with: libpemc_shared,
+  include_directories: libpemc_include,
+  dependencies: [microsoft_gsl_dep, boost_dep, fmt_dep, spdlog_dep] )
 
 libpemcCpp_include = include_directories('language')
 
@@ -90,7 +112,7 @@ libpemcCpp =  static_library('pemcCpp',
   'language/pemc_cpp/cpp_model.cc',
   'language/pemc_cpp/generate_slow_cpp_formula_evaluator.cc',
   include_directories : [ libpemc_include, libpemcCpp_include ],
-  dependencies: [microsoft_gsl_dep] )
+  dependencies: [libpemc_dep, microsoft_gsl_dep] )
 
 libpemcCpp_dep = declare_dependency(
   link_with: [ libpemc, libpemcCpp ],
@@ -109,10 +131,11 @@ if py_installation.found()
 
   # Python module does not need to be linked against the Library, because it opens the library during runtime
   # as a plugin. But: Dependencies must be installed with the module.
-  libpypemc =  py_installation.extension_module('pemc',
+  libpypemc =  py_installation.extension_module('pypemc',
+    'language/pemc_c/pemc_c.c',
     'language/pemc_python/pemcmodule.c',
     include_directories : [ libpemc_include, libpypemc_include ],
-    dependencies: [python_dep] )
+    dependencies: [python_dep, platform_specific_dep] )
 
 endif
 
@@ -159,5 +182,5 @@ endif
 
 
 if meson.get_cross_property('build-examples', 'yes') == 'yes'
-   executable('example_dice', 'language/pemc_cpp_examples/dice.cc', dependencies : [libpemcCpp_dep])
+   executable('example_dice', 'language/pemc_cpp_examples/dice.cc', dependencies : [libpemc_dep, libpemcCpp_dep])
 endif

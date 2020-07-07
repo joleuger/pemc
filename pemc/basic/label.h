@@ -26,20 +26,20 @@
 #define PEMC_BASIC_LABEL_H_
 
 #include <cstdint>
-#include <vector>
 #include <functional>
+#include <vector>
 
 namespace pemc {
 
-  struct Label {
-    int32_t value = 0;
+struct Label {
+  int32_t value = 0;
 
-    Label();
-    Label(const std::vector<bool>& values);
-    Label(const std::vector<std::function<bool()>>& formulaEvaluators);
+  Label();
+  Label(const std::vector<bool>& values);
+  Label(const std::vector<std::function<bool()>>& formulaEvaluators);
 
-    bool operator[](int32_t index);
-  };
+  bool operator[](int32_t index);
+};
 
-}
+}  // namespace pemc
 #endif  // PEMC_BASIC_LABEL_H_

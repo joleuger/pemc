@@ -26,70 +26,82 @@
 #define PEMC_LMC_LMC_H_
 
 #include <atomic>
-#include <string>
-#include <vector>
 #include <functional>
 #include <gsl/span>
+#include <string>
+#include <vector>
 
-#include "pemc/basic/tsc_index.h"
-#include "pemc/basic/probability.h"
+#include "pemc/basic/dll_defines.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/model_capacity.h"
+#include "pemc/basic/probability.h"
+#include "pemc/basic/tsc_index.h"
 #include "pemc/formula/formula.h"
 
 namespace pemc {
 
-  struct LmcStateEntry { TransitionIndex from; int32_t elements; };
+struct LmcStateEntry {
+  TransitionIndex from;
+  int32_t elements;
+};
 
-  // Transition = Target + Probability
-  struct LmcTransitionEntry {
-    Probability probability; Label label; StateIndex state;
+// Transition = Target + Probability
+struct LmcTransitionEntry {
+  Probability probability;
+  Label label;
+  StateIndex state;
 
-    LmcTransitionEntry() = default;
-    LmcTransitionEntry(Probability _probability, Label _label, StateIndex _state)
+  LmcTransitionEntry() = default;
+  LmcTransitionEntry(Probability _probability, Label _label, StateIndex _state)
       : probability(_probability), label(_label), state(_state) {}
-  };
+};
 
-  class Lmc {
-  private:
-      TransitionIndex maxNumberOfTransitions = 0;
-      std::atomic<TransitionIndex> transitionCount{0};
-      std::vector<LmcTransitionEntry> transitions;
-      TransitionIndex initialTransitionFrom = -1; //is uninitialized at first, but may be something else than 0
-      int32_t initialTransitionElements = 0;
+class Lmc {
+ private:
+  TransitionIndex maxNumberOfTransitions = 0;
+  std::atomic<TransitionIndex> transitionCount{0};
+  std::vector<LmcTransitionEntry> transitions;
+  TransitionIndex initialTransitionFrom =
+      -1;  // is uninitialized at first, but may be something else than 0
+  int32_t initialTransitionElements = 0;
 
-      StateIndex maxNumberOfStates = 0;
-      StateIndex stateCount = 0;
-      std::vector<LmcStateEntry> states;
+  StateIndex maxNumberOfStates = 0;
+  StateIndex stateCount = 0;
+  std::vector<LmcStateEntry> states;
 
-      std::vector<std::string> labelIdentifier;
+  std::vector<std::string> labelIdentifier;
 
-      TransitionIndex getPlaceForNewTransitionEntries(NoOfElements number);
-  public:
-      Lmc();
+  TransitionIndex getPlaceForNewTransitionEntries(NoOfElements number);
 
-      gsl::span<LmcStateEntry> getStates();
+ public:
+  Lmc();
 
-      gsl::span<std::string> getLabelIdentifier();
-      void setLabelIdentifier(const std::vector<std::string>& _labelIdentifier);
-      std::function<bool(TransitionIndex)> createLabelBasedFormulaEvaluator(Formula* formula);
+  gsl::span<LmcStateEntry> getStates();
 
-      gsl::span<LmcTransitionEntry> getTransitions();
-      gsl::span<LmcTransitionEntry> getInitialTransitions();
-      std::tuple<TransitionIndex,TransitionIndex> getInitialTransitionIndexes();
-      gsl::span<LmcTransitionEntry> getTransitionsOfState(StateIndex state);
-      std::tuple<TransitionIndex,TransitionIndex> getTransitionIndexesOfState(StateIndex state);
+  gsl::span<std::string> getLabelIdentifier();
+  void setLabelIdentifier(const std::vector<std::string>& _labelIdentifier);
+  std::function<bool(TransitionIndex)> createLabelBasedFormulaEvaluator(
+      Formula* formula);
 
-      TransitionIndex getPlaceForNewTransitionEntriesOfState(StateIndex stateIndex, NoOfElements number);
-      TransitionIndex getPlaceForNewInitialTransitionEntries(NoOfElements number);
-      void setLmcTransitionEntry(TransitionIndex index, const LmcTransitionEntry& entry);
-      void createStutteringState(StateIndex stutteringStateIndex);
+  gsl::span<LmcTransitionEntry> getTransitions();
+  gsl::span<LmcTransitionEntry> getInitialTransitions();
+  std::tuple<TransitionIndex, TransitionIndex> getInitialTransitionIndexes();
+  gsl::span<LmcTransitionEntry> getTransitionsOfState(StateIndex state);
+  std::tuple<TransitionIndex, TransitionIndex> getTransitionIndexesOfState(
+      StateIndex state);
 
-      void initialize(ModelCapacity& modelCapacity);
-      void finishCreation(StateIndex _stateCount);
-      void validate();
-  };
+  TransitionIndex getPlaceForNewTransitionEntriesOfState(StateIndex stateIndex,
+                                                         NoOfElements number);
+  TransitionIndex getPlaceForNewInitialTransitionEntries(NoOfElements number);
+  void setLmcTransitionEntry(TransitionIndex index,
+                             const LmcTransitionEntry& entry);
+  void createStutteringState(StateIndex stutteringStateIndex);
 
-}
+  void initialize(ModelCapacity& modelCapacity);
+  void finishCreation(StateIndex _stateCount);
+  void validate();
+};
+
+}  // namespace pemc
 
 #endif  // PEMC_LMC_LMC_H_

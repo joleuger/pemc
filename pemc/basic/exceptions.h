@@ -25,44 +25,41 @@
 #ifndef PEMC_BASIC_EXCEPTIONS_H_
 #define PEMC_BASIC_EXCEPTIONS_H_
 
-#include <string>
 #include <exception>
+#include <string>
 
 namespace pemc {
 
-  class OutOfMemoryException : public std::exception {
-  private:
-      std::string completeMessage;
-  public:
-    OutOfMemoryException(const std::string& message) {
-        completeMessage = "OutOfMemoryException: " + message;
-    }
-    ~OutOfMemoryException() = default;
+class OutOfMemoryException : public std::exception {
+ private:
+  std::string completeMessage;
 
-    virtual const char* what() const throw() {
-      return completeMessage.c_str();
-    }
-  };
+ public:
+  OutOfMemoryException(const std::string& message) {
+    completeMessage = "OutOfMemoryException: " + message;
+  }
+  ~OutOfMemoryException() = default;
 
-  class NotImplementedYetException : public std::exception {
-  public:
-    NotImplementedYetException() = default;
-    ~NotImplementedYetException() = default;
+  virtual const char* what() const throw() { return completeMessage.c_str(); }
+};
 
-    virtual const char* what() const throw() {
-      return "NotImplementedYetException";
-    }
-  };
+class NotImplementedYetException : public std::exception {
+ public:
+  NotImplementedYetException() = default;
+  ~NotImplementedYetException() = default;
 
-    class NotTestedYetException : public std::exception {
-    public:
-      NotTestedYetException() = default;
-      ~NotTestedYetException() = default;
+  virtual const char* what() const throw() {
+    return "NotImplementedYetException";
+  }
+};
 
-      virtual const char* what() const throw() {
-        return "NotTestedYetException";
-      }
-    };
+class NotTestedYetException : public std::exception {
+ public:
+  NotTestedYetException() = default;
+  ~NotTestedYetException() = default;
 
-}
+  virtual const char* what() const throw() { return "NotTestedYetException"; }
+};
+
+}  // namespace pemc
 #endif  // PEMC_BASIC_EXCEPTIONS_H_

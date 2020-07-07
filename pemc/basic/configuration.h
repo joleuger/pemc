@@ -32,23 +32,24 @@
 
 namespace pemc {
 
-  struct Configuration {
+struct Configuration {
+  // Output stream to write output to.
+  // Note: Memory of cout is not managed. If memory management is required,
+  // then let coutManaged handle the memory management of the class and
+  // forward cout to coutManaged.get().
+  std::ostream* cout = &std::cout;
+  std::shared_ptr<std::ostream> coutManaged = nullptr;
 
-    // Output stream to write output to.
-    // Note: Memory of cout is not managed. If memory management is required,
-    // then let coutManaged handle the memory management of the class and
-    // forward cout to coutManaged.get().
-    std::ostream* cout = &std::cout;
-    std::shared_ptr<std::ostream> coutManaged = nullptr;
+  bool printGraphViz = false;
 
-    bool printGraphViz = false;
+  int32_t maximalSearchDepth = 1 << 20;
 
-    int32_t maximalSearchDepth = 1 << 20;
+  int32_t successorCapacity = 1 << 14;
 
-    int32_t successorCapacity = 1 << 14;
+  std::shared_ptr<ModelCapacity> modelCapacity =
+      std::make_shared<ModelCapacityByModelSize>(
+          ModelCapacityByModelSize::Small());
+};
 
-    std::shared_ptr<ModelCapacity> modelCapacity = std::make_shared<ModelCapacityByModelSize>(ModelCapacityByModelSize::Small());
-  };
-
-}
+}  // namespace pemc
 #endif  // PEMC_BASIC_CONFIGURATION_H_

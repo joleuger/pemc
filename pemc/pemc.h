@@ -27,6 +27,7 @@
 #include <functional>
 
 #include "pemc/basic/configuration.h"
+#include "pemc/basic/dll_defines.h"
 #include "pemc/basic/probability.h"
 #include "pemc/executable_model/abstract_model.h"
 #include "pemc/formula/formula.h"

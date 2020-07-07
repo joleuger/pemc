@@ -21,6 +21,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import pemc
+import pypemc
 
-pemc.check_lmc("aa")
+pypemc.check_lmc("aa")

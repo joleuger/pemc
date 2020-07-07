@@ -24,7 +24,11 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#include "pemc_c/pemc_c.h"
+
 // see https://docs.python.org/3/extending/extending.html
+
+pemc_functions pemc_functions_from_dll;
 
 static PyObject* pemc_check_lmc(PyObject* self, PyObject* args) {
   const char* command;
@@ -39,9 +43,21 @@ static PyObject* pemc_check_lmc(PyObject* self, PyObject* args) {
   return PyLong_FromLong(sts);
 }
 
+static PyObject* pemc_get_state_vector_size(PyObject* self, PyObject* args) {
+  const char* command;
+  int sts;
+
+  // calculate
+  sts = pemc_functions_from_dll.get_state_vector_size();
+
+  return PyLong_FromLong(sts);
+}
+
 static PyMethodDef PemcMethods[] = {
     {"check_lmc", pemc_check_lmc, METH_VARARGS,
      "Check the data structure using a labeled Markov chain."},
+    {"get_state_vector_size", pemc_get_state_vector_size, METH_VARARGS,
+     "Get State Vector Sized."},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
@@ -52,6 +68,7 @@ static struct PyModuleDef pemcmodule = {
            or -1 if the module keeps state in global variables. */
     PemcMethods};
 
-PyMODINIT_FUNC PyInit_pemc(void) {
+PyMODINIT_FUNC PyInit_pypemc(void) {
+  assign_pemc_functions_from_dll(&pemc_functions_from_dll);
   return PyModule_Create(&pemcmodule);
 }

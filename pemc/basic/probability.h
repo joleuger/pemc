@@ -29,68 +29,66 @@
 
 namespace pemc {
 
-  struct Probability {
-    Probability() = default;
+struct Probability {
+  Probability() = default;
 
-    Probability(double _value) {
-      value=_value;
-    }
+  Probability(double _value) { value = _value; }
 
-    double value;
+  double value;
 
-    friend bool operator<(const Probability& l, const Probability& r) {
-        return l.value < r.value;
-    }
+  friend bool operator<(const Probability& l, const Probability& r) {
+    return l.value < r.value;
+  }
 
-    friend bool operator>(const Probability& l, const Probability& r) {
-        return l.value > r.value;
-    }
+  friend bool operator>(const Probability& l, const Probability& r) {
+    return l.value > r.value;
+  }
 
-    friend bool operator<=(const Probability& l, const Probability& r) {
-        return l.value <= r.value;
-    }
+  friend bool operator<=(const Probability& l, const Probability& r) {
+    return l.value <= r.value;
+  }
 
-    friend bool operator>=(const Probability& l, const Probability& r) {
-        return l.value >= r.value;
-    }
+  friend bool operator>=(const Probability& l, const Probability& r) {
+    return l.value >= r.value;
+  }
 
-    friend Probability operator+(const Probability& l, const Probability& r) {
-        return Probability(l.value + r.value);
-    }
+  friend Probability operator+(const Probability& l, const Probability& r) {
+    return Probability(l.value + r.value);
+  }
 
-    friend Probability& operator+=(Probability& l, const Probability& r) {
-        l.value += r.value;
-        return l;
-    }
+  friend Probability& operator+=(Probability& l, const Probability& r) {
+    l.value += r.value;
+    return l;
+  }
 
-    friend Probability operator*(const Probability& l, const Probability& r) {
-        return Probability(l.value * r.value);
-    }
+  friend Probability operator*(const Probability& l, const Probability& r) {
+    return Probability(l.value * r.value);
+  }
 
-    static Probability One() {
-      return Probability(1.0);
-    }
+  static Probability One() { return Probability(1.0); }
 
-    static Probability Zero() {
-      return Probability(0.0);
-    }
+  static Probability Zero() { return Probability(0.0); }
 
-    static Probability Error() {
-      return Probability(std::numeric_limits<float>::quiet_NaN());
-    }
-  };
+  static Probability Error() {
+    return Probability(std::numeric_limits<float>::quiet_NaN());
+  }
+};
 
-  std::string prettyPrint(const Probability& probability);
+std::string prettyPrint(const Probability& probability);
 
-  bool probabilityIsValid(const Probability& probability);
+bool probabilityIsValid(const Probability& probability);
 
-  bool probabilityIsOne(double value, double tolerance);
+bool probabilityIsOne(double value, double tolerance);
 
-  bool probabilityIsAround(double realValue, double desiredValue, double tolerance);
+bool probabilityIsAround(double realValue,
+                         double desiredValue,
+                         double tolerance);
 
-  bool probabilityIsOne(const Probability& value, double tolerance);
+bool probabilityIsOne(const Probability& value, double tolerance);
 
-  bool probabilityIsAround(const Probability& realValue, double desiredValue, double tolerance);
-}
+bool probabilityIsAround(const Probability& realValue,
+                         double desiredValue,
+                         double tolerance);
+}  // namespace pemc
 
 #endif  // PEMC_BASIC_PROBABILITY_H_
