@@ -87,7 +87,9 @@
         "__errc": "cpp",
         "__node_handle": "cpp",
         "bit": "cpp",
-        "pemc_c.h": "c"
+        "pemc_c.h": "c",
+        "gsl_transition": "cpp",
+        "format": "cpp"
     },
     "editor.formatOnSave": true,
     "C_Cpp.clang_format_fallbackStyle": "Chromium",

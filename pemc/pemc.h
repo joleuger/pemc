@@ -51,8 +51,14 @@ class Pemc {
       const std::function<std::unique_ptr<AbstractModel>()>& modelCreator,
       std::vector<std::shared_ptr<Formula>> formulas);
 
-  // Lmc is a Labeled Markov chain. This method calculates the probability to
-  // reach
+  // The modelCreator creates an instance of an executable model.
+  // The formulas are the formulas to include as labels.
+  bool checkReachabilityInExecutableModel(
+      const std::function<std::unique_ptr<AbstractModel>()>& modelCreator,
+      std::shared_ptr<Formula> formula);
+
+  // Lmc is a Labeled Markov chain. This method calculates the probability
+  // to reach
   Probability calculateProbabilityToReachStateWithinBound(
       Lmc& lmc,
       std::shared_ptr<Formula> formula,

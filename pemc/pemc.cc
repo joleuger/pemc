@@ -29,6 +29,8 @@
 #include "pemc/lmc/lmc_model_checker.h"
 #include "pemc/lmc_traverser/add_transitions_to_lmc_modifier.h"
 #include "pemc/lmc_traverser/lmc_choice_resolver.h"
+#include "pemc/reachability_traverser/reachability_choice_resolver.h"
+#include "pemc/reachability_traverser/reachability_modifier.h"
 
 namespace pemc {
 Pemc::Pemc() {
@@ -88,6 +90,51 @@ std::unique_ptr<Lmc> Pemc::buildLmcFromExecutableModel(
   auto getNoOfStates = traverser.getNoOfStates();
   lmc->finishCreation(getNoOfStates);
   return lmc;
+}
+
+bool Pemc::checkReachabilityInExecutableModel(
+    const std::function<std::unique_ptr<AbstractModel>()>& modelCreator,
+    std::shared_ptr<Formula> formula) {
+  // initialize an empty Lmc, which will contain the resulting model.
+  auto lmc = std::make_unique<Lmc>();
+  lmc->initialize(*conf.modelCapacity);
+
+  // Because there is only one formula there is only one label
+  std::vector<std::shared_ptr<Formula>> formulas;
+  formulas.push_back(formula);
+
+  auto traverser = GenericTraverser(conf);
+
+  // Declare a creator for a ModelExecutor that has an instance of the model
+  // that should be executed.
+  auto transitionsCalculatorCreator =
+      [&modelCreator, &conf = this->conf,
+       &formulas]() -> std::unique_ptr<ModelExecutor> {
+    auto modelExecutor = std::make_unique<ModelExecutor>(conf);
+    auto model = modelCreator();
+    model->setFormulasForLabel(formulas);
+    modelExecutor->setModel(std::move(model));
+    modelExecutor->setChoiceResolver(
+        std::make_unique<ReachabilityChoiceResolver>());
+    return modelExecutor;
+  };
+  traverser.transitionsCalculatorCreator = transitionsCalculatorCreator;
+
+  bool reached = false;
+
+  // Declare a creator for a modifier that adds states to the Lmc.
+  auto reachabilityModifierCreator =
+      [&reached]() -> std::unique_ptr<IPostStateStorageModifier> {
+    auto modifier = std::make_unique<ReachabilityModifier>(&reached);
+    return modifier;
+  };
+  traverser.postStateStorageModifierCreators.push_back(
+      reachabilityModifierCreator);
+
+  // Traverse the model.
+  traverser.traverse();
+
+  return reached;
 }
 
 Probability Pemc::calculateProbabilityToReachStateWithinBound(
