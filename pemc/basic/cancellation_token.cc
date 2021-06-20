@@ -22,8 +22,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Ripped off and simplified from the MIT-licensed Parallel Patterns Library.
-// See
-// https://github.com/mghazaryan/pplx/blob/master/include/pplx/pplxcancellation_token.h
-
 #include "pemc/basic/cancellation_token.h"
+
+namespace {
+static const long _STATE_CLEAR = 0;
+static const long _STATE_CANCELED = 1;
+}  // namespace
+
+namespace pemc {
+bool cancellation_token::is_cancelable() const {
+  return state != nullptr;
+}
+
+bool cancellation_token::is_canceled() const {
+  return (state != nullptr && state.get()->load() != _STATE_CLEAR);
+}
+
+cancellation_token_source::cancellation_token_source() {
+  state = std::make_shared<std::atomic<long>>(_STATE_CLEAR);
+}
+
+cancellation_token cancellation_token_source::get_token() const {
+  return cancellation_token(state);
+}
+
+void cancellation_token_source::cancel() const {
+  state.get()->store(_STATE_CANCELED);
+}
+}  // namespace pemc

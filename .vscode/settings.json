@@ -89,7 +89,10 @@
         "bit": "cpp",
         "pemc_c.h": "c",
         "gsl_transition": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "clocale": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp"
     },
     "editor.formatOnSave": true,
     "C_Cpp.clang_format_fallbackStyle": "Chromium",
