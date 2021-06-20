@@ -23,6 +23,8 @@
 
 #include "pemc/pemc.h"
 
+#include <atomic>
+
 #include "pemc/executable_model/model_executor.h"
 #include "pemc/formula/bounded_unary_formula.h"
 #include "pemc/generic_traverser/generic_traverser.h"
@@ -120,7 +122,7 @@ bool Pemc::checkReachabilityInExecutableModel(
   };
   traverser.transitionsCalculatorCreator = transitionsCalculatorCreator;
 
-  bool reached = false;
+  std::atomic<bool> reached(false);
 
   // Declare a creator for a modifier that adds states to the Lmc.
   auto reachabilityModifierCreator =

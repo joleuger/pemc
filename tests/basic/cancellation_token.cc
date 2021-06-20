@@ -1,8 +1,7 @@
-// SPDX-License-Identifier: MIT
 // The MIT License (MIT)
 //
 // Copyright (c) 2014-2018, Institute for Software & Systems Engineering
-// Copyright (c) 2018-2019, Johannes Leupolz
+// Copyright (c) 2018, Johannes Leupolz
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +21,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "pemc/reachability_traverser/reachability_modifier.h"
+#include "pemc/basic/cancellation_token.h"
 
-namespace pemc {
+#include <gtest/gtest.h>
 
-ReachabilityModifier::ReachabilityModifier(std::atomic<bool>* _reached) {
-  reached = _reached;
-};
+#include <iostream>
 
-void ReachabilityModifier::applyOnTransitions(
-    std::optional<StateIndex> stateIndexOfSource,
-    gsl::span<TraversalTransition> transitions,
-    void* customPayLoad) {
-  TransitionIndex locationOfFirstEntry;
-  auto transitionCount = transitions.size();
+#include "pemc/formula/adapted_formula.h"
 
-  for (auto i = 0; i < transitionCount; i++) {
-    if (transitions[i].label[0] == true) {
-      *reached = true;
-    }
-  }
+using namespace pemc;
+
+TEST(basic_test, cancellation_token_works) {
+  auto f1 = AdaptedFormula();
+  auto f2 = AdaptedFormula();
+  std::cout << "Identifier f1: " << f1.getIdentifier() << std::endl;
+  std::cout << "Identifier f2: " << f2.getIdentifier() << std::endl;
+
+  ASSERT_NE(f1.getIdentifier(), f2.getIdentifier()) << "FAIL";
 }
-}  // namespace pemc

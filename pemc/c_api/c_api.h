@@ -25,6 +25,7 @@
 #define PEMC_C_API_C_API_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
 #include "pemc/basic/dll_defines.h"
 

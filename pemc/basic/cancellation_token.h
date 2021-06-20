@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 // The MIT License (MIT)
 //
-// Copyright (c) 2014-2018, Institute for Software & Systems Engineering
-// Copyright (c) 2018-2019, Johannes Leupolz
+// Copyright (c) 2018, Microsoft
+// Copyright (c) 2021, Johannes Leupolz
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +22,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "pemc/reachability_traverser/reachability_modifier.h"
+// Ripped off and simplified from the MIT-licensed Parallel Patterns Library.
+// See
+// https://github.com/mghazaryan/pplx/blob/master/include/pplx/pplxcancellation_token.h
 
-namespace pemc {
+#ifndef PEMC_BASIC_CANCELLATION_TOKEN_H_
+#define PEMC_BASIC_CANCELLATION_TOKEN_H_
 
-ReachabilityModifier::ReachabilityModifier(std::atomic<bool>* _reached) {
-  reached = _reached;
-};
+#include <cstdint>
+#include <functional>
+#include <vector>
 
-void ReachabilityModifier::applyOnTransitions(
-    std::optional<StateIndex> stateIndexOfSource,
-    gsl::span<TraversalTransition> transitions,
-    void* customPayLoad) {
-  TransitionIndex locationOfFirstEntry;
-  auto transitionCount = transitions.size();
+namespace pemc {}
 
-  for (auto i = 0; i < transitionCount; i++) {
-    if (transitions[i].label[0] == true) {
-      *reached = true;
-    }
-  }
-}
-}  // namespace pemc
+#endif

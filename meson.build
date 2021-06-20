@@ -49,6 +49,7 @@ endif
 libpemc_include = include_directories('.')
 
 libpemc =  static_library('pemc',
+  'pemc/basic/cancellation_token.cc',
   'pemc/basic/label.cc',
   'pemc/basic/probability.cc',
   'pemc/basic/raw_memory.cc',
@@ -147,6 +148,7 @@ gtest_main_dep = dependency('googletest', fallback : ['googletest', 'gtest_main_
 
 libpemctests = [
   'tests/test.cc',
+  'tests/basic/cancellation_token.cc',
   'tests/formula/createUuids.cc',
   'tests/formula/formulaToString.cc',
   'tests/formula/labelBasedFormulaEvaluator.cc',

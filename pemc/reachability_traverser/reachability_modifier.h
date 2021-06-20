@@ -25,16 +25,18 @@
 #ifndef PEMC_REACHABILITY_TRAVERSER_REACHABILITY_MODIFIER_H_
 #define PEMC_REACHABILITY_TRAVERSER_REACHABILITY_MODIFIER_H_
 
+#include <atomic>
+
 #include "pemc/generic_traverser/i_post_state_storage_modifier.h"
 #include "pemc/lmc/lmc.h"
 
 namespace pemc {
 class ReachabilityModifier : public IPostStateStorageModifier {
  private:
-  bool* reached;
+  std::atomic<bool>* reached;
 
  public:
-  ReachabilityModifier(bool* reached);
+  ReachabilityModifier(std::atomic<bool>* reached);
 
   virtual void applyOnTransitions(std::optional<StateIndex> stateIndexOfSource,
                                   gsl::span<TraversalTransition> transitions,
