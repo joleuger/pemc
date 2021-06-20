@@ -136,7 +136,7 @@ bool Pemc::checkReachabilityInExecutableModel(
   // Traverse the model.
   traverser.traverse();
 
-  return reached;
+  return reached.load();
 }
 
 Probability Pemc::calculateProbabilityToReachStateWithinBound(
