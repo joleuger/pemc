@@ -147,7 +147,7 @@ class Worker {
     }
   }
 
-  void traverse() {
+  void traverse(cancellation_token cancellationToken) {
     // traverse initial transitions
     auto initialTransitions =
         transitionsCalculator->calculateInitialTransitions();
@@ -155,6 +155,10 @@ class Worker {
 
     StateIndex stateIndexToTraverse;
     while (pathTracker.tryGetStateIndex(stateIndexToTraverse)) {
+      if (cancellationToken.is_canceled()) {
+        return;
+      }
+
       auto stateToTraverse = (*traverser.stateStorage)[stateIndexToTraverse];
       auto transitions =
           transitionsCalculator->calculateTransitionsOfState(stateToTraverse);
@@ -173,7 +177,7 @@ StateIndex GenericTraverser::getNoOfStates() {
   return stateStorage->getNumberOfSavedStates();
 }
 
-void GenericTraverser::traverse() {
+void GenericTraverser::traverse(cancellation_token cancellationToken) {
   // currently only single core traversal implemented. Therefore, instantiate a
   // single worker.
   auto worker = Worker(conf, *this);
@@ -198,7 +202,7 @@ void GenericTraverser::traverse() {
   }
 
   // conduct the actual traversal
-  worker.traverse();
+  worker.traverse(cancellationToken);
 }
 
 }  // namespace pemc

@@ -114,3 +114,10 @@ TEST(basic_test, cancellation_token_works_in_other_thread) {
 
   ASSERT_EQ(success.load(), true) << "FAIL";
 }
+
+TEST(basic_test, cancellation_token_none) {
+  auto cancellationToken = cancellation_token::none();
+
+  ASSERT_EQ(cancellationToken.is_canceled(), false) << "FAIL";
+  ASSERT_EQ(cancellationToken.is_cancelable(), false) << "FAIL";
+}

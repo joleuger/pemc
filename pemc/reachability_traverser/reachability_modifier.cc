@@ -26,8 +26,11 @@
 
 namespace pemc {
 
-ReachabilityModifier::ReachabilityModifier(std::atomic<bool>* _reached) {
+ReachabilityModifier::ReachabilityModifier(
+    std::atomic<bool>* _reached,
+    cancellation_token_source _cancellationTokenSource) {
   reached = _reached;
+  cancellationTokenSource = _cancellationTokenSource;
 };
 
 void ReachabilityModifier::applyOnTransitions(
@@ -40,6 +43,7 @@ void ReachabilityModifier::applyOnTransitions(
   for (auto i = 0; i < transitionCount; i++) {
     if (transitions[i].label[0] == true) {
       *reached = true;
+      cancellationTokenSource.cancel();
     }
   }
 }

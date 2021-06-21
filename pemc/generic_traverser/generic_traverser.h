@@ -25,60 +25,64 @@
 #ifndef PEMC_GENERIC_TRAVERSER_GENERIC_TRAVERSER_H_
 #define PEMC_GENERIC_TRAVERSER_GENERIC_TRAVERSER_H_
 
-#include <vector>
-#include <gsl/span>
-#include <cstdint>
 #include <atomic>
-#include <stack>
-#include <limits>
+#include <cstdint>
 #include <functional>
+#include <gsl/span>
+#include <limits>
+#include <stack>
+#include <vector>
 
-#include "pemc/basic/tsc_index.h"
+#include "pemc/basic/cancellation_token.h"
 #include "pemc/basic/configuration.h"
 #include "pemc/basic/label.h"
 #include "pemc/basic/model_capacity.h"
 #include "pemc/basic/raw_memory.h"
+#include "pemc/basic/tsc_index.h"
 #include "pemc/formula/formula.h"
-#include "pemc/generic_traverser/i_transitions_calculator.h"
-#include "pemc/generic_traverser/i_pre_state_storage_modifier.h"
 #include "pemc/generic_traverser/i_post_state_storage_modifier.h"
+#include "pemc/generic_traverser/i_pre_state_storage_modifier.h"
+#include "pemc/generic_traverser/i_transitions_calculator.h"
 #include "pemc/generic_traverser/state_storage.h"
 
 namespace pemc {
 
-  class GenericTraverser {
-  private:
-      const Configuration& conf;
-      bool createStutteringState = false;
+class GenericTraverser {
+ private:
+  const Configuration& conf;
+  bool createStutteringState = false;
 
-  public:
-      GenericTraverser(const Configuration& _conf);
+ public:
+  GenericTraverser(const Configuration& _conf);
 
-      // a transitionsCalculator calculates the successors of a given state.
-      std::function<std::unique_ptr<ITransitionsCalculator>()> transitionsCalculatorCreator;
+  // a transitionsCalculator calculates the successors of a given state.
+  std::function<std::unique_ptr<ITransitionsCalculator>()>
+      transitionsCalculatorCreator;
 
-      // preStateStorageModifier can access and modify the transistions returned by
-      // the transitionsOfStateCalculator before the corresponding states are added to the StateStorage.
-      // The states in the array are given as byte vectors.
-      // Note that order matters.
-      std::vector<std::function<std::unique_ptr<IPreStateStorageModifier>()>> preStateStorageModifierCreators;
+  // preStateStorageModifier can access and modify the transistions returned by
+  // the transitionsOfStateCalculator before the corresponding states are added
+  // to the StateStorage. The states in the array are given as byte vectors.
+  // Note that order matters.
+  std::vector<std::function<std::unique_ptr<IPreStateStorageModifier>()>>
+      preStateStorageModifierCreators;
 
-      // postStateStorageModifier can access and modify the transistions returned by
-      // the transitionsOfStateCalculator after the corresponding states are added to the StateStorage.
-      // The states in the array are given as indexes into the stateStorage.
-      // Note that order matters.
-      std::vector<std::function<std::unique_ptr<IPostStateStorageModifier>()>> postStateStorageModifierCreators;
+  // postStateStorageModifier can access and modify the transistions returned by
+  // the transitionsOfStateCalculator after the corresponding states are added
+  // to the StateStorage. The states in the array are given as indexes into the
+  // stateStorage. Note that order matters.
+  std::vector<std::function<std::unique_ptr<IPostStateStorageModifier>()>>
+      postStateStorageModifierCreators;
 
-      // stores all encoutered states and maps each state to a unique index.
-      std::unique_ptr<StateStorage> stateStorage;
+  // stores all encoutered states and maps each state to a unique index.
+  std::unique_ptr<StateStorage> stateStorage;
 
-      StateIndex stutteringStateIndex;
+  StateIndex stutteringStateIndex;
 
-      StateIndex getNoOfStates();
+  StateIndex getNoOfStates();
 
-      void traverse();
-  };
+  void traverse(cancellation_token cancellationToken);
+};
 
-}
+}  // namespace pemc
 
 #endif  // PEMC_GENERIC_TRAVERSER_GENERIC_TRAVERSER_H_

@@ -190,7 +190,7 @@ TEST(genericTraverser_test, genericTraverser_works) {
       countTransitionsModifierCreator);
 
   // Traverse the model.
-  traverser.traverse();
+  traverser.traverse(cancellation_token::none());
 
   // get the number of the states.
   auto getNoOfStates = traverser.getNoOfStates();

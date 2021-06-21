@@ -27,6 +27,7 @@
 
 #include <atomic>
 
+#include "pemc/basic/cancellation_token.h"
 #include "pemc/generic_traverser/i_post_state_storage_modifier.h"
 #include "pemc/lmc/lmc.h"
 
@@ -34,9 +35,12 @@ namespace pemc {
 class ReachabilityModifier : public IPostStateStorageModifier {
  private:
   std::atomic<bool>* reached;
+  //
+  cancellation_token_source cancellationTokenSource;
 
  public:
-  ReachabilityModifier(std::atomic<bool>* reached);
+  ReachabilityModifier(std::atomic<bool>* reached,
+                       cancellation_token_source cancellationTokenSource);
 
   virtual void applyOnTransitions(std::optional<StateIndex> stateIndexOfSource,
                                   gsl::span<TraversalTransition> transitions,

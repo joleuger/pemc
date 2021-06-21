@@ -86,7 +86,7 @@ std::unique_ptr<Lmc> Pemc::buildLmcFromExecutableModel(
       addTransitionsToLmcModifierCreator);
 
   // Traverse the model.
-  traverser.traverse();
+  traverser.traverse(cancellation_token::none());
 
   // Finish the creation of the Lmc and return it.
   auto getNoOfStates = traverser.getNoOfStates();
@@ -124,17 +124,22 @@ bool Pemc::checkReachabilityInExecutableModel(
 
   std::atomic<bool> reached(false);
 
+  // the tokenSource is used to cancel the token when a state satisfying the
+  // condition is reached
+  cancellation_token_source tokenSource;
+
   // Declare a creator for a modifier that adds states to the Lmc.
   auto reachabilityModifierCreator =
-      [&reached]() -> std::unique_ptr<IPostStateStorageModifier> {
-    auto modifier = std::make_unique<ReachabilityModifier>(&reached);
+      [&reached, &tokenSource]() -> std::unique_ptr<IPostStateStorageModifier> {
+    auto modifier =
+        std::make_unique<ReachabilityModifier>(&reached, tokenSource);
     return modifier;
   };
   traverser.postStateStorageModifierCreators.push_back(
       reachabilityModifierCreator);
 
   // Traverse the model.
-  traverser.traverse();
+  traverser.traverse(tokenSource.get_token());
 
   return reached.load();
 }
