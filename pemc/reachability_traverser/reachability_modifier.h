@@ -35,7 +35,8 @@ namespace pemc {
 class ReachabilityModifier : public IPostStateStorageModifier {
  private:
   std::atomic<bool>* reached;
-  //
+  // the cancellationTokenSource is used to cancel the token when a state
+  // satisfying the condition is reached
   cancellation_token_source cancellationTokenSource;
 
  public:
