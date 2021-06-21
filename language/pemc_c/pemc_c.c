@@ -40,8 +40,10 @@ typedef HMODULE dlhandle;
 #include <dlfcn.h>
 
 #ifdef __APPLE__
+#define DLLPREFIX "lib"
 #define DLLEXT "dylib"
 #else
+#define DLLPREFIX ""
 #define DLLEXT "so"
 #endif
 
@@ -52,7 +54,7 @@ typedef HMODULE dlhandle;
 int32_t assign_pemc_functions_from_dll(pemc_functions* target) {
   char dll_name[256];
 
-  snprintf(dll_name, sizeof dll_name, "pemc_shared.%s", DLLEXT);
+  snprintf(dll_name, sizeof dll_name, "%spemc_shared.%s", DLLPREFIX, DLLEXT);
 
   void* pemc_library = dlopen(dll_name, RTLD_LAZY);
   if (pemc_library == NULL) {
