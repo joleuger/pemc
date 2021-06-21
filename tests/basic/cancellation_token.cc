@@ -25,17 +25,92 @@
 
 #include <gtest/gtest.h>
 
+#include <atomic>
 #include <iostream>
-
-#include "pemc/formula/adapted_formula.h"
+#include <mutex>
+#include <thread>
 
 using namespace pemc;
 
-TEST(basic_test, cancellation_token_works) {
-  auto f1 = AdaptedFormula();
-  auto f2 = AdaptedFormula();
-  std::cout << "Identifier f1: " << f1.getIdentifier() << std::endl;
-  std::cout << "Identifier f2: " << f2.getIdentifier() << std::endl;
+TEST(basic_test, cancellation_token_works_when_cancelled) {
+  std::atomic<bool> success(false);
 
-  ASSERT_NE(f1.getIdentifier(), f2.getIdentifier()) << "FAIL";
+  std::mutex mutex1;
+  std::unique_lock<std::mutex> lock1(mutex1);
+  // std::unique_lock<std::mutex> lock2(mutex1,std::defer_lock);
+
+  cancellation_token_source tokenSource;
+  auto cancellationToken = tokenSource.get_token();
+
+  auto f1 = std::thread([&mutex1, &success, &cancellationToken]() {
+    std::unique_lock<std::mutex> lock1(mutex1);
+    success = cancellationToken.is_canceled();
+  });
+  auto f2 = std::thread([&lock1, &tokenSource]() {
+    tokenSource.cancel();
+    lock1.unlock();
+  });
+
+  f1.join();
+  f2.join();
+
+  ASSERT_EQ(success.load(), true) << "FAIL";
+}
+
+TEST(basic_test, cancellation_token_works_when_not_cancelled) {
+  std::atomic<bool> success(false);
+
+  std::mutex mutex1;
+  std::unique_lock<std::mutex> lock1(mutex1);
+  // std::unique_lock<std::mutex> lock2(mutex1,std::defer_lock);
+
+  cancellation_token_source tokenSource;
+  auto cancellationToken = tokenSource.get_token();
+
+  auto f1 = std::thread([&mutex1, &success, &cancellationToken]() {
+    std::unique_lock<std::mutex> lock1(mutex1);
+    success = cancellationToken.is_canceled();
+  });
+  auto f2 = std::thread([&lock1]() { lock1.unlock(); });
+
+  f1.join();
+  f2.join();
+
+  ASSERT_EQ(success.load(), false) << "FAIL";
+}
+
+TEST(basic_test, cancellation_token_works_in_other_thread) {
+  std::atomic<bool> success(false);
+
+  std::mutex mutex1;
+  std::unique_lock<std::mutex> lock1(mutex1);
+
+  cancellation_token_source tokenSource;
+  auto cancellationToken = tokenSource.get_token();
+
+  auto f1 = std::thread([&lock1, &success, &cancellationToken]() {
+    bool unlock_mutex = true;
+    while (!cancellationToken.is_canceled()) {
+      // loop until cancellationToken is canceled
+
+      // ensure that cancelation_token is initially not cancelled and loop is
+      // run at least once
+      if (unlock_mutex) {
+        unlock_mutex = false;
+        lock1.unlock();
+      }
+    }
+    success = cancellationToken.is_canceled();
+  });
+  auto f2 = std::thread([&mutex1, &tokenSource]() {
+    // ensure that cancelation_token is initially not cancelled
+    std::unique_lock<std::mutex> lock1(mutex1);
+
+    tokenSource.cancel();
+  });
+
+  f1.join();
+  f2.join();
+
+  ASSERT_EQ(success.load(), true) << "FAIL";
 }

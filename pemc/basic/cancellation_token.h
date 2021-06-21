@@ -47,6 +47,8 @@ class cancellation_token {
  private:
   friend class cancellation_token_source;
 
+  // weak_ptr is not enought because cancellation should be permanent even when
+  // the source cancellation_token_source is gone.
   std::shared_ptr<std::atomic<long>> state;
 
   cancellation_token() {}
