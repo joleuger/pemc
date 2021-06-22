@@ -24,6 +24,10 @@
 #ifndef PEMC_C_API_C_API_H_
 #define PEMC_C_API_C_API_H_
 
+// This file is designed to be standalone and does not depend on the rest of
+// pemc. Thus, it can be included in external programs without introducing any
+// direct dependency on pemc.
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -32,6 +36,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// function pointer for model functions
 
 typedef void (*pemc_serialize_function_type)(unsigned char*,  // position
                                              size_t);         // size
@@ -52,11 +58,6 @@ typedef int32_t (*pemc_model_create)(unsigned char**);
 typedef int32_t (*pemc_model_free)(unsigned char*);
 
 typedef struct {
-  const char* identifier;
-  unsigned char* formula;
-} formula;
-
-typedef struct {
   pemc_model_create model_create;
   pemc_model_free model_free;
   pemc_serialize_function_type serialize;
@@ -66,14 +67,24 @@ typedef struct {
   pemc_get_state_vector_size_function_type get_state_vector_size;
 } pemc_model_functions;
 
+// function pointer for formulas
+
 typedef struct {
-  pemc_model_create model_create;
-  pemc_model_free model_free;
-  pemc_serialize_function_type serialize;
-  pemc_deserialize_function_type deserialize;
-  pemc_reset_to_initial_state_function_type reset_to_initial_state;
-  pemc_step_function_type step;
-  pemc_get_state_vector_size_function_type get_state_vector_size;
+  const char* identifier;
+  unsigned char* formula;
+} formula;
+
+// function pointer for entry points
+
+typedef int32_t (*check_reachability_in_executable_model_function_type)(
+    pemc_model_functions model_functions);
+
+typedef int32_t (*test_function_type)(void);
+
+typedef struct {
+  check_reachability_in_executable_model_function_type
+      check_reachability_in_executable_model;
+  test_function_type test;
 } pemc_functions;
 
 PEMC_API int32_t assign_pemc_functions(pemc_functions* target);

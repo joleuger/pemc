@@ -43,12 +43,12 @@ static PyObject* pemc_check_lmc(PyObject* self, PyObject* args) {
   return PyLong_FromLong(sts);
 }
 
-static PyObject* pemc_get_state_vector_size(PyObject* self, PyObject* args) {
+static PyObject* pemc_test(PyObject* self, PyObject* args) {
   const char* command;
   int sts;
 
   // calculate
-  sts = pemc_functions_from_dll.get_state_vector_size();
+  sts = pemc_functions_from_dll.test();
 
   return PyLong_FromLong(sts);
 }
@@ -56,7 +56,7 @@ static PyObject* pemc_get_state_vector_size(PyObject* self, PyObject* args) {
 static PyMethodDef PemcMethods[] = {
     {"check_lmc", pemc_check_lmc, METH_VARARGS,
      "Check the data structure using a labeled Markov chain."},
-    {"get_state_vector_size", pemc_get_state_vector_size, METH_VARARGS,
+    {"get_state_vector_size", pemc_test, METH_VARARGS,
      "Get State Vector Sized."},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };

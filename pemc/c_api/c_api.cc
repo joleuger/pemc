@@ -103,19 +103,11 @@ std::transform(
 
 }  // namespace
 
-static void serialize(unsigned char* position, size_t size) {}
-
-static void deserialize(unsigned char* position, size_t size) {}
-
-static void resetToInitialState() {}
-
-static void step() {}
-
-static int32_t getStateVectorSize() {
+static int32_t test() {
   return sizeof(int);
 }
 
-static bool wrap_checkReachabilityInExecutableModel(
+static int32_t wrap_checkReachabilityInExecutableModel(
     pemc_model_functions model_functions) {
   auto modelCreator = [&model_functions]() {
     return std::make_unique<CApiModel>(model_functions);
@@ -129,12 +121,9 @@ static bool wrap_checkReachabilityInExecutableModel(
 }
 
 extern "C" int32_t assign_pemc_functions(pemc_functions* target) {
-  target->serialize = (pemc_serialize_function_type)serialize;
-  target->deserialize = (pemc_deserialize_function_type)deserialize;
-  target->reset_to_initial_state =
-      (pemc_reset_to_initial_state_function_type)resetToInitialState;
-  target->step = (pemc_step_function_type)step;
-  target->get_state_vector_size =
-      (pemc_get_state_vector_size_function_type)getStateVectorSize;
+  target->check_reachability_in_executable_model =
+      (check_reachability_in_executable_model_function_type)
+          wrap_checkReachabilityInExecutableModel;
+  target->test = (test_function_type)test;
   return 0;
 }
