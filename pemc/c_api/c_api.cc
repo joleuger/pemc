@@ -23,6 +23,86 @@
 
 #include "pemc/c_api/c_api.h"
 
+#include <pemc/formula/adapted_formula.h>
+#include "pemc/executable_model/abstract_model.h"
+#include "pemc/pemc.h"
+
+using namespace pemc;
+
+namespace {
+
+class CApiModel : public AbstractModel {
+ private:
+  pemc_model_functions model_functions;
+  unsigned char* model;
+
+ public:
+  CApiModel(pemc_model_functions _model_functions) {
+    model_functions = _model_functions;
+    model_functions.model_create(&model);
+  }
+
+  virtual ~CApiModel() { model_functions.model_free(model); }
+
+  virtual void serialize(gsl::span<gsl::byte> position) {
+    model_functions.serialize(reinterpret_cast<unsigned char*>(position.data()),
+                              position.size_bytes());
+  }
+
+  virtual void deserialize(gsl::span<gsl::byte> position) {
+    model_functions.deserialize(
+        reinterpret_cast<unsigned char*>(position.data()),
+        position.size_bytes());
+  }
+
+  virtual void setFormulasForLabel(
+      const std::vector<std::shared_ptr<Formula>>& _formulas) {
+    /*
+formulaEvaluators.clear();
+formulaEvaluators.reserve(_formulas.size());
+std::transform(
+    _formulas.begin(), _formulas.end(),
+    std::back_inserter(formulaEvaluators), [this](auto& formula) {
+      return generateSlowCppFormulaEvaluator(this, formula.get());
+    });
+    */
+  }
+
+  virtual void resetToInitialState() {
+    model_functions.reset_to_initial_state(model);
+  }
+
+  virtual void step() { model_functions.step(model); }
+
+  virtual int32_t getStateVectorSize() {
+    return model_functions.get_state_vector_size(model);
+  }
+
+  template <typename T>
+  std::tuple<Probability, T> choose(
+      std::initializer_list<std::tuple<Probability, T>> choices) {
+    // This is a Member template and the implementation must stay therefore in
+    // the header.
+    auto probabilities = std::vector<Probability>();
+    probabilities.reserve(choices.size());
+    std::transform(choices.begin(), choices.end(),
+                   std::back_inserter(probabilities),
+                   [](auto& choice) { return std::get<0>(choice); });
+    auto chosenIdx = choiceResolver->choose(probabilities);
+    return choices.begin()[chosenIdx];
+  }
+
+  template <typename T>
+  T choose(std::initializer_list<T> choices) {
+    // This is a Member template and the implementation must stay therefore in
+    // the header.
+    auto chosenIdx = choiceResolver->choose(choices.size());
+    return choices.begin()[chosenIdx];
+  }
+};
+
+}  // namespace
+
 static void serialize(unsigned char* position, size_t size) {}
 
 static void deserialize(unsigned char* position, size_t size) {}
@@ -33,6 +113,19 @@ static void step() {}
 
 static int32_t getStateVectorSize() {
   return sizeof(int);
+}
+
+static bool wrap_checkReachabilityInExecutableModel(
+    pemc_model_functions model_functions) {
+  auto modelCreator = [&model_functions]() {
+    return std::make_unique<CApiModel>(model_functions);
+  };
+  std::shared_ptr<Formula> formula;
+
+  auto configuration = Configuration();
+  auto pemc = Pemc(configuration);
+
+  return pemc.checkReachabilityInExecutableModel(modelCreator, formula);
 }
 
 extern "C" int32_t assign_pemc_functions(pemc_functions* target) {

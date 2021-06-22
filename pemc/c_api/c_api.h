@@ -24,8 +24,8 @@
 #ifndef PEMC_C_API_C_API_H_
 #define PEMC_C_API_C_API_H_
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 #include "pemc/basic/dll_defines.h"
 
@@ -39,13 +39,36 @@ typedef void (*pemc_serialize_function_type)(unsigned char*,  // position
 typedef void (*pemc_deserialize_function_type)(unsigned char*,  // position
                                                size_t);         // size
 
-typedef void (*pemc_reset_to_initial_state_function_type)(void);
+typedef void (*pemc_reset_to_initial_state_function_type)(unsigned char*);
 
-typedef void (*pemc_step_function_type)(void);
+typedef void (*pemc_step_function_type)(unsigned char*);
 
-typedef int32_t (*pemc_get_state_vector_size_function_type)(void);
+typedef int32_t (*pemc_get_state_vector_size_function_type)(unsigned char*);
+
+typedef int32_t (*pemc_get_state_vector_size_function_type)(unsigned char*);
+
+typedef int32_t (*pemc_model_create)(unsigned char**);
+
+typedef int32_t (*pemc_model_free)(unsigned char*);
 
 typedef struct {
+  const char* identifier;
+  unsigned char* formula;
+} formula;
+
+typedef struct {
+  pemc_model_create model_create;
+  pemc_model_free model_free;
+  pemc_serialize_function_type serialize;
+  pemc_deserialize_function_type deserialize;
+  pemc_reset_to_initial_state_function_type reset_to_initial_state;
+  pemc_step_function_type step;
+  pemc_get_state_vector_size_function_type get_state_vector_size;
+} pemc_model_functions;
+
+typedef struct {
+  pemc_model_create model_create;
+  pemc_model_free model_free;
   pemc_serialize_function_type serialize;
   pemc_deserialize_function_type deserialize;
   pemc_reset_to_initial_state_function_type reset_to_initial_state;
