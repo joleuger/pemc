@@ -40,10 +40,16 @@ extern "C" {
 
 // function pointer for model functions
 
-typedef void (*pemc_serialize_function_type)(unsigned char*,  // position
+typedef int32_t (*pemc_model_create)(unsigned char**);
+
+typedef int32_t (*pemc_model_free)(unsigned char*);
+
+typedef void (*pemc_serialize_function_type)(unsigned char*,  // model
+                                             unsigned char*,  // position
                                              size_t);         // size
 
-typedef void (*pemc_deserialize_function_type)(unsigned char*,  // position
+typedef void (*pemc_deserialize_function_type)(unsigned char*,  // model
+                                               unsigned char*,  // position
                                                size_t);         // size
 
 typedef void (*pemc_reset_to_initial_state_function_type)(unsigned char*);
@@ -51,12 +57,6 @@ typedef void (*pemc_reset_to_initial_state_function_type)(unsigned char*);
 typedef void (*pemc_step_function_type)(unsigned char*);
 
 typedef int32_t (*pemc_get_state_vector_size_function_type)(unsigned char*);
-
-typedef int32_t (*pemc_get_state_vector_size_function_type)(unsigned char*);
-
-typedef int32_t (*pemc_model_create)(unsigned char**);
-
-typedef int32_t (*pemc_model_free)(unsigned char*);
 
 typedef struct {
   pemc_model_create model_create;

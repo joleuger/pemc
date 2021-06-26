@@ -62,13 +62,14 @@ class CApiModel : public AbstractModel {
   virtual ~CApiModel() { model_functions.model_free(model); }
 
   virtual void serialize(gsl::span<gsl::byte> position) {
-    model_functions.serialize(reinterpret_cast<unsigned char*>(position.data()),
+    model_functions.serialize(model,
+                              reinterpret_cast<unsigned char*>(position.data()),
                               position.size_bytes());
   }
 
   virtual void deserialize(gsl::span<gsl::byte> position) {
     model_functions.deserialize(
-        reinterpret_cast<unsigned char*>(position.data()),
+        model, reinterpret_cast<unsigned char*>(position.data()),
         position.size_bytes());
   }
 
