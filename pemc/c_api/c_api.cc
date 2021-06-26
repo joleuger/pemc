@@ -24,12 +24,29 @@
 #include "pemc/c_api/c_api.h"
 
 #include <pemc/formula/adapted_formula.h>
+#include "pemc/basic/ThrowAssert.hpp"
 #include "pemc/executable_model/abstract_model.h"
+#include "pemc/formula/slow_formula_compilation_visitor.h"
 #include "pemc/pemc.h"
 
 using namespace pemc;
 
 namespace {
+
+class CApiModel;
+
+class SlowCApiFormulaCompilationVisitor : public SlowFormulaCompilationVisitor {
+ private:
+  CApiModel* model;
+
+ public:
+  std::function<bool()> result;
+
+  SlowCApiFormulaCompilationVisitor(CApiModel* _model);
+  virtual ~SlowCApiFormulaCompilationVisitor() = default;
+
+  virtual void visitAdaptedFormula(AdaptedFormula* formula);
+};
 
 class CApiModel : public AbstractModel {
  private:
@@ -57,15 +74,15 @@ class CApiModel : public AbstractModel {
 
   virtual void setFormulasForLabel(
       const std::vector<std::shared_ptr<Formula>>& _formulas) {
-    /*
-formulaEvaluators.clear();
-formulaEvaluators.reserve(_formulas.size());
-std::transform(
-    _formulas.begin(), _formulas.end(),
-    std::back_inserter(formulaEvaluators), [this](auto& formula) {
-      return generateSlowCppFormulaEvaluator(this, formula.get());
-    });
-    */
+    formulaEvaluators.clear();
+    formulaEvaluators.reserve(_formulas.size());
+    std::transform(_formulas.begin(), _formulas.end(),
+                   std::back_inserter(formulaEvaluators),
+                   [this](auto& formula) {
+                     auto compiler = SlowCApiFormulaCompilationVisitor(this);
+                     formula->visit(&compiler);
+                     return std::move(compiler.result);
+                   });
   }
 
   virtual void resetToInitialState() {
@@ -100,6 +117,32 @@ std::transform(
     return choices.begin()[chosenIdx];
   }
 };
+
+// such formulas should be static in the model classes
+class CApiFormula : public AdaptedFormula {
+ private:
+  std::function<bool(CApiModel*)> evaluator;
+
+ public:
+  CApiFormula(const std::function<bool(CApiModel*)>& _evaluator,
+              const std::string& _identifier = "")
+      : AdaptedFormula(_identifier), evaluator(_evaluator) {}
+  virtual ~CApiFormula() = default;
+
+  std::function<bool(CApiModel*)> getEvaluator() { return evaluator; }
+};
+
+SlowCApiFormulaCompilationVisitor::SlowCApiFormulaCompilationVisitor(
+    CApiModel* _model)
+    : SlowFormulaCompilationVisitor(), model(_model) {}
+
+void SlowCApiFormulaCompilationVisitor::visitAdaptedFormula(
+    AdaptedFormula* formula) {
+  auto capiFormula = dynamic_cast<CApiFormula*>(formula);
+  throw_assert(capiFormula != nullptr,
+               "Could not cast AdaptedFormula into a CApiFormula");
+  result = std::bind(capiFormula->getEvaluator(), model);
+}
 
 }  // namespace
 
