@@ -175,14 +175,23 @@ libpemcCpptests = [
   'language/pemc_cpp_tests/test.cc'
 ]
 
+libpemcCApitests = [
+  'tests/c_api/c_api.cc'
+]
+
 if meson.get_cross_property('build-tests', 'yes') == 'yes'
    pemcExe = executable('testpemc', libpemctests,
       dependencies : [gtest_main_dep, libpemc_dep])
-   test('gtest test', pemcExe)
+   test('test pemc core', pemcExe)
 
    pemcCppExe = executable('testpemcCpp', libpemcCpptests,
       dependencies : [gtest_main_dep, libpemcCpp_dep])
-   test('gtest test', pemcCppExe)
+   test('test c++ interface', pemcCppExe)
+
+   pemcCApiExe = executable('testpemcCApi', libpemcCApitests,
+      dependencies : [gtest_main_dep],
+      link_with : [libpemc_shared])
+   test('test c api', pemcCApiExe)
 endif
 
 

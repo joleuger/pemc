@@ -27,6 +27,7 @@
 // This file is designed to be standalone and does not depend on the rest of
 // pemc. Thus, it can be included in external programs without introducing any
 // direct dependency on pemc.
+// CApi is build as part of the shared library.
 
 #include <stddef.h>
 #include <stdint.h>
