@@ -87,8 +87,8 @@ void test_model_step(unsigned char* model) {
 
   if (testmodel->state_serialized == 0) {
     int32_t option = 0;
-    // testmodel->pemc_choice_resolver->pemc_choice_resolver_by_no_of_options(
-    //    2);
+    testmodel->pemc_choice_resolver->pemc_choose_by_no_of_options(
+        testmodel->pemc_choice_resolver->model_internals, 2);
     if (option == 0) {
       testmodel->state_serialized = 3;
     }

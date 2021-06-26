@@ -40,12 +40,16 @@ extern "C" {
 
 // function pointer for choices
 
-typedef int32_t (*pemc_choice_resolver_by_no_of_options_function_type)(
+typedef int32_t (*pemc_choose_by_no_of_options_function_type)(
+    unsigned char* model_internals,
     int32_t no_of_options);
 
 typedef struct {
-  pemc_choice_resolver_by_no_of_options_function_type
-      pemc_choice_resolver_by_no_of_options;
+  unsigned char* model_internals;
+
+  // choice resolver
+  pemc_choose_by_no_of_options_function_type pemc_choose_by_no_of_options;
+
 } pemc_choice_resolver;
 
 // function pointer for model functions

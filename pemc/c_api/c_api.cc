@@ -50,12 +50,13 @@ class SlowCApiFormulaCompilationVisitor : public SlowFormulaCompilationVisitor {
   virtual void visitAdaptedFormula(AdaptedFormula* formula);
 };
 
+int32_t pemc_choose_by_no_of_options(unsigned char* _model_internals,
+                                     int32_t no_of_options);
+
 class CApiModel : public AbstractModel {
  private:
   pemc_model_functions model_functions;
   pemc_choice_resolver pemc_choice_resolver;
-
-  std::function<int32_t(int32_t)> choice_resolver_by_no_of_options;
 
  public:
   unsigned char* model;
@@ -63,12 +64,12 @@ class CApiModel : public AbstractModel {
   CApiModel(pemc_model_functions _model_functions) {
     model_functions = _model_functions;
 
-    choice_resolver_by_no_of_options = [this](int32_t no_of_options) {
-      return this->choose(no_of_options);
-    };
+    pemc_choice_resolver.pemc_choose_by_no_of_options =
+        (pemc_choose_by_no_of_options_function_type)
+            pemc_choose_by_no_of_options;
 
-    pemc_choice_resolver.pemc_choice_resolver_by_no_of_options =
-        choice_resolver_by_no_of_options.target<int32_t(int32_t)>();
+    pemc_choice_resolver.model_internals =
+        reinterpret_cast<unsigned char*>(this);
 
     model_functions.model_create(&model, &pemc_choice_resolver);
 
@@ -155,8 +156,6 @@ void SlowCApiFormulaCompilationVisitor::visitAdaptedFormula(
   spdlog::info("C-Api: Formulas finished.");
 }
 
-}  // namespace
-
 // formulas
 pemc_formula_ref* pemc_register_basic_formula(
     pemc_basic_formula_function_type* c_function) {
@@ -195,6 +194,15 @@ void pemc_unref_formula(pemc_formula_ref* formula_ref) {
   }
 };
 
+// choice resolvers
+
+int32_t pemc_choose_by_no_of_options(unsigned char* _model_internals,
+                                     int32_t no_of_options) {
+  spdlog::info("C-Api: Choice Resolver.");
+  CApiModel* model_internals = reinterpret_cast<CApiModel*>(_model_internals);
+  return model_internals->choose(no_of_options);
+};
+
 // main functionality
 
 static int32_t check_reachability_in_executable_model(
@@ -220,6 +228,7 @@ static int32_t check_reachability_in_executable_model(
 static int32_t test() {
   return sizeof(int);
 }
+}  // namespace
 
 extern "C" int32_t assign_pemc_functions(pemc_functions* target) {
   // main functionality
