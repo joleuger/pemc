@@ -38,9 +38,21 @@
 extern "C" {
 #endif
 
+// function pointer for choices
+
+typedef int32_t (*pemc_choice_resolver_by_no_of_options_function_type)(
+    int32_t no_of_options);
+
+typedef struct {
+  pemc_choice_resolver_by_no_of_options_function_type
+      pemc_choice_resolver_by_no_of_options;
+} pemc_choice_resolver;
+
 // function pointer for model functions
 
-typedef int32_t (*pemc_model_create)(unsigned char**);
+typedef int32_t (*pemc_model_create)(
+    unsigned char**,         // pointer to model
+    pemc_choice_resolver*);  // choice resolver of that model
 
 typedef int32_t (*pemc_model_free)(unsigned char*);
 
@@ -58,6 +70,7 @@ typedef void (*pemc_step_function_type)(unsigned char*);
 
 typedef int32_t (*pemc_get_state_vector_size_function_type)(unsigned char*);
 
+// required functions: Those must be provided by the user of pemc
 typedef struct {
   pemc_model_create model_create;
   pemc_model_free model_free;
@@ -71,20 +84,39 @@ typedef struct {
 // function pointer for formulas
 
 typedef struct {
-  const char* identifier;
+  size_t refs;
   unsigned char* formula;
-} formula;
+} pemc_formula_ref;
+
+typedef int32_t (*pemc_basic_formula_function_type)(unsigned char*);  // model
+
+typedef pemc_formula_ref* (*pemc_register_basic_formula_function_type)(
+    pemc_basic_formula_function_type);  // model
+
+typedef void (*pemc_ref_formula_function_type)(pemc_formula_ref*);
+
+typedef void (*pemc_unref_formula_function_type)(pemc_formula_ref*);
 
 // function pointer for entry points
 
 typedef int32_t (*check_reachability_in_executable_model_function_type)(
-    pemc_model_functions model_functions);
+    pemc_model_functions model_functions,
+    pemc_formula_ref* formula_ref);
 
 typedef int32_t (*test_function_type)(void);
 
+// provided functions: Those can be used by the user of pemc
 typedef struct {
+  // formulas
+  pemc_register_basic_formula_function_type pemc_register_basic_formula;
+  pemc_ref_formula_function_type pemc_ref_formula;
+  pemc_unref_formula_function_type pemc_unref_formula;
+
+  // main functionality
   check_reachability_in_executable_model_function_type
       check_reachability_in_executable_model;
+
+  // debugging
   test_function_type test;
 } pemc_functions;
 

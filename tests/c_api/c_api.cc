@@ -25,65 +25,93 @@
 
 #include <gtest/gtest.h>
 
-#include <atomic>
 #include <iostream>
-#include <mutex>
 #include <thread>
 
-pemc_functions pemc_function_accessor;
+typedef struct TestModel {
+  int32_t state_serialized;
+  int64_t state_temporary;
+  pemc_choice_resolver* pemc_choice_resolver;
+} TestModel;
 
-void test_model_create(unsigned char** model) {
-  *model = (unsigned char*)malloc(sizeof(int32_t));
+void test_model_create(unsigned char** model,
+                       pemc_choice_resolver* pemc_choice_resolver) {
+  TestModel* testmodel = (TestModel*)malloc(sizeof(TestModel));
+  testmodel->pemc_choice_resolver = pemc_choice_resolver;
+  *model = (unsigned char*)testmodel;
+  std::cout << "Test model created\n";
 }
 
 void test_model_free(unsigned char* model) {
   free(model);
+  std::cout << "Test model destructed\n";
 }
 
 void test_model_serialize(unsigned char* model,
                           unsigned char* position,
                           size_t size) {
-  // copy state from model to position
+  // retrieve model
+  TestModel* testmodel = (TestModel*)model;
 
-  int32_t state =
-      *(int32_t*)model;  // copy value in postition to a temporary variable
+  *(int32_t*)position = testmodel->state_serialized;  // copy value to position
 
-  *(int32_t*)position = state;  // copy value to position
+  std::cout << "Test model serialized\n";
 }
 
 void test_model_deserialize(unsigned char* model,
                             unsigned char* position,
                             size_t size) {
-  // copy state from postion to model
+  // retrieve model
+  TestModel* testmodel = (TestModel*)model;
 
   int32_t state =
       *(int32_t*)position;  // copy value in postition to a temporary variable
 
-  *(int32_t*)model = state;  // copy value to model
+  testmodel->state_serialized = state;  // copy value to model
+
+  std::cout << "Test model deserialized\n";
 }
 
 void test_model_reset_to_initial_state(unsigned char* model) {
-  int32_t state = 0;
+  // retrieve model
+  TestModel* testmodel = (TestModel*)model;
 
-  *(int32_t*)model = state;  // copy value back to model
+  testmodel->state_serialized = 0;  // set initial value
+  std::cout << "Test model reset\n";
 }
 
 void test_model_step(unsigned char* model) {
-  int32_t state =
-      *(int32_t*)model;  // copy value in postition to a temporary variable
+  // retrieve model
+  std::cout << "Test model step\n";
+  TestModel* testmodel = (TestModel*)model;
 
-  if (state == 0) {
-    // state = choose({3, 1});
-  } else if (state == 1) {
-    state = 3;
+  if (testmodel->state_serialized == 0) {
+    int32_t option = 0;
+    // testmodel->pemc_choice_resolver->pemc_choice_resolver_by_no_of_options(
+    //    2);
+    if (option == 0) {
+      testmodel->state_serialized = 3;
+    }
+    if (option == 1) {
+      testmodel->state_serialized = 3;
+    }
+  } else if (testmodel->state_serialized == 1) {
+    testmodel->state_serialized = 3;
   }
+  std::cout << "Test model step end: Choice resolver needs to be fixed\n";
+}
 
-  *(int32_t*)model = state;  // copy value back to model
+int32_t formula_f1(unsigned char* model) {
+  // retrieve model
+  TestModel* testmodel = (TestModel*)model;
+  return testmodel->state_serialized == 3;
 }
 
 int32_t test_model_get_state_vector_size(unsigned char* model) {
   return sizeof(int32_t);
 }
+
+pemc_functions pemc_function_accessor;
 
 TEST(c_api_test, c_api_function_accessor_works) {
   // get pemc functions
@@ -115,8 +143,11 @@ TEST(c_api_test, c_api_check_reachability_in_executable_model_works) {
   // get pemc functions
   assign_pemc_functions(&pemc_function_accessor);
 
-  // pemc_function_accessor.check_reachability_in_executable_model(
-  //    model_functions);
+  pemc_formula_ref* f1 =
+      pemc_function_accessor.pemc_register_basic_formula(&formula_f1);
+
+  pemc_function_accessor.check_reachability_in_executable_model(model_functions,
+                                                                f1);
 
   ASSERT_EQ(true, true) << "FAIL";
 }

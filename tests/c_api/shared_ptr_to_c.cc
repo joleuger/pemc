@@ -26,6 +26,8 @@
 #include <iostream>
 #include <memory>
 
+// https://stackoverflow.com/questions/31063055/passing-a-shared-ptr-through-a-c-interface-that-takes-void
+
 struct Formula {
   int somedata;
   Formula() { std::cout << "Formula::Formula() called\n"; }

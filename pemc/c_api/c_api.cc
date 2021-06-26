@@ -29,6 +29,8 @@
 #include "pemc/formula/slow_formula_compilation_visitor.h"
 #include "pemc/pemc.h"
 
+#include <spdlog/spdlog.h>
+
 using namespace pemc;
 
 namespace {
@@ -51,15 +53,32 @@ class SlowCApiFormulaCompilationVisitor : public SlowFormulaCompilationVisitor {
 class CApiModel : public AbstractModel {
  private:
   pemc_model_functions model_functions;
-  unsigned char* model;
+  pemc_choice_resolver pemc_choice_resolver;
+
+  std::function<int32_t(int32_t)> choice_resolver_by_no_of_options;
 
  public:
+  unsigned char* model;
+
   CApiModel(pemc_model_functions _model_functions) {
     model_functions = _model_functions;
-    model_functions.model_create(&model);
+
+    choice_resolver_by_no_of_options = [this](int32_t no_of_options) {
+      return this->choose(no_of_options);
+    };
+
+    pemc_choice_resolver.pemc_choice_resolver_by_no_of_options =
+        choice_resolver_by_no_of_options.target<int32_t(int32_t)>();
+
+    model_functions.model_create(&model, &pemc_choice_resolver);
+
+    spdlog::info("C-Api: Model instance created.");
   }
 
-  virtual ~CApiModel() { model_functions.model_free(model); }
+  virtual ~CApiModel() {
+    model_functions.model_free(model);
+    spdlog::info("C-Api: Model instance freed.");
+  }
 
   virtual void serialize(gsl::span<gsl::byte> position) {
     model_functions.serialize(model,
@@ -75,6 +94,7 @@ class CApiModel : public AbstractModel {
 
   virtual void setFormulasForLabel(
       const std::vector<std::shared_ptr<Formula>>& _formulas) {
+    spdlog::info("C-Api: Formulas.");
     formulaEvaluators.clear();
     formulaEvaluators.reserve(_formulas.size());
     std::transform(_formulas.begin(), _formulas.end(),
@@ -90,47 +110,28 @@ class CApiModel : public AbstractModel {
     model_functions.reset_to_initial_state(model);
   }
 
-  virtual void step() { model_functions.step(model); }
+  virtual void step() {
+    spdlog::info("C-Api: Step.");
+    model_functions.step(model);
+  }
 
   virtual int32_t getStateVectorSize() {
     return model_functions.get_state_vector_size(model);
-  }
-
-  template <typename T>
-  std::tuple<Probability, T> choose(
-      std::initializer_list<std::tuple<Probability, T>> choices) {
-    // This is a Member template and the implementation must stay therefore in
-    // the header.
-    auto probabilities = std::vector<Probability>();
-    probabilities.reserve(choices.size());
-    std::transform(choices.begin(), choices.end(),
-                   std::back_inserter(probabilities),
-                   [](auto& choice) { return std::get<0>(choice); });
-    auto chosenIdx = choiceResolver->choose(probabilities);
-    return choices.begin()[chosenIdx];
-  }
-
-  template <typename T>
-  T choose(std::initializer_list<T> choices) {
-    // This is a Member template and the implementation must stay therefore in
-    // the header.
-    auto chosenIdx = choiceResolver->choose(choices.size());
-    return choices.begin()[chosenIdx];
   }
 };
 
 // such formulas should be static in the model classes
 class CApiFormula : public AdaptedFormula {
  private:
-  std::function<bool(CApiModel*)> evaluator;
+  pemc_basic_formula_function_type* evaluator;
 
  public:
-  CApiFormula(const std::function<bool(CApiModel*)>& _evaluator,
+  CApiFormula(pemc_basic_formula_function_type* _evaluator,
               const std::string& _identifier = "")
       : AdaptedFormula(_identifier), evaluator(_evaluator) {}
   virtual ~CApiFormula() = default;
 
-  std::function<bool(CApiModel*)> getEvaluator() { return evaluator; }
+  pemc_basic_formula_function_type* getEvaluator() { return evaluator; }
 };
 
 SlowCApiFormulaCompilationVisitor::SlowCApiFormulaCompilationVisitor(
@@ -140,34 +141,101 @@ SlowCApiFormulaCompilationVisitor::SlowCApiFormulaCompilationVisitor(
 void SlowCApiFormulaCompilationVisitor::visitAdaptedFormula(
     AdaptedFormula* formula) {
   auto capiFormula = dynamic_cast<CApiFormula*>(formula);
+  CApiModel* cmodel = this->model;
   throw_assert(capiFormula != nullptr,
                "Could not cast AdaptedFormula into a CApiFormula");
-  result = std::bind(capiFormula->getEvaluator(), model);
+  result = [&capiFormula, cmodel]() {
+    spdlog::info("C-Api: Evaluate. Needs to be fixed");
+    return false;
+    // pemc_basic_formula_function_type* evaluator =
+    // capiFormula->getEvaluator(); auto evaluatedFormula =
+    // (*evaluator)(cmodel->model); spdlog::info("C-Api: Evaluated."); return
+    // evaluatedFormula;
+  };
+  spdlog::info("C-Api: Formulas finished.");
 }
 
 }  // namespace
+
+// formulas
+pemc_formula_ref* pemc_register_basic_formula(
+    pemc_basic_formula_function_type* c_function) {
+  pemc_formula_ref* pemc_formula =
+      (pemc_formula_ref*)malloc(sizeof(pemc_formula_ref));
+  if (!pemc_formula)
+    return nullptr;
+
+  auto cApiFormula = std::make_shared<CApiFormula>(c_function);
+  auto ptr = std::make_unique<std::shared_ptr<CApiFormula>>(cApiFormula);
+
+  pemc_formula->refs = 1;
+  pemc_formula->formula = reinterpret_cast<unsigned char*>(ptr.release());
+
+  return pemc_formula;
+}
+
+void pemc_ref_formula(pemc_formula_ref* formula_ref) {
+  if (!formula_ref)
+    return;
+
+  formula_ref->refs++;
+}
+
+void pemc_unref_formula(pemc_formula_ref* formula_ref) {
+  if (!formula_ref)
+    return;
+
+  formula_ref->formula--;
+
+  if (formula_ref->refs <= 0) {
+    // revive unique_ptr, which destroys everything inside it, when the program
+    // leaves the scope.
+    auto ptr = std::unique_ptr<std::shared_ptr<Formula>>(
+        reinterpret_cast<std::shared_ptr<Formula>*>(formula_ref->formula));
+  }
+};
+
+// main functionality
+
+static int32_t check_reachability_in_executable_model(
+    pemc_model_functions model_functions,
+    pemc_formula_ref* formula_ref) {
+  auto modelCreator = [&model_functions]() {
+    return std::make_unique<CApiModel>(model_functions);
+  };
+
+  pemc_ref_formula(formula_ref);
+  auto formula =
+      *reinterpret_cast<std::shared_ptr<Formula>*>(formula_ref->formula);
+
+  auto configuration = Configuration();
+  auto pemc = Pemc(configuration);
+
+  auto result = pemc.checkReachabilityInExecutableModel(modelCreator, formula);
+  pemc_unref_formula(formula_ref);
+
+  return result;
+}
 
 static int32_t test() {
   return sizeof(int);
 }
 
-static int32_t wrap_checkReachabilityInExecutableModel(
-    pemc_model_functions model_functions) {
-  auto modelCreator = [&model_functions]() {
-    return std::make_unique<CApiModel>(model_functions);
-  };
-  std::shared_ptr<Formula> formula;
-
-  auto configuration = Configuration();
-  auto pemc = Pemc(configuration);
-
-  return pemc.checkReachabilityInExecutableModel(modelCreator, formula);
-}
-
 extern "C" int32_t assign_pemc_functions(pemc_functions* target) {
+  // main functionality
+
   target->check_reachability_in_executable_model =
       (check_reachability_in_executable_model_function_type)
-          wrap_checkReachabilityInExecutableModel;
+          check_reachability_in_executable_model;
+
+  // formulas
+  target->pemc_register_basic_formula =
+      (pemc_register_basic_formula_function_type)pemc_register_basic_formula;
+  target->pemc_ref_formula = (pemc_ref_formula_function_type)pemc_ref_formula;
+  target->pemc_unref_formula =
+      (pemc_ref_formula_function_type)pemc_unref_formula;
+
+  // debugging
   target->test = (test_function_type)test;
   return 0;
 }

@@ -25,24 +25,29 @@
 #ifndef PEMC_FORMULA_FORMULA_H_
 #define PEMC_FORMULA_FORMULA_H_
 
+#include <memory>
 #include <string>
 
 namespace pemc {
 
-  class FormulaVisitor;
+class FormulaVisitor;
 
-  class Formula {
-  private:
-    std::string identifier;
-  protected:
-    Formula(const std::string& _identifier = "");
-  public:
-    virtual ~Formula() = default;
+// Because we always use Formula inside a shared_ptr, we
+// use std::enable_shared_from_this. it can become handy in the future
+class Formula : std::enable_shared_from_this<Formula> {
+ private:
+  std::string identifier;
 
-    const std::string& getIdentifier();
+ protected:
+  Formula(const std::string& _identifier = "");
 
-    virtual void visit(FormulaVisitor* visitor) = 0;
-  };
+ public:
+  virtual ~Formula() = default;
 
-}
+  const std::string& getIdentifier();
+
+  virtual void visit(FormulaVisitor* visitor) = 0;
+};
+
+}  // namespace pemc
 #endif  // PEMC_FORMULA_FORMULA_H_

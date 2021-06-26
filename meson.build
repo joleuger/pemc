@@ -176,7 +176,8 @@ libpemcCpptests = [
 ]
 
 libpemcCApitests = [
-  'tests/c_api/c_api.cc'
+  'tests/c_api/c_api.cc',
+  'tests/c_api/shared_ptr_to_c.cc'
 ]
 
 if meson.get_cross_property('build-tests', 'yes') == 'yes'
