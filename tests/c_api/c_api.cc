@@ -106,6 +106,12 @@ int32_t formula_f1(unsigned char* model) {
   return testmodel->state_serialized == 3;
 }
 
+int32_t formula_f2(unsigned char* model) {
+  // retrieve model
+  TestModel* testmodel = (TestModel*)model;
+  return testmodel->state_serialized == 4;
+}
+
 int32_t test_model_get_state_vector_size(unsigned char* model) {
   return sizeof(int32_t);
 }
@@ -145,8 +151,20 @@ TEST(c_api_test, c_api_check_reachability_in_executable_model_works) {
   pemc_formula_ref* f1 =
       pemc_function_accessor.pemc_register_basic_formula(formula_f1);
 
-  pemc_function_accessor.check_reachability_in_executable_model(model_functions,
-                                                                f1);
+  pemc_formula_ref* f2 =
+      pemc_function_accessor.pemc_register_basic_formula(formula_f2);
 
-  ASSERT_EQ(true, true) << "FAIL";
+  auto result_f1 =
+      pemc_function_accessor.check_reachability_in_executable_model(
+          model_functions, f1);
+
+  auto result_f2 =
+      pemc_function_accessor.check_reachability_in_executable_model(
+          model_functions, f2);
+
+  pemc_function_accessor.pemc_unref_formula(f1);
+  pemc_function_accessor.pemc_unref_formula(f2);
+
+  ASSERT_EQ(result_f1, true) << "FAIL";
+  ASSERT_EQ(result_f2, false) << "FAIL";
 }
