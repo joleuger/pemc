@@ -124,15 +124,15 @@ class CApiModel : public AbstractModel {
 // such formulas should be static in the model classes
 class CApiFormula : public AdaptedFormula {
  private:
-  pemc_basic_formula_function_type* evaluator;
+  pemc_basic_formula_function_type evaluator;
 
  public:
-  CApiFormula(pemc_basic_formula_function_type* _evaluator,
+  CApiFormula(pemc_basic_formula_function_type _evaluator,
               const std::string& _identifier = "")
       : AdaptedFormula(_identifier), evaluator(_evaluator) {}
   virtual ~CApiFormula() = default;
 
-  pemc_basic_formula_function_type* getEvaluator() { return evaluator; }
+  pemc_basic_formula_function_type getEvaluator() { return evaluator; }
 };
 
 SlowCApiFormulaCompilationVisitor::SlowCApiFormulaCompilationVisitor(
@@ -145,20 +145,20 @@ void SlowCApiFormulaCompilationVisitor::visitAdaptedFormula(
   CApiModel* cmodel = this->model;
   throw_assert(capiFormula != nullptr,
                "Could not cast AdaptedFormula into a CApiFormula");
-  result = [&capiFormula, cmodel]() {
+  result = [capiFormula, cmodel]() {
     spdlog::info("C-Api: Evaluate. Needs to be fixed");
-    return false;
-    // pemc_basic_formula_function_type* evaluator =
-    // capiFormula->getEvaluator(); auto evaluatedFormula =
-    // (*evaluator)(cmodel->model); spdlog::info("C-Api: Evaluated."); return
-    // evaluatedFormula;
+    pemc_basic_formula_function_type evaluator = capiFormula->getEvaluator();
+    auto evaluatedFormula = evaluator(cmodel->model);
+    spdlog::info("C-Api: Evaluated.");
+    return evaluatedFormula;
   };
   spdlog::info("C-Api: Formulas finished.");
 }
 
 // formulas
 pemc_formula_ref* pemc_register_basic_formula(
-    pemc_basic_formula_function_type* c_function) {
+    pemc_basic_formula_function_type c_function) {
+  spdlog::info("C-Api: Register formula.");
   pemc_formula_ref* pemc_formula =
       (pemc_formula_ref*)malloc(sizeof(pemc_formula_ref));
   if (!pemc_formula)

@@ -98,7 +98,6 @@ void test_model_step(unsigned char* model) {
   } else if (testmodel->state_serialized == 1) {
     testmodel->state_serialized = 3;
   }
-  std::cout << "Test model step end: Choice resolver needs to be fixed\n";
 }
 
 int32_t formula_f1(unsigned char* model) {
@@ -144,7 +143,7 @@ TEST(c_api_test, c_api_check_reachability_in_executable_model_works) {
   assign_pemc_functions(&pemc_function_accessor);
 
   pemc_formula_ref* f1 =
-      pemc_function_accessor.pemc_register_basic_formula(&formula_f1);
+      pemc_function_accessor.pemc_register_basic_formula(formula_f1);
 
   pemc_function_accessor.check_reachability_in_executable_model(model_functions,
                                                                 f1);
