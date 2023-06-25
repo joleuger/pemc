@@ -31,13 +31,13 @@
 typedef struct TestModel {
   int32_t state_serialized;
   int64_t state_temporary;
-  pemc_choice_resolver* pemc_choice_resolver;
+  pemc_model_specific_interface* pemc_interface;
 } TestModel;
 
 void test_model_create(unsigned char** model,
-                       pemc_choice_resolver* pemc_choice_resolver) {
+                       pemc_model_specific_interface* _pemc_interface) {
   TestModel* testmodel = (TestModel*)malloc(sizeof(TestModel));
-  testmodel->pemc_choice_resolver = pemc_choice_resolver;
+  testmodel->pemc_interface = _pemc_interface;
   *model = (unsigned char*)testmodel;
   std::cout << "Test model created\n";
 }
@@ -87,8 +87,8 @@ void test_model_step(unsigned char* model) {
 
   if (testmodel->state_serialized == 0) {
     int32_t option = 0;
-    testmodel->pemc_choice_resolver->pemc_choose_by_no_of_options(
-        testmodel->pemc_choice_resolver->model_internals, 2);
+    testmodel->pemc_interface->pemc_choose_by_no_of_options(
+        testmodel->pemc_interface, 2);
     if (option == 0) {
       testmodel->state_serialized = 3;
     }
