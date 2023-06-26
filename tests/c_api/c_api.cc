@@ -87,10 +87,10 @@ void test_model_step(unsigned char* model) {
 
   if (testmodel->state_serialized == 0) {
     int32_t option = 0;
-    testmodel->pemc_interface->pemc_choose_by_no_of_options(
+    option = testmodel->pemc_interface->pemc_choose_by_no_of_options(
         testmodel->pemc_interface, 2);
     if (option == 0) {
-      testmodel->state_serialized = 3;
+      testmodel->state_serialized = 1;
     }
     if (option == 1) {
       testmodel->state_serialized = 3;

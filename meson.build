@@ -199,3 +199,12 @@ endif
 if meson.get_cross_property('build-examples', 'yes') == 'yes'
    executable('example_dice', 'language/pemc_cpp_examples/dice.cc', dependencies : [libpemc_dep, libpemcCpp_dep])
 endif
+
+if meson.get_cross_property('build-examples', 'yes') == 'yes'
+  language_c_include = include_directories('language')
+
+   executable('example_dice_c',
+    ['language/pemc_c_examples/dice.c',
+    'language/pemc_c/pemc_c.c',],
+    include_directories : [ language_c_include ])
+endif

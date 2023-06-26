@@ -183,13 +183,36 @@ void pemc_unref_formula(pemc_formula_ref* formula_ref) {
   if (!formula_ref)
     return;
 
-  formula_ref->formula--;
+  formula_ref->refs--;
 
   if (formula_ref->refs <= 0) {
     // revive unique_ptr, which destroys everything inside it, when the program
     // leaves the scope.
     auto ptr = std::unique_ptr<std::shared_ptr<Formula>>(
         reinterpret_cast<std::shared_ptr<Formula>*>(formula_ref->formula));
+  }
+};
+
+// models
+
+void pemc_ref_lmc(pemc_lmc_ref* lmc_ref) {
+  if (!lmc_ref)
+    return;
+
+  lmc_ref->refs++;
+}
+
+void pemc_unref_lmc(pemc_lmc_ref* lmc_ref) {
+  if (!lmc_ref)
+    return;
+
+  lmc_ref->refs--;
+
+  if (lmc_ref->refs <= 0) {
+    // revive unique_ptr, which destroys everything inside it, when the program
+    // leaves the scope.
+    auto ptr = std::unique_ptr<std::shared_ptr<Lmc>>(
+        reinterpret_cast<std::shared_ptr<Lmc>*>(lmc_ref->lmc));
   }
 };
 
@@ -226,24 +249,103 @@ static int32_t check_reachability_in_executable_model(
   return result;
 }
 
+static pemc_lmc_ref* build_lmc_from_executable_model(
+    pemc_model_functions model_functions,
+    const pemc_formula_ref** formulas,
+    int32_t num_formulas) {
+  auto modelCreator = [&model_functions]() {
+    return std::make_unique<CApiModel>(model_functions);
+  };
+
+  // create a c++ array with the formulas
+  std::vector<std::shared_ptr<Formula>> formulasAsVec;
+  std::transform(
+      formulas, formulas + num_formulas, std::back_inserter(formulasAsVec),
+      [](const pemc_formula_ref* element) {
+        auto formula =
+            *reinterpret_cast<std::shared_ptr<Formula>*>(element->formula);
+        return formula;
+      });
+
+  auto configuration = Configuration();
+  auto pemc = Pemc(configuration);
+
+  auto result = pemc.buildLmcFromExecutableModel(modelCreator, formulasAsVec);
+
+  // wrap the result into pemc_lmc_ref
+  pemc_lmc_ref* pemc_lmc = (pemc_lmc_ref*)malloc(sizeof(pemc_lmc_ref));
+  if (!pemc_lmc)
+    return nullptr;
+  pemc_lmc->refs = 1;
+  pemc_lmc->lmc = reinterpret_cast<unsigned char*>(result.release());
+
+  return pemc_lmc;
+}
+
+static double calculate_probability_to_reach_state_within_bound(
+    pemc_lmc_ref* lmc_ref,
+    pemc_formula_ref* formula_ref,
+    int32_t bound) {
+  pemc_ref_lmc(lmc_ref);
+  pemc_ref_formula(formula_ref);
+
+  auto lmc = reinterpret_cast<Lmc*>(lmc_ref->lmc);
+
+  auto formula =
+      *reinterpret_cast<std::shared_ptr<Formula>*>(formula_ref->formula);
+
+  auto configuration = Configuration();
+  auto pemc = Pemc(configuration);
+
+  auto result =
+      pemc.calculateProbabilityToReachStateWithinBound(*lmc, formula, bound);
+
+  pemc_unref_formula(formula_ref);
+  pemc_unref_lmc(lmc_ref);
+
+  return result.value;
+}
+
 static int32_t test() {
   return sizeof(int);
+}
+
+static int32_t pemc_choose_int_option(
+    pemc_model_specific_interface* pemc_interface,
+    const int32_t* options,
+    int32_t numOptions) {
+  int32_t selected_option =
+      pemc_interface->pemc_choose_by_no_of_options(pemc_interface, numOptions);
+  return options[numOptions];
 }
 }  // namespace
 
 extern "C" int32_t assign_pemc_functions(pemc_functions* target) {
-  // main functionality
-
-  target->check_reachability_in_executable_model =
-      (check_reachability_in_executable_model_function_type)
-          check_reachability_in_executable_model;
-
   // formulas
   target->pemc_register_basic_formula =
       (pemc_register_basic_formula_function_type)pemc_register_basic_formula;
   target->pemc_ref_formula = (pemc_ref_formula_function_type)pemc_ref_formula;
   target->pemc_unref_formula =
       (pemc_ref_formula_function_type)pemc_unref_formula;
+
+  // models
+  target->pemc_ref_lmc = (pemc_ref_lmc_function_type)pemc_ref_lmc;
+  target->pemc_unref_lmc = (pemc_unref_lmc_function_type)pemc_unref_lmc;
+
+  // main functionality
+  target->check_reachability_in_executable_model =
+      (check_reachability_in_executable_model_function_type)
+          check_reachability_in_executable_model;
+  target->build_lmc_from_executable_model =
+      (build_lmc_from_executable_model_function_type)
+          build_lmc_from_executable_model;
+  target->calculate_probability_to_reach_state_within_bound =
+      (calculate_probability_to_reach_state_within_bound_function_type)
+          calculate_probability_to_reach_state_within_bound;
+
+  // convenience functions
+  target->pemc_choose_int_option =
+      (pemc_choose_int_option_function_type)pemc_choose_int_option;
 
   // debugging
   target->test = (test_function_type)test;

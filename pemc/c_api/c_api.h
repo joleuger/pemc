@@ -103,11 +103,39 @@ typedef void (*pemc_ref_formula_function_type)(pemc_formula_ref*);
 
 typedef void (*pemc_unref_formula_function_type)(pemc_formula_ref*);
 
+// function pointer for models
+
+typedef struct {
+  size_t refs;
+  unsigned char* lmc;
+} pemc_lmc_ref;
+
+typedef void (*pemc_ref_lmc_function_type)(pemc_lmc_ref*);
+
+typedef void (*pemc_unref_lmc_function_type)(pemc_lmc_ref*);
+
 // function pointer for entry points
 
 typedef int32_t (*check_reachability_in_executable_model_function_type)(
-    pemc_model_functions model_functions,
-    pemc_formula_ref* formula_ref);
+    pemc_model_functions,
+    pemc_formula_ref*);
+
+typedef pemc_lmc_ref* (*build_lmc_from_executable_model_function_type)(
+    pemc_model_functions,
+    const pemc_formula_ref**,
+    int32_t);
+
+typedef double (
+    *calculate_probability_to_reach_state_within_bound_function_type)(
+    pemc_lmc_ref*,
+    pemc_formula_ref*,
+    int32_t);
+
+// function pointer for convenience functions
+typedef int32_t (*pemc_choose_int_option_function_type)(
+    pemc_model_specific_interface*,
+    const int32_t*,
+    int32_t);
 
 typedef int32_t (*test_function_type)(void);
 
@@ -118,9 +146,19 @@ typedef struct {
   pemc_ref_formula_function_type pemc_ref_formula;
   pemc_unref_formula_function_type pemc_unref_formula;
 
+  // models
+  pemc_ref_lmc_function_type pemc_ref_lmc;
+  pemc_unref_lmc_function_type pemc_unref_lmc;
+
   // main functionality
   check_reachability_in_executable_model_function_type
       check_reachability_in_executable_model;
+  build_lmc_from_executable_model_function_type build_lmc_from_executable_model;
+  calculate_probability_to_reach_state_within_bound_function_type
+      calculate_probability_to_reach_state_within_bound;
+
+  // convenience functions
+  pemc_choose_int_option_function_type pemc_choose_int_option;
 
   // debugging
   test_function_type test;
