@@ -316,7 +316,7 @@ static int32_t pemc_choose_int_option(
     int32_t numOptions) {
   int32_t selected_option =
       pemc_interface->pemc_choose_by_no_of_options(pemc_interface, numOptions);
-  return options[numOptions];
+  return options[selected_option];
 }
 }  // namespace
 

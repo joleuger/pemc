@@ -34,6 +34,8 @@ typedef struct TestModel {
   pemc_model_specific_interface* pemc_interface;
 } TestModel;
 
+pemc_functions pemc_function_accessor;
+
 void test_model_create(unsigned char** model,
                        pemc_model_specific_interface* _pemc_interface) {
   TestModel* testmodel = (TestModel*)malloc(sizeof(TestModel));
@@ -90,7 +92,11 @@ void test_model_step(unsigned char* model) {
     option = testmodel->pemc_interface->pemc_choose_by_no_of_options(
         testmodel->pemc_interface, 2);
     if (option == 0) {
-      testmodel->state_serialized = 1;
+      int32_t options[] = {1};
+      int numOptions = sizeof(options) / sizeof(options[0]);
+      int32_t selected_option = pemc_function_accessor.pemc_choose_int_option(
+          testmodel->pemc_interface, options, numOptions);
+      testmodel->state_serialized = selected_option;
     }
     if (option == 1) {
       testmodel->state_serialized = 3;
@@ -115,8 +121,6 @@ int32_t formula_f2(unsigned char* model) {
 int32_t test_model_get_state_vector_size(unsigned char* model) {
   return sizeof(int32_t);
 }
-
-pemc_functions pemc_function_accessor;
 
 TEST(c_api_test, c_api_function_accessor_works) {
   // get pemc functions
@@ -167,4 +171,28 @@ TEST(c_api_test, c_api_check_reachability_in_executable_model_works) {
 
   ASSERT_EQ(result_f1, true) << "FAIL";
   ASSERT_EQ(result_f2, false) << "FAIL";
+}
+
+static int32_t dummy_choose_by_no_of_options(
+    pemc_model_specific_interface* pemc_interface,
+    int32_t no_of_options) {
+  return *pemc_interface->model_internals;
+}
+
+TEST(c_api_test, c_api_check_pemc_choose_int_option_works) {
+  pemc_model_specific_interface_struct pemc_interface;
+  unsigned char selectedOption = 0;
+  pemc_interface.model_internals = &selectedOption;
+  pemc_interface.pemc_choose_by_no_of_options = &dummy_choose_by_no_of_options;
+
+  int32_t options[] = {6, 456};
+  int numOptions = sizeof(options) / sizeof(options[0]);
+  auto result_option0 = pemc_function_accessor.pemc_choose_int_option(
+      &pemc_interface, options, numOptions);
+  selectedOption = 1;
+  auto result_option1 = pemc_function_accessor.pemc_choose_int_option(
+      &pemc_interface, options, numOptions);
+
+  ASSERT_EQ(result_option0, 6) << "FAIL";
+  ASSERT_EQ(result_option1, 456) << "FAIL";
 }

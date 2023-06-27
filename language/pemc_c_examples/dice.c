@@ -54,7 +54,7 @@ void dice_model_serialize(unsigned char* model,
 
   *(int32_t*)position = dicemodel->state_serialized;  // copy value to position
 
-  printf("Dice model serialized\n");
+  printf("Dice model serialized: %d\n", dicemodel->state_serialized);
 }
 
 void dice_model_deserialize(unsigned char* model,
@@ -68,7 +68,7 @@ void dice_model_deserialize(unsigned char* model,
 
   dicemodel->state_serialized = state;  // copy value to model
 
-  printf("Dice model deserialized\n");
+  printf("Dice model deserialized: %d\n", dicemodel->state_serialized);
 }
 
 void dice_model_reset_to_initial_state(unsigned char* model) {
@@ -83,9 +83,9 @@ void dice_model_step(unsigned char* model) {
   // retrieve model
   printf("Dice model step\n");
   DiceModel* dicemodel = (DiceModel*)model;
+  printf("Before step %d\n", dicemodel->state_serialized);
 
-  int32_t state = dicemodel->pemc_interface->pemc_choose_by_no_of_options(
-      dicemodel->pemc_interface, 2);
+  int32_t state = dicemodel->state_serialized;
   if (state == 0) {
     // either 1,2,3 or 3,4,5
     int32_t options[] = {123, 456};
@@ -129,6 +129,7 @@ void dice_model_step(unsigned char* model) {
     state = pemc_function_accessor.pemc_choose_int_option(
         dicemodel->pemc_interface, options, numOptions);
   }
+  dicemodel->state_serialized = state;
 }
 
 int32_t formula_f1(unsigned char* model) {
