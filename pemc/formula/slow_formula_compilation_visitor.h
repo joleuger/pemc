@@ -25,7 +25,7 @@
 #ifndef PEMC_FORMULA_SLOW_FORMULA_COMPILATION_VISITOR_H_
 #define PEMC_FORMULA_SLOW_FORMULA_COMPILATION_VISITOR_H_
 
-#include "pemc/formula/slow_formula_compilation_visitor.h"
+#include <functional>
 
 #include "pemc/formula/adapted_formula.h"
 #include "pemc/formula/binary_formula.h"

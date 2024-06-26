@@ -1,10 +1,13 @@
 [wrap-file]
-directory = fmt-6.2.0
+directory = fmt-10.2.0
+source_url = https://github.com/fmtlib/fmt/archive/10.2.0.tar.gz
+source_filename = fmt-10.2.0.tar.gz
+source_hash = 3ca91733a7313a8ad41c0885929415f8ec0a2a31d4dc7e27e9331412f4ca26ac
+patch_filename = fmt_10.2.0-2_patch.zip
+patch_url = https://wrapdb.mesonbuild.com/v2/fmt_10.2.0-2/get_patch
+patch_hash = 2428c3a386a8390c76378f81ef804a297f4edc3b789499dd56629b7902b8ddb7
+source_fallback_url = https://github.com/mesonbuild/wrapdb/releases/download/fmt_10.2.0-2/fmt-10.2.0.tar.gz
+wrapdb_version = 10.2.0-2
 
-source_url = https://github.com/fmtlib/fmt/archive/6.2.0.tar.gz
-source_filename = fmt-6.2.0.tar.gz
-source_hash = fe6e4ff397e01c379fc4532519339c93da47404b9f6674184a458a9967a76575
-
-patch_url = https://wrapdb.mesonbuild.com/v1/projects/fmt/6.2.0/1/get_zip
-patch_filename = fmt-6.2.0-1-wrap.zip
-patch_hash = ef3b2b295ccd58b661705835b15035116bf55390b134205fd7f1e9b1ac78ffe9
+[provide]
+fmt = fmt_dep

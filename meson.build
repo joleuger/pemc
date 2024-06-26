@@ -19,7 +19,7 @@ microsoft_gsl_dep = dependency('microsoft_gsl', fallback : ['microsoft-gsl', 'mi
 
 fmt_dep = dependency('fmt', fallback : ['fmt', 'fmt_dep'])
 
-spdlog_include = include_directories('subprojects/spdlog-1.3.1/include',)
+spdlog_include = include_directories('subprojects/spdlog-1.14.1/include',)
 spdlog_dep = declare_dependency(include_directories : spdlog_include, compile_args:'-DSPDLOG_FMT_EXTERNAL', dependencies : [fmt_dep])
 
 
