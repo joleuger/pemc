@@ -37,10 +37,13 @@ typedef struct TestModel {
 pemc_functions pemc_function_accessor;
 
 void test_model_create(unsigned char** model,
-                       pemc_model_specific_interface* _pemc_interface) {
+                       pemc_model_specific_interface* _pemc_interface,
+                       unsigned char* optional_value_for_model_create) {
   TestModel* testmodel = (TestModel*)malloc(sizeof(TestModel));
   testmodel->pemc_interface = _pemc_interface;
   *model = (unsigned char*)testmodel;
+  bool optional_value_is_3 = (*optional_value_for_model_create) == 3;
+  std::cout << "Optional parameter is 3? " << optional_value_is_3 << "\n";
   std::cout << "Test model created\n";
 }
 
@@ -158,13 +161,15 @@ TEST(c_api_test, c_api_check_reachability_in_executable_model_works) {
   pemc_formula_ref* f2 =
       pemc_function_accessor.pemc_register_basic_formula(formula_f2);
 
+  unsigned char optional_parameter = 3;
+
   auto result_f1 =
       pemc_function_accessor.check_reachability_in_executable_model(
-          model_functions, f1);
+          model_functions, &optional_parameter, f1);
 
   auto result_f2 =
       pemc_function_accessor.check_reachability_in_executable_model(
-          model_functions, f2);
+          model_functions, &optional_parameter, f2);
 
   pemc_function_accessor.pemc_unref_formula(f1);
   pemc_function_accessor.pemc_unref_formula(f2);

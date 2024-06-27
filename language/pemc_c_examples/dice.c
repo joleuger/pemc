@@ -34,7 +34,8 @@ typedef struct {
 } DiceModel;
 
 void dice_model_create(unsigned char** model,
-                       pemc_model_specific_interface* _pemc_interface) {
+                       pemc_model_specific_interface* _pemc_interface,
+                       unsigned char* optional_value_for_model_create) {
   DiceModel* dicemodel = (DiceModel*)malloc(sizeof(DiceModel));
   dicemodel->pemc_interface = _pemc_interface;
   *model = (unsigned char*)dicemodel;
@@ -152,7 +153,7 @@ int main() {
   // setup model functions
   pemc_model_functions model_functions;
   model_functions.model_create = (pemc_model_create)dice_model_create;
-  model_functions.model_free = (pemc_model_free)dice_model_create;
+  model_functions.model_free = (pemc_model_free)dice_model_free;
   model_functions.serialize =
       (pemc_serialize_function_type)dice_model_serialize;
   model_functions.deserialize =
@@ -176,17 +177,17 @@ int main() {
 
   int32_t number_3_is_reachable =
       pemc_function_accessor.check_reachability_in_executable_model(
-          model_functions, f1);
+          model_functions, NULL, f1);
 
   int32_t number_7_is_reachable =
       pemc_function_accessor.check_reachability_in_executable_model(
-          model_functions, f2);
+          model_functions, NULL, f2);
 
   pemc_formula_ref* formulas[] = {f1, f2};
   int formula_num = sizeof(formulas) / sizeof(formulas[0]);
 
   pemc_lmc_ref* lmc = pemc_function_accessor.build_lmc_from_executable_model(
-      model_functions, formulas, formula_num);
+      model_functions, NULL, formulas, formula_num);
 
   double probability_2steps =
       pemc_function_accessor.calculate_probability_to_reach_state_within_bound(

@@ -61,7 +61,8 @@ class CApiModel : public AbstractModel {
  public:
   unsigned char* model;
 
-  CApiModel(pemc_model_functions _model_functions) {
+  CApiModel(pemc_model_functions _model_functions,
+            unsigned char* optional_value_for_model_create) {
     model_functions = _model_functions;
 
     pemc_interface.pemc_choose_by_no_of_options =
@@ -70,7 +71,8 @@ class CApiModel : public AbstractModel {
 
     pemc_interface.model_internals = reinterpret_cast<unsigned char*>(this);
 
-    model_functions.model_create(&model, &pemc_interface);
+    model_functions.model_create(&model, &pemc_interface,
+                                 optional_value_for_model_create);
 
     spdlog::info("C-Api: Model instance created.");
   }
@@ -231,9 +233,11 @@ int32_t pemc_choose_by_no_of_options(
 
 static int32_t check_reachability_in_executable_model(
     pemc_model_functions model_functions,
+    unsigned char* optional_value_for_model_create,
     pemc_formula_ref* formula_ref) {
-  auto modelCreator = [&model_functions]() {
-    return std::make_unique<CApiModel>(model_functions);
+  auto modelCreator = [&model_functions, &optional_value_for_model_create]() {
+    return std::make_unique<CApiModel>(model_functions,
+                                       optional_value_for_model_create);
   };
 
   pemc_ref_formula(formula_ref);
@@ -251,10 +255,12 @@ static int32_t check_reachability_in_executable_model(
 
 static pemc_lmc_ref* build_lmc_from_executable_model(
     pemc_model_functions model_functions,
+    unsigned char* optional_value_for_model_create,
     const pemc_formula_ref** formulas,
     int32_t num_formulas) {
-  auto modelCreator = [&model_functions]() {
-    return std::make_unique<CApiModel>(model_functions);
+  auto modelCreator = [&model_functions, &optional_value_for_model_create]() {
+    return std::make_unique<CApiModel>(model_functions,
+                                       optional_value_for_model_create);
   };
 
   // create a c++ array with the formulas

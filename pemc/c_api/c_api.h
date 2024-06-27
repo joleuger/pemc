@@ -57,8 +57,9 @@ struct pemc_model_specific_interface_struct {
 // function pointer for model functions
 
 typedef int32_t (*pemc_model_create)(
-    unsigned char**,                  // pointer to model
-    pemc_model_specific_interface*);  // choice resolver of that model
+    unsigned char**,                 // pointer to model
+    pemc_model_specific_interface*,  // choice resolver of that model
+    unsigned char*);                 // optional value
 
 typedef int32_t (*pemc_model_free)(unsigned char*);
 
@@ -118,10 +119,12 @@ typedef void (*pemc_unref_lmc_function_type)(pemc_lmc_ref*);
 
 typedef int32_t (*check_reachability_in_executable_model_function_type)(
     pemc_model_functions,
+    unsigned char*,  // optional value for model create
     pemc_formula_ref*);
 
 typedef pemc_lmc_ref* (*build_lmc_from_executable_model_function_type)(
     pemc_model_functions,
+    unsigned char*,  // optional value for model create
     const pemc_formula_ref**,
     int32_t);
 
