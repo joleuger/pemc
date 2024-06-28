@@ -133,6 +133,10 @@ void dice_model_step(unsigned char* model) {
   dicemodel->state_serialized = state;
 }
 
+int32_t dice_model_get_state_vector_size(unsigned char* model) {
+  return sizeof(int32_t);
+}
+
 int32_t formula_f1(unsigned char* model) {
   // retrieve model
   DiceModel* dicemodel = (DiceModel*)model;
@@ -143,10 +147,6 @@ int32_t formula_f2(unsigned char* model) {
   // retrieve model
   DiceModel* dicemodel = (DiceModel*)model;
   return dicemodel->state_serialized == 7;
-}
-
-int32_t dice_model_get_state_vector_size(unsigned char* model) {
-  return sizeof(int32_t);
 }
 
 int main() {
