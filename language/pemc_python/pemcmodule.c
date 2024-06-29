@@ -120,9 +120,47 @@ static void pyadapter_model_reset_to_initial_state(unsigned char* model) {
   PyObject* model_instance_py = (PyObject*)model;
   PemcModelObject* model_instance = (PemcModelObject*)model;
 
-  // Todo: Get value from the model_instance_py.step()
-  model_instance->model_state.value1 = 0;  // set initial value
-  printf("pyadapter model reset\n");
+  // Ensure the GIL is held
+  PyGILState_STATE gstate = PyGILState_Ensure();
+
+  // Call the Python method
+  PyObject* result =
+      PyObject_CallMethod(model_instance_py, "get_initial_state_value", NULL);
+  if (result == NULL) {
+    // Error handling
+    printf("Call to get_initial_state_value failed\n");
+    PyErr_Print();
+    PyGILState_Release(gstate);
+    return;
+  }
+
+  // Ensure result is a valid integer
+  if (!PyLong_Check(result)) {
+    printf("get_initial_state_value did not return an integer\n");
+    Py_DECREF(result);
+    PyGILState_Release(gstate);
+    return;
+  }
+
+  // Convert result to int32_t
+  int32_t initial_value = (int32_t)PyLong_AsLong(result);
+  if (PyErr_Occurred()) {
+    // Handle conversion error
+    printf("Error converting result to int32_t\n");
+    PyErr_Print();
+    Py_DECREF(result);
+    PyGILState_Release(gstate);
+    return;
+  }
+
+  // Update the C structure
+  model_instance->model_state.value1 = initial_value;
+
+  // Cleanup
+  Py_DECREF(result);
+  PyGILState_Release(gstate);
+
+  printf("pyadapter model reset to initial state\n");
 }
 
 static void pyadapter_model_step(unsigned char* model) {
@@ -180,17 +218,35 @@ static PyObject* PemcModel_step(PemcModelObject* self, PyObject* args) {
   Py_RETURN_NONE;
 }
 
-PyObject* get_state(PyObject* self, PyObject* args) {
-  return PyLong_FromLong(0);
+PyObject* get_state(PemcModelObject* self, PyObject* args) {
+  printf("get state\n");
+  // No arguments expected
+  // if (!PyArg_ParseTuple(args, "")) {
+  //  PyErr_SetString(PyExc_TypeError, "get_state() takes no arguments");
+  //  return NULL;
+  //}
+
+  // Convert the C integer to a Python integer
+  return PyLong_FromLong((long)self->model_state.value1);
 }
 
-PyObject* set_state(PyObject* self, PyObject* args) {
-  long value;
+PyObject* set_state(PemcModelObject* self, PyObject* args) {
+  printf("set state\n");
+  int32_t new_value;
 
-  if (!PyArg_ParseTuple(args, "l", &value))
+  // Parse the single integer argument
+  if (!PyArg_ParseTuple(args, "i", &new_value)) {
+    PyErr_SetString(PyExc_TypeError,
+                    "set_state() expects a single integer argument");
     return NULL;
+  }
 
-  printf("State set to: %ld\n", value);
+  // Set the value in the C structure
+  self->model_state.value1 = new_value;
+
+  printf("State set to: %ld\n", new_value);
+
+  // Return None to indicate success
   Py_RETURN_NONE;
 }
 
@@ -255,7 +311,7 @@ static PyMethodDef PemcModel_methods[] = {
     {"step", (PyCFunction)PemcModel_step, METH_NOARGS,
      "Perform a step operation."},
     {"get_state", (PyCFunction)get_state, METH_NOARGS, "Get state"},
-    {"set_state", set_state, METH_VARARGS, "Set state"},
+    {"set_state", (PyCFunction)set_state, METH_VARARGS, "Set state"},
     {"choose", (PyCFunction)PemcModel_choose, METH_VARARGS,
      "Description of pemc_choose_int_option"},
     {"evaluate_formula", (PyCFunction)PemcModel_evaluate_formula, METH_NOARGS,
@@ -365,36 +421,25 @@ static struct PyModuleDef pemcmodule = {
     PemcMethods};
 
 PyMODINIT_FUNC PyInit_pypemc(void) {
-  printf("1\n");
-
   assign_pemc_functions_from_dll(&pemc_function_accessor);
-  printf("2\n");
 
   if (PyType_Ready(&PemcModelType) < 0) {
     return NULL;
   }
 
-  printf("3\n");
-
   PyObject* module = PyModule_Create(&pemcmodule);
 
-  printf("4\n");
   if (module == NULL) {
     return NULL;
   }
 
-  printf("5\n");
-
   Py_INCREF(&PemcModelType);
 
-  printf("6\n");
   if (PyModule_AddObject(module, "PemcModel", (PyObject*)&PemcModelType) < 0) {
     Py_DECREF(&PemcModelType);
     Py_DECREF(module);
     return NULL;
   }
-
-  printf("7\n");
 
   return module;
 }
