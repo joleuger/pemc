@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 
 #define PY_SSIZE_T_CLEAN
+#define CHOOSE_MAX_OPTIONS 8
 #include <Python.h>
 
 #include "pemc_c/pemc_c.h"
@@ -36,7 +37,7 @@
 // - a simple "choose" method is existing.
 // - no parallelizm, because we don't really create model instances, yet
 
-pemc_functions pemc_functions_from_dll;
+pemc_functions pemc_function_accessor;
 
 typedef struct {
   // Fields of the C struct
@@ -45,8 +46,7 @@ typedef struct {
 
 typedef struct {
   PyObject_HEAD  // PyObject_HEAD
-      pemc_functions pemc_function_accessor;
-  pemc_model_specific_interface* pemc_interface;
+      pemc_model_specific_interface* pemc_interface;
   PemcModelState model_state;
 } PemcModelObject;
 
@@ -64,7 +64,7 @@ static void pyadapter_model_create(
 
   PyObject* model_instance_py = PyObject_CallObject(py_class_of_model, NULL);
   if (model_instance_py == NULL)
-    return NULL;
+    return;
 
   *model = (unsigned char*)model_instance_py;
   PemcModelObject* model_instance = (PemcModelObject*)model_instance_py;
@@ -72,8 +72,6 @@ static void pyadapter_model_create(
   Py_XINCREF(model_instance_py);
 
   // now assign the values to the object
-
-  assign_pemc_functions_from_dll(&model_instance->pemc_function_accessor);
 
   model_instance->pemc_interface = _pemc_interface;
 
@@ -134,8 +132,13 @@ static void pyadapter_model_step(unsigned char* model) {
   PemcModelObject* model_instance = (PemcModelObject*)model;
 
   printf("Before step %d\n", model_instance->model_state.value1);
-
-  PyObject_CallMethod(model_instance_py, "step", NULL);
+  PyGILState_STATE gstate = PyGILState_Ensure();
+  PyObject* result = PyObject_CallMethod(model_instance_py, "step", NULL);
+  if (result == NULL) {
+    printf("Evaluate step failed\n");
+    PyErr_Print();
+  }
+  PyGILState_Release(gstate);
 }
 
 int32_t pyadapter_model_get_state_vector_size(unsigned char* model) {
@@ -144,12 +147,24 @@ int32_t pyadapter_model_get_state_vector_size(unsigned char* model) {
 
 int32_t pyadapter_evaluate_formula(unsigned char* model) {
   // retrieve model
+  printf("Evaluate formula\n");
   PyObject* model_instance_py = (PyObject*)model;
+
+  PyGILState_STATE gstate = PyGILState_Ensure();
 
   PyObject* result =
       PyObject_CallMethod(model_instance_py, "evaluate_formula", NULL);
+  if (result == NULL) {
+    printf("Evaluate formula failed\n");
+    PyErr_Print();
+    PyGILState_Release(gstate);
+    return 0;
+  }
   int32_t is_true = PyObject_IsTrue(result);
+  PyGILState_Release(gstate);
+
   Py_DECREF(result);
+  printf("Evaluate formula %d\n", is_true);
 
   return is_true;
 }
@@ -179,6 +194,41 @@ PyObject* set_state(PyObject* self, PyObject* args) {
   Py_RETURN_NONE;
 }
 
+static PyObject* PemcModel_choose(PemcModelObject* self, PyObject* args) {
+  Py_ssize_t numOptions = PyTuple_Size(args);
+  if (numOptions < 1) {
+    PyErr_SetString(PyExc_ValueError,
+                    "Expected at least one integer argument.");
+    return NULL;
+  }
+
+  if (numOptions > CHOOSE_MAX_OPTIONS) {
+    PyErr_SetString(PyExc_ValueError, "Too many options.");
+    return NULL;
+  }
+
+  // Allocate the options array on the stack
+  int32_t options[CHOOSE_MAX_OPTIONS];
+
+  for (Py_ssize_t i = 0; i < numOptions; i++) {
+    PyObject* item = PyTuple_GetItem(args, i);
+    if (!PyLong_Check(item)) {
+      PyErr_SetString(PyExc_TypeError, "Arguments must be integers.");
+      return NULL;
+    }
+    options[i] = (int32_t)PyLong_AsLong(item);
+    if (PyErr_Occurred()) {
+      return NULL;
+    }
+  }
+
+  // Call your function
+  int32_t state = pemc_function_accessor.pemc_choose_int_option(
+      self->pemc_interface, options, (int)numOptions);
+
+  return PyLong_FromLong((long)state);
+}
+
 static PyObject* PemcModel_evaluate_formula(PyObject* self, PyObject* args) {
   Py_RETURN_TRUE;
 }
@@ -206,6 +256,8 @@ static PyMethodDef PemcModel_methods[] = {
      "Perform a step operation."},
     {"get_state", (PyCFunction)get_state, METH_NOARGS, "Get state"},
     {"set_state", set_state, METH_VARARGS, "Set state"},
+    {"choose", (PyCFunction)PemcModel_choose, METH_VARARGS,
+     "Description of pemc_choose_int_option"},
     {"evaluate_formula", (PyCFunction)PemcModel_evaluate_formula, METH_NOARGS,
      "Evaluate formula (return True)"},
 
@@ -217,7 +269,7 @@ static PyTypeObject PemcModelType = {
     .tp_doc = "PemcModel object",
     .tp_basicsize = sizeof(PemcModelObject),
     .tp_itemsize = 0,
-    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,  // Enable subclassing
     .tp_new = PemcModel_new,
     .tp_dealloc = (destructor)PemcModel_dealloc,
     .tp_methods = PemcModel_methods,
@@ -255,9 +307,6 @@ static PyObject* py_check_reachability_in_executable_model(PyObject* self,
   pemc_model_functions model_functions;
   setup_model_functions(&model_functions);
 
-  pemc_functions pemc_function_accessor;
-  assign_pemc_functions_from_dll(&pemc_function_accessor);
-
   pemc_formula_ref* f1 = pemc_function_accessor.pemc_register_basic_formula(
       pyadapter_evaluate_formula);
 
@@ -289,13 +338,6 @@ static PyObject* py_calculate_probability_to_reach_state_within_bound(
   Py_RETURN_NONE;
 }
 
-// Convenience functions
-static PyObject* py_pemc_choose_int_option(PyObject* self, PyObject* args) {
-  // Implementation
-  // ...
-  Py_RETURN_NONE;
-}
-
 // Method table
 static PyMethodDef PemcMethods[] = {
     {"pemc_register_basic_formula", py_pemc_register_basic_formula,
@@ -312,9 +354,6 @@ static PyMethodDef PemcMethods[] = {
      py_calculate_probability_to_reach_state_within_bound, METH_VARARGS,
      "Description of calculate_probability_to_reach_state_within_bound"},
 
-    // {"pemc_choose_int_option", py_pemc_choose_int_option, METH_VARARGS,
-    //  "Description of pemc_choose_int_option"},
-
     {NULL, NULL, 0, NULL}  // Sentinel
 };
 
@@ -326,23 +365,36 @@ static struct PyModuleDef pemcmodule = {
     PemcMethods};
 
 PyMODINIT_FUNC PyInit_pypemc(void) {
-  assign_pemc_functions_from_dll(&pemc_functions_from_dll);
+  printf("1\n");
+
+  assign_pemc_functions_from_dll(&pemc_function_accessor);
+  printf("2\n");
 
   if (PyType_Ready(&PemcModelType) < 0) {
     return NULL;
   }
 
+  printf("3\n");
+
   PyObject* module = PyModule_Create(&pemcmodule);
+
+  printf("4\n");
   if (module == NULL) {
     return NULL;
   }
 
+  printf("5\n");
+
   Py_INCREF(&PemcModelType);
+
+  printf("6\n");
   if (PyModule_AddObject(module, "PemcModel", (PyObject*)&PemcModelType) < 0) {
     Py_DECREF(&PemcModelType);
     Py_DECREF(module);
     return NULL;
   }
+
+  printf("7\n");
 
   return module;
 }

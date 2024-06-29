@@ -60,7 +60,8 @@ class MyModel(pypemc.PemcModel):
         self.set_state(state)
 
     def evaluate_formula(self):
-        return True
+        state = self.get_state()
+        return state == 8
 
 
 reachable = pypemc.check_reachability_in_executable_model(MyModel)
