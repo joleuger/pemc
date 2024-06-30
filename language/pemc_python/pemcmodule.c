@@ -331,6 +331,39 @@ static PyTypeObject PemcModelType = {
     .tp_methods = PemcModel_methods,
 };
 
+typedef struct {
+  PyObject_HEAD  // PyObject_HEAD
+      pemc_lmc_ref* lmc;
+} LmcObject;
+
+static void Lmc_dealloc(LmcObject* self) {
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+static PyObject* Lmc_new(PyTypeObject* type, PyObject* args, PyObject* kwds) {
+  LmcObject* self;
+  self = (LmcObject*)type->tp_alloc(type, 0);
+  if (self != NULL) {
+  }
+  return (PyObject*)self;
+}
+
+static PyMethodDef Lmc_methods[] = {
+
+    {NULL, NULL, 0, NULL}  // Sentinel
+};
+
+static PyTypeObject LmcType = {
+    PyVarObject_HEAD_INIT(NULL, 0).tp_name = "pemc.Lmc",
+    .tp_doc = "Labeled Markov Chain (LMC) object",
+    .tp_basicsize = sizeof(LmcObject),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT,  // No subclassing
+    .tp_new = Lmc_new,
+    .tp_dealloc = (destructor)Lmc_dealloc,
+    .tp_methods = Lmc_methods,
+};
+
 // Formulas
 static PyObject* py_pemc_register_basic_formula(PyObject* self,
                                                 PyObject* args) {
@@ -381,9 +414,32 @@ static PyObject* py_check_reachability_in_executable_model(PyObject* self,
 
 static PyObject* py_build_lmc_from_executable_model(PyObject* self,
                                                     PyObject* args) {
-  // Implementation
-  // ...
-  Py_RETURN_NONE;
+  pemc_model_functions model_functions;
+  setup_model_functions(&model_functions);
+
+  pemc_formula_ref* f1 = pemc_function_accessor.pemc_register_basic_formula(
+      pyadapter_evaluate_formula);
+
+  PyObject* py_class_of_model;
+
+  if (!PyArg_ParseTuple(args, "O", &py_class_of_model))
+    return NULL;
+
+  pemc_formula_ref* formulas[] = {f1};
+  int formula_num = sizeof(formulas) / sizeof(formulas[0]);
+
+  pemc_lmc_ref* lmc = pemc_function_accessor.build_lmc_from_executable_model(
+      model_functions, py_class_of_model, formulas, formula_num);
+
+  // Todo: Create instance of Lmc Class in Python and return that instead of
+  // calculating the probability directly
+  double probability_20steps =
+      pemc_function_accessor.calculate_probability_to_reach_state_within_bound(
+          lmc, f1, 20);
+  printf("The probability in 20 steps is %f\n", probability_20steps);
+
+  // Create and return a Python integer object with the result
+  return PyLong_FromLong(0);
 }
 
 static PyObject* py_calculate_probability_to_reach_state_within_bound(
@@ -427,6 +483,10 @@ PyMODINIT_FUNC PyInit_pypemc(void) {
     return NULL;
   }
 
+  if (PyType_Ready(&LmcType) < 0) {
+    return NULL;
+  }
+
   PyObject* module = PyModule_Create(&pemcmodule);
 
   if (module == NULL) {
@@ -434,9 +494,17 @@ PyMODINIT_FUNC PyInit_pypemc(void) {
   }
 
   Py_INCREF(&PemcModelType);
+  Py_INCREF(&LmcType);
 
   if (PyModule_AddObject(module, "PemcModel", (PyObject*)&PemcModelType) < 0) {
     Py_DECREF(&PemcModelType);
+    Py_DECREF(module);
+    return NULL;
+  }
+
+  if (PyModule_AddObject(module, "Lmc", (PyObject*)&LmcType) < 0) {
+    Py_DECREF(&PemcModelType);
+    Py_DECREF(&LmcType);
     Py_DECREF(module);
     return NULL;
   }

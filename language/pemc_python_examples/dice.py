@@ -61,12 +61,12 @@ class MyModel(pypemc.PemcModel):
 
     def evaluate_formula(self):
         state = self.get_state()
-        return state == 8
+        return state == 6
 
 
 reachable = pypemc.check_reachability_in_executable_model(MyModel)
 print("The reachability is "+str(reachable))
-# lmc = pypemc.build_lmc_from_executable_model(MyModel)
+lmc = pypemc.build_lmc_from_executable_model(MyModel)
 # probability_4steps = pypemc.calculate_probability_to_reach_state_within_bound(
 #    lmc, 4)
 # print("The probability in 4 steps is "+str(probability_4steps))
