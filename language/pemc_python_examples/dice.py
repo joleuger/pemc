@@ -66,7 +66,11 @@ class MyModel(pypemc.PemcModel):
 
 reachable = pypemc.check_reachability_in_executable_model(MyModel)
 print("The reachability is "+str(reachable))
+
 lmc = pypemc.build_lmc_from_executable_model(MyModel)
-# probability_4steps = pypemc.calculate_probability_to_reach_state_within_bound(
-#    lmc, 4)
-# print("The probability in 4 steps is "+str(probability_4steps))
+probability_4steps = lmc.calculate_probability_to_reach_state_within_bound(
+    4)
+print("The probability in 4 steps is "+str(probability_4steps))
+probability_20steps = lmc.calculate_probability_to_reach_state_within_bound(
+    20)
+print("The probability in 20 steps is "+str(probability_20steps))

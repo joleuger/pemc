@@ -21,10 +21,7 @@ For a release build use `meson --buildtype release buildrelease` instead of `mes
 After compiling, the Knuth dice example can be executed by `./example_dice`. The executable is located in the `build`-directory. Its code is located in the directory `language/pemc_cpp_examples/dice.cc`.
 
 
-To test the python plugin on macos, run following commands in the build directory:
+To test the python plugin on macos, run following command in the build directory:
 ```
-mkdir pypemc
-cp pypemc.cpython-39-darwin.so pypemc
-cp ../language/pemc_python_examples/dice.py .
 python3 dice.py
 ``` 

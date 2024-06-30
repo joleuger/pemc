@@ -334,21 +334,50 @@ static PyTypeObject PemcModelType = {
 typedef struct {
   PyObject_HEAD  // PyObject_HEAD
       pemc_lmc_ref* lmc;
+  pemc_formula_ref* formula;
 } LmcObject;
 
 static void Lmc_dealloc(LmcObject* self) {
+  // Free resources
+  if (self->lmc) {
+    // TODO cleanup
+  }
   Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject* Lmc_new(PyTypeObject* type, PyObject* args, PyObject* kwds) {
-  LmcObject* self;
-  self = (LmcObject*)type->tp_alloc(type, 0);
-  if (self != NULL) {
+  PyErr_SetString(PyExc_TypeError,
+                  "Direct instantiation of Lmc is not allowed. Use "
+                  "pemc.build_lmc_from_executable_model instead.");
+  return NULL;
+}
+
+static PyObject* lmc_calculate_probability_to_reach_state_within_bound(
+    LmcObject* self,
+    PyObject* args) {
+  int32_t bound;
+
+  // Parse the single integer argument
+  if (!PyArg_ParseTuple(args, "i", &bound)) {
+    PyErr_SetString(PyExc_TypeError, "Expected an integer parameter");
+    return NULL;
   }
-  return (PyObject*)self;
+
+  // Call the C function
+  double result =
+      pemc_function_accessor.calculate_probability_to_reach_state_within_bound(
+          self->lmc, self->formula, bound);
+
+  // Return the result as a Python float
+  return PyFloat_FromDouble(result);
 }
 
 static PyMethodDef Lmc_methods[] = {
+
+    {"calculate_probability_to_reach_state_within_bound",
+     (PyCFunction)lmc_calculate_probability_to_reach_state_within_bound,
+     METH_VARARGS,
+     "Description of calculate_probability_to_reach_state_within_bound"},
 
     {NULL, NULL, 0, NULL}  // Sentinel
 };
@@ -431,23 +460,18 @@ static PyObject* py_build_lmc_from_executable_model(PyObject* self,
   pemc_lmc_ref* lmc = pemc_function_accessor.build_lmc_from_executable_model(
       model_functions, py_class_of_model, formulas, formula_num);
 
-  // Todo: Create instance of Lmc Class in Python and return that instead of
-  // calculating the probability directly
-  double probability_20steps =
-      pemc_function_accessor.calculate_probability_to_reach_state_within_bound(
-          lmc, f1, 20);
-  printf("The probability in 20 steps is %f\n", probability_20steps);
+  // Allocate a new LmcObject using tp_alloc
+  LmcObject* lmc_py = (LmcObject*)LmcType.tp_alloc(&LmcType, 0);
+  if (!lmc_py) {
+    PyErr_NoMemory();
+    return NULL;
+  }
 
-  // Create and return a Python integer object with the result
-  return PyLong_FromLong(0);
-}
+  // Initialize the LmcObject (this example assumes you have a model pointer)
+  lmc_py->lmc = lmc;
+  lmc_py->formula = f1;
 
-static PyObject* py_calculate_probability_to_reach_state_within_bound(
-    PyObject* self,
-    PyObject* args) {
-  // Implementation
-  // ...
-  Py_RETURN_NONE;
+  return (PyObject*)lmc_py;
 }
 
 // Method table
@@ -461,10 +485,6 @@ static PyMethodDef PemcMethods[] = {
 
     {"build_lmc_from_executable_model", py_build_lmc_from_executable_model,
      METH_VARARGS, "Description of build_lmc_from_executable_model"},
-
-    {"calculate_probability_to_reach_state_within_bound",
-     py_calculate_probability_to_reach_state_within_bound, METH_VARARGS,
-     "Description of calculate_probability_to_reach_state_within_bound"},
 
     {NULL, NULL, 0, NULL}  // Sentinel
 };
